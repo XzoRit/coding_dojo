@@ -9,6 +9,7 @@
 #include <numeric>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 #include <stdexcept>
 
 namespace StringCalculator
@@ -25,19 +26,21 @@ namespace StringCalculator
     std::transform(sepNumsAsString.begin(), sepNumsAsString.end(),
 		   ints.begin(), &Convert::String::to<int>);
 
-    std::vector<int> negNums;
-    std::remove_copy_if(ints.begin(), ints.end(),
-			std::back_inserter(negNums), std::bind2nd(std::greater_equal<int>(), 0));
-    if(negNums.empty())
+    if(ints.end() == std::find(ints.begin(), ints.end(), std::bind2nd(std::less<int>(), 0)))
       {
 	std::copy(ints.begin(), ints.end(), out);
       }
     else
       {
+        std::vector<int> negNums;
+        std::remove_copy_if(ints.begin(), ints.end(),
+			    std::back_inserter(negNums), std::bind2nd(std::greater_equal<int>(), 0));
+
 	std::ostringstream exceptTxt;
 	exceptTxt << "Negative numbers not allowed: ";
 	std::transform(negNums.begin(), negNums.end(),
 		       std::ostream_iterator<std::string>(exceptTxt, " "), &Convert::Int::to<std::string>);
+
 	throw std::invalid_argument(exceptTxt.str());
       }
   }
