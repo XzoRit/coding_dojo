@@ -18,8 +18,6 @@ namespace StringCalculator
   template<typename IterOut>
   void make_ints_from_str(std::string const& numsAsString, std::string const& sep, IterOut out)
   {
-    if(numsAsString.empty()) return;
-
     std::vector<std::string> sepNumsAsString;
     StrUtil::split(numsAsString, sep, std::back_inserter(sepNumsAsString));
 
@@ -58,6 +56,8 @@ namespace StringCalculator
 
   int add(std::string const& nums)
   {
+    if(nums.empty()) return 0;
+
     std::pair<std::string, std::string> const numsAndSep = extractSep(nums);
 
     std::vector<int> ints;

@@ -7,7 +7,7 @@ include_directories(".." "../../../../c++/catch/single_include" "../../../../c++
 set (${PROJECT_NAME}_headers "../lib/convert.hpp" "../lib/str_utils.hpp")
 set (${PROJECT_NAME}_sources "../test/main.cpp")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage --coverage -fverbose-asm -save-temps")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage --coverage -fverbose-asm -save-temps")
 
 add_executable(${PROJECT_NAME}_cpploop
   ${${PROJECT_NAME}_headers} "../cpploop/string_calculator.hpp"

@@ -20,9 +20,8 @@
 #include <boost/phoenix/core.hpp>
 #include <boost/phoenix/operator/comparison.hpp>
 
-#include <boost/container/vector.hpp>
-#include <boost/container/string.hpp>
-
+#include <vector>
+#include <string>
 #include <functional>
 #include <sstream> // boost stream?
 #include <stdexcept> // boost exception?
@@ -31,51 +30,49 @@
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
  
-int strToInt(boost::container::string const& str)
+int strToInt(std::string const& str)
 {
   int result;
-  boost::container::string::const_iterator i = str.begin();
+  std::string::const_iterator i = str.begin();
   if(boost::spirit::qi::parse(i, str.end(), boost::spirit::int_, result)) return result;
   else throw std::invalid_argument(str.c_str());
 }
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <iostream>
-#include <string>
+// #include <boost/spirit/include/qi.hpp>
+// #include <boost/spirit/include/phoenix_core.hpp>
+// #include <boost/spirit/include/phoenix_operator.hpp>
+// #include <iostream>
+// #include <string>
 
-namespace client
-{
-    namespace qi = boost::spirit::qi;
-    namespace ascii = boost::spirit::ascii;
-    namespace phoenix = boost::phoenix;
+// namespace client
+// {
+//     namespace qi = boost::spirit::qi;
+//     namespace ascii = boost::spirit::ascii;
+//     namespace phoenix = boost::phoenix;
 
-    using qi::int_;
-    using qi::_1;
-    using ascii::space;
-    using phoenix::ref;
+//     using qi::int_;
+//     using qi::_1;
+//     using ascii::space;
+//     using phoenix::ref;
 
-    template <typename Iterator>
-    bool adder(Iterator first, Iterator last, int& n)
-    {
-        bool r = qi::phrase_parse(first, last,
-            (
-                int_[ref(n) = _1] >> *(',' >> int_[ref(n) += _1])
-            )
-            ,
-            space);
+//     template <typename Iterator>
+//     bool adder(Iterator first, Iterator last, int& n)
+//     {
+//         bool r = qi::phrase_parse(first, last,
+//             (
+//                 int_[ref(n) = _1] >> *(',' >> int_[ref(n) += _1])
+// 	    ),
+//             space);
 
-        if (first != last)
-            return false;
-        return r;
-    }
-}
+//         if (first != last) return false;
+//         return r;
+//     }
+// }
 
 namespace StringCalculator
 {
   template<typename IterOut>
-  void make_ints_from_str(boost::container::string const& numsAsString, boost::container::string const& sep, IterOut out)
+  void make_ints_from_str(std::string const& numsAsString, std::string const& sep, IterOut out)
   {
     using boost::lexical_cast;
     using boost::bind;
@@ -88,8 +85,8 @@ namespace StringCalculator
     
     using boost::phoenix::arg_names::arg1;
 
-    using boost::container::vector;
-    using boost::container::string;
+    using std::vector;
+    using std::string;
 
     if(numsAsString.empty()) return;
 
@@ -116,9 +113,9 @@ namespace StringCalculator
       }
   }
 
-  std::pair<boost::container::string, boost::container::string> extractSep(boost::container::string const& parse)
+  std::pair<std::string, std::string> extractSep(std::string const& parse)
   {
-    using boost::container::string;
+    using std::string;
 
     static string::size_type const SizeOfSepSection = 4;
 
@@ -128,17 +125,18 @@ namespace StringCalculator
       return std::make_pair(parse, ",\n");
   }
 
-  int add(boost::container::string const& nums)
+  int add(std::string const& nums)
   {
-    int sum = 0;
-    client::adder(nums.begin(), nums.end(), sum);
-    return sum;
-    // std::pair<boost::container::string, boost::container::string> const numsAndSep = extractSep(nums);
+    // int sum = 0;
+    // client::adder(nums.begin(), nums.end(), sum);
+    // return sum;
 
-    // boost::container::vector<int> ints;
-    // make_ints_from_str(numsAndSep.first, numsAndSep.second, std::back_inserter(ints));
+    std::pair<std::string, std::string> const numsAndSep = extractSep(nums);
 
-    // return boost::accumulate(ints, 0);
+    std::vector<int> ints;
+    make_ints_from_str(numsAndSep.first, numsAndSep.second, std::back_inserter(ints));
+
+    return boost::accumulate(ints, 0);
   }
 
 }

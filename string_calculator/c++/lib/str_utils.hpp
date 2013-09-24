@@ -30,7 +30,7 @@ namespace StrUtil
   }
 
   template<typename IterOut>
-  void split(std::string const& txt, std::string const& sep, IterOut out)
+  void split(std::string txt, std::string const& sep, IterOut out)
   {
     split(txt.begin(), txt.end(), sep.begin(), sep.end(), out);
   }
