@@ -1,20 +1,15 @@
 #ifndef STRING_CALCULATOR_H
 #define STRING_CALCULATOR_H
 
-#include <lib/str_utils.hpp>
-
-#include <boost/lexical_cast.hpp>
-
-#include <boost/bind.hpp>
-
 #include <boost/range/algorithm_ext/push_back.hpp>
-#include <boost/range/algorithm/transform.hpp>
-#include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/find_if.hpp>
+#include <boost/range/algorithm/copy.hpp>
 #include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/numeric.hpp>
-#include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
+
+#include <boost/tokenizer.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/phoenix/core.hpp>
@@ -22,7 +17,6 @@
 
 #include <vector>
 #include <string>
-#include <functional>
 #include <sstream> // boost stream?
 #include <stdexcept> // boost exception?
 #include <iterator>
@@ -71,56 +65,12 @@ int strToInt(std::string const& str)
 
 namespace StringCalculator
 {
-  template<typename IterOut>
-  void make_ints_from_str(std::string const& numsAsString, std::string const& sep, IterOut out)
-  {
-    using boost::lexical_cast;
-    using boost::bind;
-
-    using boost::range::transform;
-    using boost::range::push_back;
-    using boost::range::copy;
-    using boost::range::find_if;
-    using boost::adaptors::filtered;
-    
-    using boost::phoenix::arg_names::arg1;
-
-    using std::vector;
-    using std::string;
-
-    if(numsAsString.empty()) return;
-
-    vector<string> sepNumsAsString;
-    StrUtil::split(numsAsString.c_str(), sep.c_str(), std::back_inserter(sepNumsAsString));
-
-    vector<int> ints(sepNumsAsString.size(), 0);
-    transform(sepNumsAsString, boost::begin(ints), &strToInt);
-
-    if(find_if(ints, arg1 < 0) == boost::const_end(ints))
-      {
-        copy(ints, out);
-      }
-    else
-      {
-	vector<int> negNums;
-	push_back(negNums, ints | filtered(arg1 < 0));
-
-	std::ostringstream exceptTxt;
-	exceptTxt << "Negative numbers not allowed: ";
-        copy(negNums, std::ostream_iterator<int>(exceptTxt, " "));
-
-	throw std::invalid_argument(exceptTxt.str());
-      }
-  }
-
   std::pair<std::string, std::string> extractSep(std::string const& parse)
   {
-    using std::string;
-
-    static string::size_type const SizeOfSepSection = 4;
+    static std::string::size_type const SizeOfSepSection = 4;
 
     if(parse.size() >= SizeOfSepSection && parse[0] == '/')
-      return std::make_pair(string(parse.begin() + SizeOfSepSection, parse.end()), string(1, parse[2]));
+      return std::make_pair(std::string(parse.begin() + SizeOfSepSection, parse.end()), std::string(1, parse[2]));
     else
       return std::make_pair(parse, ",\n");
   }
@@ -131,12 +81,37 @@ namespace StringCalculator
     // client::adder(nums.begin(), nums.end(), sum);
     // return sum;
 
+    using boost::phoenix::arg_names::arg1;
+    using boost::adaptors::transformed;
+    using boost::adaptors::filtered;
+
+    if(nums.empty()) return 0;
+
     std::pair<std::string, std::string> const numsAndSep = extractSep(nums);
 
-    std::vector<int> ints;
-    make_ints_from_str(numsAndSep.first, numsAndSep.second, std::back_inserter(ints));
+    typedef boost::char_separator<char> SeparatorType;
+    typedef boost::tokenizer<SeparatorType> TokenizerType;
 
-    return boost::accumulate(ints, 0);
+    SeparatorType separator(numsAndSep.second.c_str());
+    TokenizerType separatedNums(numsAndSep.first, separator);
+
+    std::vector<int> ints;
+    boost::push_back(ints, separatedNums | transformed(&strToInt));
+
+    if(boost::find_if(ints, arg1 < 0) == boost::const_end(ints))
+      {
+        return boost::accumulate(ints, 0);
+      }
+    else
+      {
+	std::vector<int> negNums;
+	boost::push_back(negNums, ints | filtered(arg1 < 0));
+
+	std::ostringstream exceptTxt;
+	exceptTxt << "Negative numbers not allowed: ";
+	boost::copy(negNums, std::ostream_iterator<int>(exceptTxt, " "));
+	throw std::invalid_argument(exceptTxt.str());
+      }
   }
 
 }

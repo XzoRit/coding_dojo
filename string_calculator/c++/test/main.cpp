@@ -131,6 +131,7 @@ TEST_CASE("calculate the sum from a long string pretty often", "[performance]")
       results[i] = add(numsAsString);
     }
   CAPTURE(results[0]);
+  REQUIRE(length == length);
 }
 
 TEST_CASE("extractSep", "[extractSep]")
