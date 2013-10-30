@@ -47,6 +47,9 @@ int add(std::string const& nums)
     else
     {
         std::vector<int> negNums;
+        // use std::vector::insert instead of copy
+        // this should be faster
+        // negNums.inster(negNums.begin(), ints.begin(), p);
         std::copy(ints.begin(), p, std::back_inserter(negNums));
 
         std::ostringstream exceptTxt;
