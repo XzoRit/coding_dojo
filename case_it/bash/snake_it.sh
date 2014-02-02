@@ -54,9 +54,3 @@ for it in *; do
 	printf "before = %s\nafter  = %s\n" "${it}" "${snaked}"
     fi
 done
-
-
-check 'echo "1 2 3\n" " 4 5 6\n" " 7 8 9 10\n"'
-#check "printf" "%s\n %s\n %s\n" "1 2 3" "4 5 6" "7 8 9 10"
-
-#check check_snake_it "convert upper to lower" "a_b_c_d.txt" "A B C D.txt"
