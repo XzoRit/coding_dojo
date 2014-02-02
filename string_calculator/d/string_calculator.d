@@ -28,4 +28,3 @@ unittest
 	assert(add("1\n22,333") == 356);
 	assert(add("//T\n1T22T333") == 356);
 }
-
