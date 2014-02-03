@@ -1,4 +1,5 @@
-#! /bin/bash
+#!/bin/bash
+
 set -o errexit
 set -o nounset
 shopt -s extglob
@@ -15,14 +16,15 @@ snake_it() {
     done
 }
 
-check_snake_it() {
-    local check_text="${1}"
-    local expected="${2}"
-    shift 2
-    local actual=$( snake_it "${@}" )
+check() {
+    local command="${1}"
+    local check_name="${2}"
+    local expected="${3}"
+    shift 3
+    local actual=$( "${command}" "${@}" )
     if [ "${expected}" != "${actual}" ]; then
 	{
-	    printf "FAILURE in \"%s\"\n" "${check_text}"
+	    printf "FAILURE in \"%s\"\n" "${check_name}"
 	    printf "input    = %s\n" "${@}"
 	    printf "expected = %s\n" "${expected}"
 	    printf "actual   = %s\n" "${actual}"
@@ -31,8 +33,8 @@ check_snake_it() {
     fi
 }
 
-check() {
-    eval '$@'
+check_snake_it() {
+    check snake_it "${@}"
 }
 
 check_snake_it "replace space with _" "a_b_c_d.txt" "a b c d.txt"
