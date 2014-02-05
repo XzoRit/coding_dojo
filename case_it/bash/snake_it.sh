@@ -2,6 +2,7 @@
 
 set -o errexit
 set -o nounset
+set -x
 shopt -s extglob
 #set -o verbose
 
@@ -70,6 +71,5 @@ rm "a b c d.txt"
 rm "a b  c   d.txt"
 rm "A B C D.txt"
 rm "aB cD.txt"
-rm "1.12.123.1234"
-rm "1-12-123-1234"
-
+rm "1.12.123.1234.txt"
+rm "1-12-123-1234.txt"
