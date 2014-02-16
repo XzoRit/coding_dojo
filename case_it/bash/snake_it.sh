@@ -10,12 +10,14 @@ shopt -s extglob
 # result is stored in XZR_SNAKED
 xzr_snake_it() {
     XZR_SNAKED=
-    for arg in "${@}"; do
-	local replaced_with_underscore="${arg//+([[:space:]]|[[:punct:]])/_}"
+    until [ -z "${1}" ]; do
+	set -o nounset
+	local replaced_with_underscore="${1//+([[:space:]]|[[:punct:]])/_}"
 	local different_cases_with_underscore=$( echo "${replaced_with_underscore}" |\
                                                  sed -e "s/\([a-z]\)\([A-Z]\)/\1_\2/g" )
 	XZR_SNAKED="${XZR_SNAKED:+"${XZR_SNAKED}" }${different_cases_with_underscore,,}"
-#	echo "${XZR_SNAKED}"
+	shift
+	set +o nounset
     done
 }
 
