@@ -21,6 +21,35 @@ xzr_snake_it() {
     done
 }
 
+# usage: xzr_camel_it txt1 txt2 txt3 ...
+# result is stored in XZR_CAMELED
+xzr_camel_it() {
+    XZR_CAMELED=
+    until [ -z "${1}" ]; do
+	set -o nounset
+	xzr_snake_it "${1}"
+	local cameled=$( echo "${XZR_SNAKED}" |\
+                       sed -e "s/_\([a-z0-9]\)/\U\1\E/g"  )
+	XZR_CAMELED="${XZR_CAMELED:+"${XZR_CAMELED}" }${cameled}"
+	shift
+	set +o nounset
+    done
+}
+
+# usage: xzr_pascal_it txt1 txt2 txt3 ...
+# result is stored in XZR_PASCALED
+xzr_pascal_it() {
+    XZR_PASCALED=
+    until [ -z "${1}" ]; do
+	set -o nounset
+	xzr_camel_it "${1}"
+	local pascaled="${XZR_CAMELED^?}"
+	XZR_PASCALED="${XZR_PASCALED:+"${XZR_PASCALED} "}${pascaled}"
+	shift
+	set +o nounset
+    done
+}
+
 xzr_check() {
     local command="${1}"
     local return_value="${2}"
@@ -47,6 +76,9 @@ xzr_check xzr_snake_it XZR_SNAKED "insert _ between camel cased letters" "a_b_c_
 xzr_check xzr_snake_it XZR_SNAKED "seperator . is replaced with _" "1_12_123_1234" "1.12.123.1234"
 xzr_check xzr_snake_it XZR_SNAKED "seperator - is replaced with _" "1_12_123_1234" "1-12-123-1234"
 xzr_check xzr_snake_it XZR_SNAKED "multiple texts are snaked with a space as seperator" "a_b_c_d a_b_c_d a_b_c_d a_b_c_d 1_12_123_1234 1_12_123_1234" "a b c d" "a b  c   d" "A B C D" "aB cD" "1.12.123.1234" "1-12-123-1234"
+
+xzr_check xzr_camel_it XZR_CAMELED "test xzr_camel_it" "thisShouldBeCamelCased asWellAsThis" "This should be camel cased" "as well as this"
+xzr_check xzr_pascal_it XZR_PASCALED "test xzr_pascal_it" "ThisShouldBePascalCased AsWellAsThis" "This should be pascal cased" "as well as this"
 
 # test renaming files/directories
 touch "a b c d.xzr"
