@@ -12,7 +12,7 @@ xzr_snake_it() {
 	set -o nounset
 	local replaced_with_underscore="${1//+([[:space:]]|[[:punct:]])/_}"
 	local different_cases_with_underscore=$( echo "${replaced_with_underscore}" |\
-                                                 sed -e "s/\([a-z]\)\([A-Z]\)/\1_\2/g" )
+                                                 gsed -e "s/\([a-z]\)\([A-Z]\)/\1_\2/g" )
 	XZR_SNAKED="${XZR_SNAKED:+"${XZR_SNAKED}" }${different_cases_with_underscore,,}"
 	shift
 	set +o nounset
