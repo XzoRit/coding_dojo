@@ -29,7 +29,7 @@ xzr_camel_it() {
 	set -o nounset
 	xzr_snake_it "${1}"
 	local cameled=$( echo "${XZR_SNAKED}" |\
-                       sed -e "s/_\([a-z0-9]\)/\U\1\E/g"  )
+                       gsed -e "s/_\([a-z0-9]\)/\U\1\E/g"  )
 	XZR_CAMELED="${XZR_CAMELED:+"${XZR_CAMELED}" }${cameled}"
 	shift
 	set +o nounset
