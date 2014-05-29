@@ -15,9 +15,10 @@
   0
   (let [num-seq (->> (split-by-separator nums-as-str)
    (map #(Integer/parseInt %)))]
-   (if (empty? (filter #(< % 0) num-seq))
-    (reduce + 0 num-seq)
-    (throw (IllegalArgumentException. "negative numbers not allowed"))))))
+   (let [neg-pos (split-with neg? (sort num-seq))]
+    (if (empty? (first neg-pos))
+     (reduce + 0 (second neg-pos))
+     (throw (IllegalArgumentException. (format "negative numbers %s not allowed" (vector (first neg-pos))))))))))
 
 (deftest test-calling-add-with-empty-string-returns-0
  (is (= 0 (add ""))))
@@ -31,14 +32,17 @@
 (deftest test-calling-add-with-three-nums-seperated-by-comma-returns-sum
  (is (= 356 (add "1,22,333"))))
 
-(deftest test-calling-add-with-negative-number-throws
- (is (thrown? IllegalArgumentException (add "1,-22,333"))))
-
 (deftest test-calling-add-with-new-line-as-seperator-returns-sum
  (is (= 356 (add "1\n22,333"))))
 
 (deftest test-support-for-delimiter-specifier
  (is (= 356 (add "//;\n1;22;333")))
  (is (= 356 (add "//-\n1-22-333"))))
+
+(deftest test-calling-add-with-negative-number-throws
+ (is (thrown? IllegalArgumentException (add "1,-22,-333")))
+ (try (add "1,-22,-333")
+ (catch IllegalArgumentException e
+  (is (= "java.lang.IllegalArgumentException: negative numbers [(-333 -22)] not allowed" (str e))))))
 
 (run-tests 'xzr)
