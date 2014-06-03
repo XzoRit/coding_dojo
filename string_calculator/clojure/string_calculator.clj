@@ -49,6 +49,11 @@
          (is (= "java.lang.IllegalArgumentException: negative numbers [(-333 -22)] not allowed" (str e))))))
 
 (deftest test-extract-separator
-  (is (= ["1,22,333" (re-pattern ",|\\n")] (extract-separator "1,22,333"))))
+  (let [[nums sep] (extract-separator "1,22,333")]
+    (is (= "1,22,333" nums))
+    (is (= (str #",|\n") (str sep))))
+  (let [[nums sep] (extract-separator "//;\n1;22;333")]
+    (is (= "1;22;333" nums))
+    (is (= (str #";") (str sep)))))
 
 (run-tests 'xzr)
