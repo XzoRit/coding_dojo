@@ -67,6 +67,15 @@ xzr_check() {
     fi
 }
 
+# execute_tests=
+# while getopts "t" OPTION; do
+# case $OPTION in
+# a)
+# execute_tests=1
+# ;;
+# esac
+# done
+
 xzr_check xzr_snake_it XZR_SNAKED "replace space with _" "a_b_c_d" "a b c d"
 xzr_check xzr_snake_it XZR_SNAKED "collapse multiple spaces to one _" "a_b_c_d" "a b  c   d"
 xzr_check xzr_snake_it XZR_SNAKED "convert upper to lower" "a_b_c_d" "A B C D"
@@ -77,30 +86,3 @@ xzr_check xzr_snake_it XZR_SNAKED "multiple texts are snaked with a space as sep
 
 xzr_check xzr_camel_it XZR_CAMELED "test xzr_camel_it" "thisShouldBeCamelCased asWellAsThis" "This should be camel cased" "as well as this"
 xzr_check xzr_pascal_it XZR_PASCALED "test xzr_pascal_it" "ThisShouldBePascalCased AsWellAsThis" "This should be pascal cased" "as well as this"
-
-# test renaming files/directories
-touch "a b c d.xzr"
-touch "a b  c   d e.xzr"
-touch "A B C Df.xzr"
-touch "aB cDg.xzr"
-touch "1.12.123.1234.xzr"
-touch "1-12-123-1234-12345.xzr"
-touch "1_12_123_1234_12345.xzr"
-mkdir "test 1 12 aGoodTest Xzr"
-for it in *; do
-    extension=
-    basename="${it}"
-    if [ -f "${it}" ]; then
-	basename="${it%.*}"
-	extension=".${it##*.}"
-    fi
-    xzr_snake_it "${basename}"
-    snaked="${XZR_SNAKED}${extension}"
-    if [ "${snaked}" != "${it}" ]; then
-	if [ \( -f "${it}" -o -d "${it}" \) -a ! \( -e "${snaked}" \) ]; then
-	    mv "${it}" "${snaked}"
-	    echo "renamed " "${it}" " to " "${snaked}"
-	fi
-    fi
-done
-rm -d *xzr
