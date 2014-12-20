@@ -56,4 +56,14 @@
     (is (= "1;22;333" nums))
     (is (= (str #";") (str sep)))))
 
+(defn extract-nums-and-separator [nums-as-str]
+  (if-let [[result] (re-seq #"//(.)\n(.*)" nums-as-str)]
+    (let  [[_ sep nums] result]
+      [sep nums])
+    [",|\\n", nums-as-str]))
+
+(deftest test-extract-nums-and-separator
+  (is (= [";" "1;22;333"] (extract-nums-and-separator "//;\n1;22;333")))
+  (is (= [",|\\n" "1,22,333"] (extract-nums-and-separator "1,22,333"))))
+
 (run-tests 'xzr)
