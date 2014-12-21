@@ -9,11 +9,6 @@
       [(re-pattern sep) nums])
     [(re-pattern ",|\\n"), nums-as-str]))
 
-(defn extract-separator [nums]
-  (if (= \/ (first nums))
-    [(subs nums 4) (re-pattern (str (.charAt nums 2)))]
-    [nums (re-pattern ",|\\n")]))
-
 (defn split-by-separator [nums-as-string]
   (let [[sep nums] (extract-separator-and-nums nums-as-string)]
     (->>
@@ -55,14 +50,6 @@
   (try (add "1,-22,-333")
        (catch IllegalArgumentException e
          (is (= "java.lang.IllegalArgumentException: negative numbers [(-333 -22)] not allowed" (str e))))))
-
-(deftest test-extract-separator
-  (let [[nums sep] (extract-separator "1,22,333")]
-    (is (= "1,22,333" nums))
-    (is (= (str #",|\n") (str sep))))
-  (let [[nums sep] (extract-separator "//;\n1;22;333")]
-    (is (= "1;22;333" nums))
-    (is (= (str #";") (str sep)))))
 
 (deftest test-extract-separator-and-nums
   (let [[sep nums] (extract-separator-and-nums "//;\n1;22;333")]
