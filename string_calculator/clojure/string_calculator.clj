@@ -7,7 +7,7 @@
   (if-let [[result] (re-seq #"//(.)\n(.*)" nums-as-str)]
     (let  [[_ sep nums] result]
       [(re-pattern sep) nums])
-    [(re-pattern ",|\\n"), nums-as-str]))
+    [#",|\n", nums-as-str]))
 
 (defn split-by-separator [nums-as-string]
   (let [[sep nums] (extract-separator-and-nums nums-as-string)]
