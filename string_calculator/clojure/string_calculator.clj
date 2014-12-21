@@ -4,7 +4,7 @@
   (:use clojure.test))
 
 (defn extract-separator-and-nums [nums-as-str]
-  (if-let [[result] (re-seq #"//(.)\n(.*)" nums-as-str)]
+  (if-let [[result] (re-seq #"//(.+)\n(.*)" nums-as-str)]
     (let  [[_ sep nums] result]
       [(re-pattern sep) nums])
     [#",|\n", nums-as-str]))
@@ -39,7 +39,10 @@
     (is (= (str #";") (str sep))))
   (let [[sep nums] (extract-separator-and-nums "1,22,333")]
     (is (= "1,22,333" nums))
-    (is (= (str #",|\n") (str sep)))))
+    (is (= (str #",|\n") (str sep))))
+  (let [[sep nums] (extract-separator-and-nums "//-T-\n1-T-22-T-333")]
+    (is (= "1-T-22-T-333" nums))
+    (is (= (str #"-T-") (str sep)))))
 
 (deftest test-calling-with-two-nums-seperated-by-comma-returns-sum
   (is (= 23 (add "1,22"))))
