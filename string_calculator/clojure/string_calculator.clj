@@ -33,6 +33,14 @@
 (deftest test-calling-add-with-one-number-returns-that-number
   (is (= 123 (add "123"))))
 
+(deftest test-extract-separator-and-nums
+  (let [[sep nums] (extract-separator-and-nums "//;\n1;22;333")]
+    (is (= "1;22;333" nums))
+    (is (= (str #";") (str sep))))
+  (let [[sep nums] (extract-separator-and-nums "1,22,333")]
+    (is (= "1,22,333" nums))
+    (is (= (str #",|\n") (str sep)))))
+
 (deftest test-calling-with-two-nums-seperated-by-comma-returns-sum
   (is (= 23 (add "1,22"))))
 
@@ -50,13 +58,5 @@
   (try (add "1,-22,-333")
        (catch IllegalArgumentException e
          (is (= "java.lang.IllegalArgumentException: negative numbers [(-333 -22)] not allowed" (str e))))))
-
-(deftest test-extract-separator-and-nums
-  (let [[sep nums] (extract-separator-and-nums "//;\n1;22;333")]
-    (is (= "1;22;333" nums))
-    (is (= (str #";") (str sep))))
-  (let [[sep nums] (extract-separator-and-nums "1,22,333")]
-    (is (= "1,22,333" nums))
-    (is (= (str #",|\n") (str sep)))))
 
 (run-tests 'xzr)
