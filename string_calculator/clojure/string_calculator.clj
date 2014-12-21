@@ -6,8 +6,8 @@
 (defn extract-nums-and-separator [nums-as-str]
   (if-let [[result] (re-seq #"//(.)\n(.*)" nums-as-str)]
     (let  [[_ sep nums] result]
-      [sep nums])
-    [",|\\n", nums-as-str]))
+      [(re-pattern sep) nums])
+    [(re-pattern ",|\\n"), nums-as-str]))
 
 (defn extract-separator [nums]
   (if (= \/ (first nums))
@@ -17,7 +17,7 @@
 (defn split-by-separator [nums-as-string]
   (let [[sep nums] (extract-nums-and-separator nums-as-string)]
     (->>
-     (clojure.string/split nums (re-pattern sep))
+     (clojure.string/split nums sep)
      (map #(Integer/parseInt %)))))
 
 (defn add [nums-as-str]
@@ -65,7 +65,11 @@
     (is (= (str #";") (str sep)))))
 
 (deftest test-extract-nums-and-separator
-  (is (= [";" "1;22;333"] (extract-nums-and-separator "//;\n1;22;333")))
-  (is (= [",|\\n" "1,22,333"] (extract-nums-and-separator "1,22,333"))))
+  (let [[sep nums] (extract-nums-and-separator "//;\n1;22;333")]
+    (is (= "1;22;333" nums))
+    (is (= (str #";") (str sep))))
+  (let [[sep nums] (extract-nums-and-separator "1,22,333")]
+    (is (= "1,22,333" nums))
+    (is (= (str #",|\n") (str sep)))))
 
 (run-tests 'xzr)
