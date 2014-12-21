@@ -3,15 +3,21 @@
 (ns xzr
   (:use clojure.test))
 
+(defn extract-nums-and-separator [nums-as-str]
+  (if-let [[result] (re-seq #"//(.)\n(.*)" nums-as-str)]
+    (let  [[_ sep nums] result]
+      [sep nums])
+    [",|\\n", nums-as-str]))
+
 (defn extract-separator [nums]
   (if (= \/ (first nums))
     [(subs nums 4) (re-pattern (str (.charAt nums 2)))]
     [nums (re-pattern ",|\\n")]))
 
 (defn split-by-separator [nums-as-string]
-  (let [[nums sep] (extract-separator nums-as-string)]
+  (let [[sep nums] (extract-nums-and-separator nums-as-string)]
     (->>
-     (clojure.string/split nums sep)
+     (clojure.string/split nums (re-pattern sep))
      (map #(Integer/parseInt %)))))
 
 (defn add [nums-as-str]
@@ -57,12 +63,6 @@
   (let [[nums sep] (extract-separator "//;\n1;22;333")]
     (is (= "1;22;333" nums))
     (is (= (str #";") (str sep)))))
-
-(defn extract-nums-and-separator [nums-as-str]
-  (if-let [[result] (re-seq #"//(.)\n(.*)" nums-as-str)]
-    (let  [[_ sep nums] result]
-      [sep nums])
-    [",|\\n", nums-as-str]))
 
 (deftest test-extract-nums-and-separator
   (is (= [";" "1;22;333"] (extract-nums-and-separator "//;\n1;22;333")))
