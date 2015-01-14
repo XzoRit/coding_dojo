@@ -2,8 +2,8 @@ writeln("String-Calculator")
 
 StringCalculator := Object clone do(
     extractNumbers := method(numbers,
-        if(numbers beginsWithSeq("/"),
-            numbers exSlice(4) split(numbers exSlice(2, 3)),
+        if(numbers beginsWithSeq("//"),
+            numbers afterSeq("\n") split(numbers betweenSeq("//", "\n")),
             numbers split(",", "\n")
         )
     )
@@ -48,6 +48,14 @@ StringCalculatorTest := UnitTest clone do(
 
     testExtractNumbersWithoutCustomSpec := method(
         assertEquals(calculator extractNumbers("1,22,333"), list("1", "22", "333"))
+    )
+
+    testCustomSeparatorCanContainManyChars := method(
+        assertEquals(calculator add("//*T*\n1*T*22*T*333"), 356)
+    )
+
+    testExtractNumbersWithCustomMultiCharSpec := method(
+        assertEquals(calculator extractNumbers("//*T*\n1*T*22*T*333"), list("1", "22", "333"))
     )
 )
 
