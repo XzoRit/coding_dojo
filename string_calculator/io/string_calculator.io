@@ -30,15 +30,15 @@ StringCalculatorTest := UnitTest clone do(
         assertEquals(calculator add("1234567890"), 1234567890)
     )
 
-    testStringWithCommaSeperatedNumbersReturnsSum := method(
+    testStringWithCommaSeparatedNumbersReturnsSum := method(
         assertEquals(calculator add("1,22,333"), 356)
     )
 
-    testStringWithCommaOrNewlineAsSeperators := method(
+    testStringWithCommaOrNewlineAsSeparators := method(
         assertEquals(calculator add("1,22\n333"), 356)
     )
 
-    testStringWithCustomSeperator := method(
+    testStringWithCustomSeparator := method(
         assertEquals(calculator add("//-\n1-22-333"), 356)
     )
 
