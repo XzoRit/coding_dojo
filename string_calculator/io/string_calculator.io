@@ -1,17 +1,17 @@
 writeln("String-Calculator")
 
 StringCalculator := Object clone do(
-    extractSeparation := method(textWithSeps,
-        if(textWithSeps beginsWithSeq("/"),
-            textWithSeps exSlice(2, 3),
-            "," .. "\n"
+    extractNumbers := method(numbers,
+        if(numbers beginsWithSeq("/"),
+            numbers exSlice(4) split(numbers exSlice(2, 3)),
+            numbers split(",", "\n")
         )
     )
     
     add := method(numbers,
         if(numbers isEmpty,
             0,
-            numbers split(",", "\n") map(asNumber) sum
+            self extractNumbers(numbers) map(asNumber) sum
             // negs := ints select(i, i < 0)
             // if(negs size == 0,
             //     ints sum,
@@ -43,8 +43,16 @@ StringCalculatorTest := UnitTest clone do(
         assertEquals(calculator add("1,22\n333"), 356)
     )
 
-    testExtractSeparatorWithCustomSpec := method(
-        assertEquals(calculator extractSeparation("//-\n"), "-")
+    testStringWithCustomSeperator := method(
+        assertEquals(calculator add("//-\n1-22-333"), 356)
+    )
+
+    testExtractNumbersWithCustomSpec := method(
+        assertEquals(calculator extractNumbers("//-\n1-22-333"), list("1", "22", "333"))
+    )
+
+    testExtractNumbersWithoutCustomSpec := method(
+        assertEquals(calculator extractNumbers("1,22,333"), list("1", "22", "333"))
     )
 )
 
