@@ -12,11 +12,6 @@ StringCalculator := Object clone do(
         if(numbers isEmpty,
             0,
             self extractNumbers(numbers) map(asNumber) sum
-            // negs := ints select(i, i < 0)
-            // if(negs size == 0,
-            //     ints sum,
-            //     Exception raise ("negative numbers not allowed: " .. negs)
-            // )
         )
     )
 )
@@ -58,17 +53,3 @@ StringCalculatorTest := UnitTest clone do(
 
 test := clone StringCalculatorTest
 test run()
-
-/*
-stringCalculator extractSeparation("1,22,333")
-stringCalculator extractSeparation("//-\n")
-
-stringCalculator add("1,22,333") println
-stringCalculator add("1\n22\n333") println
-stringCalculator add("1\n22,333") println
-
-e := try(stringCalculator add("1,-22,-333"))
-e catch(Exception, e error println)
-
-stringCalculator add("//-\n1-22-333") println
-*/
