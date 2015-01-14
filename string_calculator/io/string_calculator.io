@@ -43,10 +43,6 @@ StringCalculatorTest := UnitTest clone do(
         assertEquals(calculator add("1,22\n333"), 356)
     )
 
-    testExtractSeparatorWithoutCustomSpec := method(
-        assertEquals(calculator extractSeparation("1,22,333"), ",\n")
-    )
-
     testExtractSeparatorWithCustomSpec := method(
         assertEquals(calculator extractSeparation("//-\n"), "-")
     )
