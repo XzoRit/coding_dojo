@@ -15,7 +15,8 @@ StringCalculator := Object clone do(
             negs := ints select(i, i < 0)
             if(negs isEmpty,
                 ints sum,
-                Exception raise("Negative numbers not allowed")
+                negNumsAsTextList := negs map(asString) reduce(txt, i, txt .. i .. " ", "")
+                Exception raise("Negative numbers ( " .. negNumsAsTextList .. ") not allowed")
             )
         )
     )
@@ -65,6 +66,15 @@ StringCalculatorTest := UnitTest clone do(
 
     testNegativeNumbersShallRaiseAnException := method(
         assertRaisesException(calculator add("1,-22,333"))
+    )
+
+    testExceptionTextShallContainNegativeNumbers := method(
+        e := try(
+            calculator add("-1,-22,-333")
+        )
+        e catch(Exception,
+            assertEquals(e error, "Negative numbers ( -1 -22 -333 ) not allowed")
+	) pass
     )
 )
 
