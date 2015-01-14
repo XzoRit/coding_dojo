@@ -11,7 +11,12 @@ StringCalculator := Object clone do(
     add := method(numbers,
         if(numbers isEmpty,
             0,
-            self extractNumbers(numbers) map(asNumber) sum
+            ints := extractNumbers(numbers) map(asNumber)
+            negs := ints select(i, i < 0)
+            if(negs isEmpty,
+                ints sum,
+                Exception raise("Negative numbers not allowed")
+            )
         )
     )
 )
@@ -56,6 +61,10 @@ StringCalculatorTest := UnitTest clone do(
 
     testExtractNumbersWithCustomMultiCharSpec := method(
         assertEquals(calculator extractNumbers("//*T*\n1*T*22*T*333"), list("1", "22", "333"))
+    )
+
+    testNegativeNumbersShallRaiseAnException := method(
+        assertRaisesException(calculator add("1,-22,333"))
     )
 )
 
