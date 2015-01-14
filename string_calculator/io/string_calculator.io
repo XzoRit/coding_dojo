@@ -11,7 +11,7 @@ StringCalculator := Object clone do(
     add := method(numbers,
         if(numbers isEmpty,
             0,
-            numbers split(",") map(asNumber) sum
+            numbers split(",", "\n") map(asNumber) sum
             // negs := ints select(i, i < 0)
             // if(negs size == 0,
             //     ints sum,
@@ -37,6 +37,10 @@ StringCalculatorTest := UnitTest clone do(
 
     testStringWithCommaSeperatedNumbersReturnsSum := method(
         assertEquals(calculator add("1,22,333"), 356)
+    )
+
+    testStringWithCommaOrNewlineAsSeperators := method(
+        assertEquals(calculator add("1,22\n333"), 356)
     )
 
     testExtractSeparatorWithoutCustomSpec := method(
