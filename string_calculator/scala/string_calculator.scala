@@ -9,7 +9,7 @@ import org.scalatest._
 class StringCalculator {
 
   def add(numbers: String) = {
-    if(numbers.isEmpty()) 0 else numbers.split(",").foldLeft(0){_+_.toInt}
+    if(numbers.isEmpty()) 0 else """,|\n""".r.split(numbers).foldLeft(0){_+_.toInt}
   }
 }
 
@@ -28,4 +28,9 @@ class TestStringCalculator extends FlatSpec with Matchers with BeforeAndAfter {
   "add with comma seperator" should "return sum of numbers" in {
     calculator.add("1,22,333") should be (356)
   }
+
+  "numbers seperated with comma or newline" should "be summed up" in {
+    calculator.add("1,22\n333") should be (356)
+  }
+
 }
