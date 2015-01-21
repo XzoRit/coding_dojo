@@ -18,9 +18,10 @@ class StringCalculator {
   }
 
   def add(numbers: String) = {
-    if(numbers.isEmpty()) 0 else {
+    if(numbers.isEmpty) 0 else {
       val (seperator, nums) = extractNumbers(numbers)
-      seperator.r.split(nums).foldLeft(0){_+_.toInt}
+      val (negs, pos) = seperator.r.split(nums).map{_.toInt}.partition{_ < 0}
+      if(negs.isEmpty) pos.foldLeft(0){_ + _} else throw new IllegalArgumentException()
     }
   }
 }
@@ -49,6 +50,12 @@ class TestStringCalculator extends FlatSpec with Matchers with BeforeAndAfter {
   "if seperator specification is present it" should "be used to sum up numbers" in {
     calculator.extractNumbers("//;\n1;22;333") should be (";", "1;22;333")
     calculator.add("//;\n1;22;333") should be (356)
+  }
+
+  "add with negative numbers" should "throw an exception with negative numbers listed" in {
+    intercept[IllegalArgumentException] {
+      calculator.add("1,-22,-333")
+    }
   }
 
 }
