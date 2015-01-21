@@ -8,8 +8,20 @@ import org.scalatest._
 
 class StringCalculator {
 
+  def extractNumbers(numbers: String): (String, String) = {
+    if(numbers.startsWith("//")) {
+      (numbers(2).toString, numbers.drop(4))
+    }
+    else {
+      (""",|\n""", numbers)
+    }
+  }
+
   def add(numbers: String) = {
-    if(numbers.isEmpty()) 0 else """,|\n""".r.split(numbers).foldLeft(0){_+_.toInt}
+    if(numbers.isEmpty()) 0 else {
+      val (seperator, nums) = extractNumbers(numbers)
+      seperator.r.split(nums).foldLeft(0){_+_.toInt}
+    }
   }
 }
 
@@ -30,7 +42,13 @@ class TestStringCalculator extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   "numbers seperated with comma or newline" should "be summed up" in {
+    calculator.extractNumbers("1,22\n333") should be (""",|\n""", "1,22\n333")
     calculator.add("1,22\n333") should be (356)
+  }
+
+  "if seperator specification is present it" should "be used to sum up numbers" in {
+    calculator.extractNumbers("//;\n1;22;333") should be (";", "1;22;333")
+    calculator.add("//;\n1;22;333") should be (356)
   }
 
 }
