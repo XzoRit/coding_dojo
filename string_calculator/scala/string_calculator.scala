@@ -2,10 +2,6 @@
 /* run test with scala-2.11 -cp <jar-files> org.scalatest.run <test-class-name> */
 import org.scalatest._
 
-// println("1,22,333".split(",").map(_.toInt).foldLeft(0)(_+_))
-// println("1,22,333".split(",").map{_.toInt}.foldLeft(0){_+_})
-// println("1,22,333".split(",").foldLeft(0)(_+_.toInt))
-
 class StringCalculator {
 
   def extractNumbers(numbers: String): (String, String) = {
