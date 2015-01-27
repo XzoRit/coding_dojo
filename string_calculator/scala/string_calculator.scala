@@ -4,7 +4,7 @@ import org.scalatest._
 
 class StringCalculator {
 
-  def extractNumbers(numbers: String): (String, String) = {
+  def extractNumbers(numbers: String) = {
     if(numbers.startsWith("//")) {
       (numbers(2).toString, numbers.drop(4))
     }
