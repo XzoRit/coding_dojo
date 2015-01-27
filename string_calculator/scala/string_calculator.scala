@@ -1,5 +1,5 @@
 /* compile with scalac-2.11 -cp <jar-files> <script-name> */
-/* run test with scala-2.11 -cp <jar-files> org.scalatest.rung <test-class-name> */
+/* run test with scala-2.11 -cp <jar-files> org.scalatest.run <test-class-name> */
 import org.scalatest._
 
 // println("1,22,333".split(",").map(_.toInt).foldLeft(0)(_+_))
@@ -21,7 +21,9 @@ class StringCalculator {
     if(numbers.isEmpty) 0 else {
       val (seperator, nums) = extractNumbers(numbers)
       val (negs, pos) = seperator.r.split(nums).map{_.toInt}.partition{_ < 0}
-      if(negs.isEmpty) pos.foldLeft(0){_ + _} else throw new IllegalArgumentException()
+      if(negs.isEmpty) pos.foldLeft(0){_ + _} else {	
+	throw new IllegalArgumentException(negs.map{_.toString}.foldLeft("Negative numbers not allowed: "){_ ++ _ ++ " "})
+      }
     }
   }
 }
@@ -53,9 +55,7 @@ class TestStringCalculator extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   "add with negative numbers" should "throw an exception with negative numbers listed" in {
-    intercept[IllegalArgumentException] {
-      calculator.add("1,-22,-333")
-    }
+    the [IllegalArgumentException] thrownBy calculator.add("1,-22,-333") should have message ("Negative numbers not allowed: -22 -333 ")
   }
 
 }
