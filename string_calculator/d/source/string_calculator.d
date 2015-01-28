@@ -18,6 +18,8 @@ int add(string numbers)
 	return reduce!((a, b) => a + b)(0, ints);
 }
 
+import specd.specd;
+
 unittest
 {
 	assert(add("") == 0);

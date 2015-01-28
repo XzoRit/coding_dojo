@@ -1,7 +1,14 @@
 {
-	"name": "string_calculator",
-	"description": "A possible implementation of the string-calculator-code-kata",
-	"dependencies": {
-	    "specd": ">=0.1.0"
+    "name": "string_calculator",
+    "description": "A possible implementation of the string-calculator-code-kata",
+    "dependencies": {
+	"specd": ">=0.1.0"
+    },
+    "configurations": [
+	{
+            "name": "test",
+            "versions": ["specrunner"],
+            "targetType": "executable"
 	}
+    ]
 }
