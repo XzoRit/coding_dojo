@@ -1,0 +1,7 @@
+{
+	"name": "string_calculator",
+	"description": "A possible implementation of the string-calculator-code-kata",
+	"dependencies": {
+	    "specd": ">=0.1.0"
+	}
+}
