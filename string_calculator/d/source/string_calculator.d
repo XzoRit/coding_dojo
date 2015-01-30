@@ -1,24 +1,34 @@
+import specd.specd;
 import std.array;
 import std.conv;
 import std.string;
 import std.algorithm;
+import std.typecons;
+import std.regex;
 
-int add(string numbers)
+auto splitBySeparator(string numbers)
 {
-  if(numbers.empty) return 0;
-  auto separator = [','];
+  alias SepAndNums = Tuple!(string, "sep", string, "nums");
+  SepAndNums sepAndNums;
   if(numbers[0] == '/')
     {
-      separator[0] = numbers[2];
-      numbers = numbers[4..$];
+      immutable i = numbers.indexOf("\n");
+      sepAndNums.sep = numbers[2..i];
+      sepAndNums.nums = numbers[(i+1)..$];
     }
-  immutable replaced = replace(numbers, "\n", separator);
-  auto splitted = split(replaced, separator);
-  auto ints = map!(a => to!int(a))(splitted);
-  return reduce!((a, b) => a + b)(0, ints);
+  else
+    {
+      sepAndNums.sep = ",";
+      sepAndNums.nums = replace(numbers, "\n", sepAndNums.sep);
+    }
+  return split(sepAndNums.nums, sepAndNums.sep);
 }
 
-import specd.specd;
+auto add(string numbers)
+{
+  if(numbers.empty) return 0;
+  return splitBySeparator(numbers).map!(a => to!int(a)).reduce!"a+b";
+}
 
 unittest
 {
@@ -37,4 +47,7 @@ unittest
   describe("calling add with numbers separated by a character contained in the separator specification section")
     .should("return the sum of these numbers",
 	    (add("//T\n1T22T333")).must.equal(356));
+  describe("calling add with numbers separated by a string contained in the separator specification section")
+    .should("return the sum of these numbers",
+  	    (add("//*-*\n1*-*22*-*333")).must.equal(356));
 }
