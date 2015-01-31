@@ -30,7 +30,7 @@ auto add(string numbers)
   auto ints = array(splitBySeparator(numbers).map!(a => to!int(a)));
   auto negs = partition!("a>=0")(ints);
   if(negs.empty) return reduce!"a+b"(0, ints);
-  else throw new Exception("");
+  else throw new Exception(reduce!((txt, i) => txt ~ " " ~ to!string(i))("negative numbers not allowed:", negs));
 }
 
 unittest
@@ -54,4 +54,12 @@ unittest
     .should("return the sum of these numbers",
   	    (add("//*-*\n1*-*22*-*333")).must.equal(356));
   add("//*-*\n1*-*-22*-*-333").must.throw_!Exception;
+  try
+    {
+      add("0,-1,22,-333");
+    }
+  catch(Exception e)
+    {
+      (e.msg).must.equal("negative numbers not allowed: -1 -333");
+    }
 }
