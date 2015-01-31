@@ -27,7 +27,10 @@ auto splitBySeparator(string numbers)
 auto add(string numbers)
 {
   if(numbers.empty) return 0;
-  return splitBySeparator(numbers).map!(a => to!int(a)).reduce!"a+b";
+  auto ints = array(splitBySeparator(numbers).map!(a => to!int(a)));
+  auto negs = partition!("a>=0")(ints);
+  if(negs.empty) return reduce!"a+b"(0, ints);
+  else throw new Exception("");
 }
 
 unittest
@@ -50,4 +53,5 @@ unittest
   describe("calling add with numbers separated by a string contained in the separator specification section")
     .should("return the sum of these numbers",
   	    (add("//*-*\n1*-*22*-*333")).must.equal(356));
+  add("//*-*\n1*-*-22*-*-333").must.throw_!Exception;
 }
