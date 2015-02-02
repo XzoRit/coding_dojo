@@ -7,25 +7,25 @@ import (
 
 func TestAddWithEmptyStringReturns0(t *testing.T) {
 	expected := 0
-	actual, _ := Add("")
+	actual, err := Add("")
 	if actual !=  expected {
-		t.Errorf("Expected: %d Actual %d", expected, actual)
+		t.Errorf("Expected: %d Actual %d with err = %s", expected, actual, err)
 	}
 }
 
 func TestAddWithANumberShouldReturnThatNumber(t *testing.T) {
 	expected := 1234567890
-	actual, _ := Add(strconv.Itoa(expected))
+	actual, err := Add(strconv.Itoa(expected))
 	if actual !=  expected {
-		t.Errorf("Expected: %d Actual %d", expected, actual)
+		t.Errorf("Expected: %d Actual %d with err = %s", expected, actual, err)
 	}
 }
 
 func TestAddWithCommaSeparatedNumberShouldReturnTheSum(t *testing.T) {
 	expected := 356
-	actual, _ := Add("1,22,333")
+	actual, err := Add("1,22,333")
 	if actual !=  expected {
-		t.Errorf("Expected: %d Actual %d", expected, actual)
+		t.Errorf("Expected: %d Actual %d with err = %s", expected, actual, err)
 	}
 }
 
