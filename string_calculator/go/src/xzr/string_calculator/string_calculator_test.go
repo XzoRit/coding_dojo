@@ -28,3 +28,11 @@ func TestAddWithCommaSeparatedNumberShouldReturnTheSum(t *testing.T) {
 		t.Errorf("Expected: %d Actual %d", expected, actual)
 	}
 }
+
+func TestNumbersCanBeSparatedByCommaOrNewLine(t *testing.T) {
+	expected := 356
+	actual, err := Add("0\n1,22\n333")
+	if actual !=  expected {
+		t.Errorf("Expected: %d Actual %d with err = %s", expected, actual, err)
+	}
+}
