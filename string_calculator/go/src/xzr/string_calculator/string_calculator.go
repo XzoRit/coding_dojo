@@ -7,7 +7,8 @@ import (
 
 func extractSeparator(numbers string) (sep string, nums string) {
 	if numbers[0] == '/' {
-		return numbers[2:3], numbers[4:]
+		sepSpecEndIdx := strings.Index(numbers, "\n")
+		return numbers[2:sepSpecEndIdx], numbers[sepSpecEndIdx+1:]
 	}
 	return ",", strings.Replace(numbers, "\n", ",", -1)
 }
