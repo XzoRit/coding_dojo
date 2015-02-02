@@ -36,3 +36,11 @@ func TestNumbersCanBeSparatedByCommaOrNewLine(t *testing.T) {
 		t.Errorf("Expected: %d Actual %d with err = %s", expected, actual, err)
 	}
 }
+
+func TestSeparatorSpecificationContainsSeparatorCharacter(t * testing.T) {
+	expected := 356
+	actual, err := Add("//;\n0;1;22;333")
+	if actual != expected {
+		t.Errorf("Expected: %d Actual %d with err = %s", expected, actual, err)
+	}
+}
