@@ -35,7 +35,7 @@ func Add(numbers string) (sum int, err error) {
 	if negs.Len() != 0 {
 		errorMsg := "negative numbers not allowed:"
 		for it := negs.Front(); it != nil; it = it.Next() {
-			errorMsg = errorMsg + " " + strconv.Itoa(it.Value.(int))
+			errorMsg += " " + strconv.Itoa(it.Value.(int))
 		}
 		return -1, errors.New(errorMsg)
 	} else {
