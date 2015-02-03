@@ -48,7 +48,7 @@ func sum(nums *list.List) (sum int) {
 }
 
 func errorMsg(nums *list.List) (errMsg string) {
-	errMsg := "negative numbers not allowed:"
+	errMsg = "negative numbers not allowed:"
 	for it := nums.Front(); it != nil; it = it.Next() {
 		errMsg += " " + strconv.Itoa(it.Value.(int))
 	}
@@ -60,8 +60,7 @@ func Add(numbers string) (int, error) {
 		return 0, nil
 	}
 	sep, nums := extractSeparator(numbers)
-	splitted := strings.Split(nums, sep)
-	ints, e := toInts(splitted)
+	ints, e := toInts(strings.Split(nums, sep))
 	if e != nil {
 		return -1, e
 	}
