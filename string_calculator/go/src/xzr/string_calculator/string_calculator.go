@@ -1,10 +1,10 @@
 package string_calculator
 
 import (
+	"container/list"
+	"errors"
 	"strconv"
 	"strings"
-	"errors"
-	"container/list"
 )
 
 func extractSeparator(numbers string) (sep string, nums string) {
@@ -40,11 +40,18 @@ func partition(nums []int) (*list.List, *list.List) {
 	return negs, pos
 }
 
-func Add(numbers string) (sum int, err error) {
+func sum(nums *list.List) (sum int) {
+	for it := nums.Front(); it != nil; it = it.Next() {
+		sum += it.Value.(int)
+	}
+	return sum
+}
+
+func Add(numbers string) (int, error) {
 	if len(numbers) == 0 {
 		return 0, nil
 	}
-	sep, nums := extractSeparator(numbers);
+	sep, nums := extractSeparator(numbers)
 	splitted := strings.Split(nums, sep)
 	ints, e := toInts(splitted)
 	if e != nil {
@@ -58,10 +65,6 @@ func Add(numbers string) (sum int, err error) {
 		}
 		return -1, errors.New(errorMsg)
 	} else {
-		sum := 0
-		for it := pos.Front(); it != nil; it = it.Next() {
-			sum += it.Value.(int)
-		}
-		return sum, nil
+		return sum(pos), nil
 	}
 }
