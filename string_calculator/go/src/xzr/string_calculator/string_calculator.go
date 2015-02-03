@@ -27,6 +27,19 @@ func toInts(numsAsStr []string) ([]int, error) {
 	return ints, nil
 }
 
+func partition(nums []int) (*list.List, *list.List) {
+	negs := list.New()
+	pos := list.New()
+	for _, n := range nums {
+		if n < 0 {
+			negs.PushBack(n)
+		} else {
+			pos.PushBack(n)
+		}
+	}
+	return negs, pos
+}
+
 func Add(numbers string) (sum int, err error) {
 	if len(numbers) == 0 {
 		return 0, nil
@@ -37,13 +50,7 @@ func Add(numbers string) (sum int, err error) {
 	if e != nil {
 		return -1, e
 	}
-	negs := list.New()
-	for _, num := range ints {
-		if num < 0 {
-			negs.PushBack(num)
-		}
-		sum += num
-	}
+	negs, pos := partition(ints)
 	if negs.Len() != 0 {
 		errorMsg := "negative numbers not allowed:"
 		for it := negs.Front(); it != nil; it = it.Next() {
@@ -51,6 +58,10 @@ func Add(numbers string) (sum int, err error) {
 		}
 		return -1, errors.New(errorMsg)
 	} else {
+		sum := 0
+		for it := pos.Front(); it != nil; it = it.Next() {
+			sum += it.Value.(int)
+		}
 		return sum, nil
 	}
 }
