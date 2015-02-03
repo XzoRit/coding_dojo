@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 	"errors"
+	"container/list"
 )
 
 func extractSeparator(numbers string) (sep string, nums string) {
@@ -18,17 +19,26 @@ func Add(numbers string) (sum int, err error) {
 	if len(numbers) == 0 {
 		return 0, nil
 	}
-	if strings.Contains(numbers, "-") {
-		return -1, errors.New("negative numbers not allowes")
-	}
 	sep, nums := extractSeparator(numbers);
 	splitted := strings.Split(nums, sep)
+	negs := list.New()
 	for _, n := range splitted {
 		num, e := strconv.Atoi(n)
 		if e != nil {
 			return -1, e
 		}
+		if num < 0 {
+			negs.PushBack(num)
+		}
 		sum += num
 	}
-	return sum, nil
+	if negs.Len() != 0 {
+		errorMsg := "negative numbers not allowed:"
+		for it := negs.Front(); it != nil; it = it.Next() {
+			errorMsg = errorMsg + " " + strconv.Itoa(it.Value.(int))
+		}
+		return -1, errors.New(errorMsg)
+	} else {
+		return sum, nil
+	}
 }

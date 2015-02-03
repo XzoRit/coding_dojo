@@ -59,3 +59,12 @@ func TestNegativeNumbersShouldResultInAnErrorBeingReturned(t *testing.T) {
 		t.Error("negativ numbers should be an error")
 	}
 }
+
+func TestNegativeNumberShouldBeListedInErrorMessage(t *testing.T) {
+	_, err := Add("0,-1,22,-333")
+	expected := "negative numbers not allowed: -1 -333"
+	actual := err.Error()
+	if actual != expected {
+		t.Errorf("Expected: %s Actual: %s", expected, actual)
+	}
+}
