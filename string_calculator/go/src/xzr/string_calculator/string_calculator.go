@@ -3,6 +3,7 @@ package string_calculator
 import (
 	"strconv"
 	"strings"
+	"errors"
 )
 
 func extractSeparator(numbers string) (sep string, nums string) {
@@ -16,6 +17,9 @@ func extractSeparator(numbers string) (sep string, nums string) {
 func Add(numbers string) (sum int, err error) {
 	if len(numbers) == 0 {
 		return 0, nil
+	}
+	if strings.Contains(numbers, "-") {
+		return -1, errors.New("negative numbers not allowes")
 	}
 	sep, nums := extractSeparator(numbers);
 	splitted := strings.Split(nums, sep)

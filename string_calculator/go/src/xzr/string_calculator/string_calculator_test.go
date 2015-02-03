@@ -52,3 +52,10 @@ func TestSeparatorSpecificationContainsSeparatorString(t * testing.T) {
 		t.Errorf("Expected: %d Actual %d with err = %s", expected, actual, err)
 	}
 }
+
+func TestNegativeNumbersShouldResultInAnErrorBeingReturned(t *testing.T) {
+	_, err := Add("0,-1,22,-333")
+	if err == nil {
+		t.Error("negativ numbers should be an error")
+	}
+}
