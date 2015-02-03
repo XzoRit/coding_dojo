@@ -15,18 +15,30 @@ func extractSeparator(numbers string) (sep string, nums string) {
 	return ",", strings.Replace(numbers, "\n", ",", -1)
 }
 
+func toInts(numsAsStr []string) ([]int, error) {
+	ints := make([]int, len(numsAsStr))
+	for idx, n := range numsAsStr {
+		num, e := strconv.Atoi(n)
+		if e != nil {
+			return ints, e
+		}
+		ints[idx] = num
+	}
+	return ints, nil
+}
+
 func Add(numbers string) (sum int, err error) {
 	if len(numbers) == 0 {
 		return 0, nil
 	}
 	sep, nums := extractSeparator(numbers);
 	splitted := strings.Split(nums, sep)
+	ints, e := toInts(splitted)
+	if e != nil {
+		return -1, e
+	}
 	negs := list.New()
-	for _, n := range splitted {
-		num, e := strconv.Atoi(n)
-		if e != nil {
-			return -1, e
-		}
+	for _, num := range ints {
 		if num < 0 {
 			negs.PushBack(num)
 		}
