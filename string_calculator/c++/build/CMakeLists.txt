@@ -3,7 +3,7 @@ cmake_policy(SET CMP0021 OLD)
 
 project(string_calculator)
 
-include_directories(".." "../../../../c++/catch/single_include" "../../../../c++/boost")
+include_directories(".." "/opt/local/include")
 
 set (${PROJECT_NAME}_headers "../lib/convert.hpp" "../lib/str_utils.hpp")
 set (${PROJECT_NAME}_sources "../test/main.cpp")
