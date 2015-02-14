@@ -6,7 +6,8 @@ class StringCalculator {
 
   def extractNumbers(numbers: String) = {
     if(numbers.startsWith("//")) {
-      (numbers(2).toString, numbers.drop(4))
+      val endOfSepSpec = numbers.indexOf("\n")
+      (numbers slice(2, endOfSepSpec), numbers.drop(endOfSepSpec + 1))
     }
     else {
       (""",|\n""", numbers)
@@ -45,11 +46,16 @@ class TestStringCalculator extends FlatSpec with Matchers with BeforeAndAfter {
     calculator.add("1,22\n333") should be (356)
   }
 
-  "if seperator specification is present it" should "be used to sum up numbers" in {
+  "if seperator specification is present add" should "use the character as seperator" in {
     calculator.extractNumbers("//;\n1;22;333") should be (";", "1;22;333")
     calculator.add("//;\n1;22;333") should be (356)
   }
 
+  "if seperator specification is present add" should "use the string as seperator" in {
+    calculator.extractNumbers("//-_-\n1-_-22-_-333") should be ("-_-", "1-_-22-_-333")
+    calculator.add("//-_-\n1-_-22-_-333") should be (356)
+  }
+  
   "add with negative numbers" should "throw an exception with negative numbers listed" in {
     the [IllegalArgumentException] thrownBy calculator.add("1,-22,-333") should have message ("Negative numbers not allowed: -22 -333 ")
   }
