@@ -4,3 +4,9 @@
 # object files
 *.o
 leap_year/c++/build
+/string_calculator/scala/*.class
+/string_calculator/d/.dub/*
+/string_calculator/d/*.a
+/string_calculator/d/string_calculator
+/string_calculator/d/dub.*.json
+/string_calculator/d/__test__library__
