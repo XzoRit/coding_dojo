@@ -27,7 +27,7 @@ auto splitBySeparator(string numbers)
 auto add(string numbers)
 {
   if(numbers.empty) return 0;
-  auto ints = numbers.splitBySeparator().map!(a => to!int(a)).array();
+  auto ints = numbers.splitBySeparator().map!(a => to!int(a));
   auto negs = filter!"a<0"(ints);
   if(negs.empty) return reduce!"a+b"(0, ints);
   else throw new Exception(reduce!((txt, i) => txt ~ " " ~ to!string(i))("negative numbers not allowed:", negs));
