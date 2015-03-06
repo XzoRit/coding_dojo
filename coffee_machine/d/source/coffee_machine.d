@@ -14,6 +14,13 @@ class CoffeeRecipe : Recipe
     return 175;
   }
 
+  unittest
+    {
+      describe("amount water for coffee")
+	.should("return 175",
+		(new CoffeeRecipe().amountWaterMl().must.equal(175)));
+    }
+
   void brew()
   {
     writeln("dripping coffee through filter");
@@ -38,11 +45,4 @@ class TeaRecipe : Recipe
   {
     writeln("steeping Tea");
   }
-}
-
-unittest
-{
-  describe("amount water for coffee")
-    .should("return 175",
-	    (new CoffeeRecipe().amountWaterMl().must.equal(175)));
 }
