@@ -1,0 +1,14 @@
+{
+    "name": "coffee_machine",
+    "description": "A possible implementation of the coffee-machine-kata",
+    "dependencies": {
+	"specd": ">=0.1.0"
+    },
+    "configurations": [
+	{
+            "name": "test",
+            "versions": ["specrunner"],
+            "targetType": "executable"
+	}
+    ]
+}
