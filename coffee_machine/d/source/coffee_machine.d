@@ -9,7 +9,7 @@ interface Recipe
 
 class CoffeeRecipe : Recipe
 {
-  int amountWaterMl()
+  pure nothrow int amountWaterMl()
   {
     return 175;
   }
@@ -29,7 +29,7 @@ class CoffeeRecipe : Recipe
 
 class TeaRecipe : Recipe
 {
-  int amountWaterMl()
+  pure nothrow int amountWaterMl()
   {
     return 200;
   }
