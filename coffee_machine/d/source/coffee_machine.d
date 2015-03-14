@@ -1,5 +1,4 @@
 import specd.specd;
-import std.stdio;
 
 interface Recipe
 {
@@ -23,7 +22,6 @@ class CoffeeRecipe : Recipe
 
   void brew()
   {
-    writeln("dripping coffee through filter");
   }
 }
 
@@ -43,24 +41,45 @@ class TeaRecipe : Recipe
 
   void brew()
   {
-    writeln("steeping Tea");
   }
 }
 
 class CaffeineBeverage
 {
-  public final pure nothrow string description()
+  this(Recipe recipe, string description)
+  {
+    m_description = description;
+    m_recipe = recipe;
+  }
+
+  final pure nothrow string description()
   {
     return m_description;
   }
 
+  void prepare()
+  {
+    boilWater(m_recipe.amountWaterMl());
+    m_recipe.brew();
+    pourInCup();
+  }
+
+  private void boilWater(int amountWaterMl)
+  {
+  }
+
+  private void pourInCup()
+  {
+  }
+
   private string m_description;
+  private Recipe m_recipe;
 }
 
 unittest
 {
-  auto caff = new CaffeineBeverage;
-  describe("a default constructed caffeine beverage")
-    .should("have an empty description",
-  	      (caff.description().must.equal("")));
+  auto caff = new CaffeineBeverage(null, "Caff");
+  describe("a call to descrption")
+    .should("return same text as given in ctor",
+  	      (caff.description().must.equal("Caff")));
 }
