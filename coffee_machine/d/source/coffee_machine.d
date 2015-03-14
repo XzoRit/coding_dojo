@@ -1,9 +1,10 @@
 import specd.specd;
+import std.signals;
 
 interface Recipe
 {
   int amountWaterMl();
-  void brew();
+  string brew();
 }
 
 class CoffeeRecipe : Recipe
@@ -20,9 +21,17 @@ class CoffeeRecipe : Recipe
       		(new CoffeeRecipe().amountWaterMl().must.equal(175)));
     }
 
-  void brew()
+  string brew()
   {
+    return "dripping coffee through filter";
   }
+
+  unittest
+    {
+      describe("brew")
+      	.should("return brewing coffee",
+      		(new CoffeeRecipe().brew().must.equal("dripping coffee through filter")));
+    }
 }
 
 class TeaRecipe : Recipe
@@ -39,13 +48,36 @@ class TeaRecipe : Recipe
       		(new TeaRecipe().amountWaterMl().must.equal(200)));
     }
 
-  void brew()
+  string brew()
   {
+    return "steeping tea";
   }
+
+  unittest
+    {
+      describe("brew")
+      	.should("return steeping tea",
+      		(new TeaRecipe().brew().must.equal("steeping tea")));
+    }
 }
 
 class CaffeineBeverage
 {
+  struct BoilingWater
+  {
+    int amountMl;
+  }
+  struct Brewing
+  {
+    string description;
+  }
+  struct PouringIntoCup
+  {}
+
+  mixin Signal!BoilingWater;
+  mixin Signal!Brewing;
+  mixin Signal!PouringIntoCup;
+
   this(Recipe recipe, string description)
   {
     m_description = description;
@@ -60,16 +92,23 @@ class CaffeineBeverage
   void prepare()
   {
     boilWater(m_recipe.amountWaterMl());
-    m_recipe.brew();
+    brewing(m_recipe.brew());
     pourInCup();
   }
 
   private void boilWater(int amountWaterMl)
   {
+    emit(BoilingWater(amountWaterMl));
+  }
+
+  private void brewing(string what)
+  {
+    emit(Brewing(what));
   }
 
   private void pourInCup()
   {
+    emit(PouringIntoCup());
   }
 
   private string m_description;
