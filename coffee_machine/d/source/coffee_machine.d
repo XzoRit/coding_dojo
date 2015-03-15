@@ -165,15 +165,37 @@ unittest
 }
 
 interface CaffeineBeverageFactory
-{}
+{
+  immutable CaffeineBeverage create()
+    out (result)
+	  {
+	    assert(result !is null);
+	  }
+}
 
 class CoffeeFactory : CaffeineBeverageFactory
-{}
+{
+  immutable CaffeineBeverage create()
+  {
+    return new CaffeineBeverage(new immutable CoffeeRecipe(), "Coffee");
+  }
+}
 
 class TeaFactory : CaffeineBeverageFactory
-{}
+{
+  immutable CaffeineBeverage create()
+  {
+    return new CaffeineBeverage(new immutable TeaRecipe(), "Tea");
+  }
+}
 
 class BeverageFactory
 {
+  this()
+  {
+    m_factories["coffee"] = new CoffeeFactory();
+    m_factories["tea"] = new TeaFactory();
+  }
+
   private CaffeineBeverageFactory[string] m_factories;
 }
