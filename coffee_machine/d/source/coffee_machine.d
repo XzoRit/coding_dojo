@@ -3,13 +3,13 @@ import std.signals;
 
 interface Recipe
 {
-  int amountWaterMl();
-  string brew();
+  immutable pure nothrow int amountWaterMl();
+  immutable pure nothrow string brew();
 }
 
 class CoffeeRecipe : Recipe
 {
-  pure nothrow int amountWaterMl()
+  immutable pure nothrow int amountWaterMl()
   {
     return 175;
   }
@@ -18,10 +18,10 @@ class CoffeeRecipe : Recipe
     {
       describe("amount water for coffee")
       	.should("return 175",
-      		(new CoffeeRecipe().amountWaterMl().must.equal(175)));
+      		(new immutable CoffeeRecipe().amountWaterMl().must.equal(175)));
     }
 
-  string brew()
+  immutable pure nothrow string brew()
   {
     return "dripping coffee through filter";
   }
@@ -30,13 +30,13 @@ class CoffeeRecipe : Recipe
     {
       describe("brew")
       	.should("return brewing coffee",
-      		(new CoffeeRecipe().brew().must.equal("dripping coffee through filter")));
+      		(new immutable CoffeeRecipe().brew().must.equal("dripping coffee through filter")));
     }
 }
 
 class TeaRecipe : Recipe
 {
-  pure nothrow int amountWaterMl()
+  immutable pure nothrow int amountWaterMl()
   {
     return 200;
   }
@@ -45,10 +45,10 @@ class TeaRecipe : Recipe
     {
       describe("amount water for tea")
       	.should("be 200ml",
-      		(new TeaRecipe().amountWaterMl().must.equal(200)));
+      		(new immutable TeaRecipe().amountWaterMl().must.equal(200)));
     }
 
-  string brew()
+  immutable pure nothrow string brew()
   {
     return "steeping tea";
   }
@@ -57,7 +57,7 @@ class TeaRecipe : Recipe
     {
       describe("brew")
       	.should("return steeping tea",
-      		(new TeaRecipe().brew().must.equal("steeping tea")));
+      		(new immutable TeaRecipe().brew().must.equal("steeping tea")));
     }
 }
 
@@ -78,13 +78,13 @@ class CaffeineBeverage
   mixin Signal!Brewing sigBrewing;
   mixin Signal!PouringIntoCup sigPouringIntoCup;
 
-  this(Recipe recipe, string description)
+  this(immutable Recipe recipe, immutable string description)
   {
     m_description = description;
     m_recipe = recipe;
   }
 
-  final pure nothrow string description()
+  const pure nothrow string description()
   {
     return m_description;
   }
@@ -111,44 +111,44 @@ class CaffeineBeverage
     emit(PouringIntoCup());
   }
 
-  private string m_description;
-  private Recipe m_recipe;
+  private immutable string m_description;
+  private immutable Recipe m_recipe;
 }
 
 unittest
 {
-  auto coffeeRecipe = new CoffeeRecipe;
-  auto caff = new CaffeineBeverage(coffeeRecipe, "Caff");
+  immutable coffeeRecipe = new CoffeeRecipe;
+  auto coffee = new CaffeineBeverage(coffeeRecipe, "Coffee");
   describe("a call to descrption")
     .should("return same text as given in ctor",
-  	      (caff.description().must.equal("Caff")));
-  class Observer
+  	      (coffee.description().must.equal("Coffee")));
+  class CaffeineBevergeObserver
   {
     int amountWaterMl;
     string brewingWhat;
     bool receivedPouringIntoCup;
 
-    void received(CaffeineBeverage.BoilingWater boiling)
+    nothrow void received(CaffeineBeverage.BoilingWater boiling)
     {
       amountWaterMl = boiling.amountMl;
     }
 
-    void received(CaffeineBeverage.Brewing brewing)
+    nothrow void received(CaffeineBeverage.Brewing brewing)
     {
       brewingWhat = brewing.description;
     }
 
-    void received(CaffeineBeverage.PouringIntoCup)
+    nothrow void received(CaffeineBeverage.PouringIntoCup)
     {
       receivedPouringIntoCup = true;
     }
   }
 
-  auto  o = new Observer;
-  caff.sigBoilingWater.connect(&o.received);
-  caff.sigBrewing.connect(&o.received);
-  caff.sigPouringIntoCup.connect(&o.received);
-  caff.prepare();
+  const o = new CaffeineBevergeObserver;
+  coffee.sigBoilingWater.connect(&o.received);
+  coffee.sigBrewing.connect(&o.received);
+  coffee.sigPouringIntoCup.connect(&o.received);
+  coffee.prepare();
   assert(o.amountWaterMl == coffeeRecipe.amountWaterMl());
   assert(o.brewingWhat == coffeeRecipe.brew());
   assert(o.receivedPouringIntoCup);
