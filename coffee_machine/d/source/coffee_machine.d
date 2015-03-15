@@ -218,34 +218,34 @@ class ConsoleWriter
 {
   import std.stdio;
   import std.conv;
-  const void received(BoilingWater boiling)
+  const void boiling(BoilingWater boiling)
   {
     writeln("boiling " ~ to!string(boiling.amountMl) ~ "ml water");
   }
 
-  const void received(Brewing brewing)
+  const void brewing(Brewing brewing)
   {
     writeln(brewing.what);
   }
 
-  const void received(PouringIntoCup pouring)
+  const void pouring(PouringIntoCup pouring)
   {
     writeln("pouring " ~ pouring.what ~ " into cup");
   }
 }
 
-// void main()
-// {
-//   auto consoleWriter = new ConsoleWriter();
-//   auto beverageFactory = new BeverageFactory();
-//   beverageFactory
-//     .create("coffee",
-// 	    &consoleWriter.received,
-// 	    &consoleWriter.received,
-// 	    &consoleWriter.received).prepare();
-//   beverageFactory
-//     .create("tea",
-// 	    &consoleWriter.received,
-// 	    &consoleWriter.received,
-// 	    &consoleWriter.received).prepare();
-// }
+void main()
+{
+  auto consoleWriter = new ConsoleWriter();
+  auto beverageFactory = new BeverageFactory();
+  beverageFactory
+    .create("coffee",
+	    &consoleWriter.boiling,
+	    &consoleWriter.brewing,
+	    &consoleWriter.pouring).prepare();
+  beverageFactory
+    .create("tea",
+	    &consoleWriter.boiling,
+	    &consoleWriter.brewing,
+	    &consoleWriter.pouring).prepare();
+}
