@@ -3,8 +3,17 @@ import std.signals;
 
 interface Recipe
 {
-  immutable pure nothrow int amountWaterMl();
-  immutable pure nothrow string brew();
+  immutable pure nothrow int amountWaterMl()
+    out (result)
+	  {
+	    assert(result > 0);
+	  }
+
+  immutable pure nothrow string brew()
+    out (result)
+	  {
+	    assert(result.length > 0);
+	  }
 }
 
 class CoffeeRecipe : Recipe
