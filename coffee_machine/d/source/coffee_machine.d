@@ -189,43 +189,44 @@ class TeaFactory : CaffeineBeverageFactory
   }
 }
 
-class BeverageFactory(BeverageObserver)
+class BeverageFactory
 {
   this()
   {
     m_factories["coffee"] = new immutable CoffeeFactory();
     m_factories["tea"] = new immutable TeaFactory();
-    m_observer = new BeverageObserver();
   }
 
-  CaffeineBeverage create(string beverage)
+  CaffeineBeverage create(string beverage,
+			  void delegate(CaffeineBeverage.BoilingWater) boiling,
+			  void delegate(CaffeineBeverage.Brewing) brewing,
+			  void delegate(CaffeineBeverage.PouringIntoCup) pouring)
   {
     auto caff = m_factories[beverage].create();
-    caff.sigBoilingWater.connect(&m_observer.received);
-    caff.sigBrewing.connect(&m_observer.received);
-    caff.sigPouringIntoCup.connect(&m_observer.received);
+    caff.sigBoilingWater.connect(boiling);
+    caff.sigBrewing.connect(brewing);
+    caff.sigPouringIntoCup.connect(pouring);
     return caff;
   }
 
   private immutable(CaffeineBeverageFactory)[string] m_factories;
-  private BeverageObserver m_observer;
 }
 
 class ConsoleWriter
 {
   import std.stdio;
   import std.conv;
-  void received(CaffeineBeverage.BoilingWater boiling)
+  const void received(CaffeineBeverage.BoilingWater boiling)
   {
     writeln("boiling " ~ to!string(boiling.amountMl) ~ "ml water");
   }
 
-  void received(CaffeineBeverage.Brewing brewing)
+  const void received(CaffeineBeverage.Brewing brewing)
   {
     writeln(brewing.description);
   }
 
-  void received(CaffeineBeverage.PouringIntoCup)
+  const void received(CaffeineBeverage.PouringIntoCup)
   {
     writeln("pouring into cup");
   }
@@ -233,8 +234,16 @@ class ConsoleWriter
 
 void main()
 {
-  alias ConsoleBeveregeFactory = BeverageFactory!ConsoleWriter; 
-  auto consoleBeverageFactory = new ConsoleBeveregeFactory();
-  consoleBeverageFactory.create("coffee").prepare();
-  consoleBeverageFactory.create("tea").prepare();
+  auto consoleWriter = new ConsoleWriter();
+  auto beverageFactory = new BeverageFactory();
+  beverageFactory
+    .create("coffee",
+	    &consoleWriter.received,
+	    &consoleWriter.received,
+	    &consoleWriter.received).prepare();
+  beverageFactory
+    .create("tea",
+	    &consoleWriter.received,
+	    &consoleWriter.received,
+	    &consoleWriter.received).prepare();
 }
