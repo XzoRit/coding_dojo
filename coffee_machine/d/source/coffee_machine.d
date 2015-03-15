@@ -74,14 +74,16 @@ class CaffeineBeverage
 {
   struct BoilingWater
   {
-    int amountMl;
+    const int amountMl;
   }
   struct Brewing
   {
-    string description;
+    const string what;
   }
   struct PouringIntoCup
-  {}
+  {
+    const string what;
+  }
 
   mixin Signal!BoilingWater sigBoilingWater;
   mixin Signal!Brewing sigBrewing;
@@ -117,7 +119,7 @@ class CaffeineBeverage
 
   private void pourInCup()
   {
-    emit(PouringIntoCup());
+    emit(PouringIntoCup(m_description));
   }
 
   private immutable string m_description;
@@ -136,7 +138,7 @@ unittest
   {
     int amountWaterMl;
     string brewingWhat;
-    bool receivedPouringIntoCup;
+    string pouringWhat;
 
     nothrow void received(CaffeineBeverage.BoilingWater boiling)
     {
@@ -145,12 +147,12 @@ unittest
 
     nothrow void received(CaffeineBeverage.Brewing brewing)
     {
-      brewingWhat = brewing.description;
+      brewingWhat = brewing.what;
     }
 
-    nothrow void received(CaffeineBeverage.PouringIntoCup)
+    nothrow void received(CaffeineBeverage.PouringIntoCup pouring)
     {
-      receivedPouringIntoCup = true;
+      pouringWhat = pouring.what;
     }
   }
 
@@ -161,7 +163,7 @@ unittest
   coffee.prepare();
   assert(o.amountWaterMl == coffeeRecipe.amountWaterMl());
   assert(o.brewingWhat == coffeeRecipe.brew());
-  assert(o.receivedPouringIntoCup);
+  assert(o.pouringWhat == coffee.description());
 }
 
 interface CaffeineBeverageFactory
@@ -223,12 +225,12 @@ class ConsoleWriter
 
   const void received(CaffeineBeverage.Brewing brewing)
   {
-    writeln(brewing.description);
+    writeln(brewing.what);
   }
 
-  const void received(CaffeineBeverage.PouringIntoCup)
+  const void received(CaffeineBeverage.PouringIntoCup pouring)
   {
-    writeln("pouring into cup");
+    writeln("pouring " ~ pouring.what ~ " into cup");
   }
 }
 
