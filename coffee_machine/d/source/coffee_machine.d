@@ -122,6 +122,7 @@ unittest
   describe("a call to descrption")
     .should("return same text as given in ctor",
   	      (coffee.description().must.equal("Coffee")));
+
   class CaffeineBevergeObserver
   {
     int amountWaterMl;
@@ -152,4 +153,18 @@ unittest
   assert(o.amountWaterMl == coffeeRecipe.amountWaterMl());
   assert(o.brewingWhat == coffeeRecipe.brew());
   assert(o.receivedPouringIntoCup);
+}
+
+interface CaffeineBeverageFactory
+{}
+
+class CoffeeFactory : CaffeineBeverageFactory
+{}
+
+class TeaFactory : CaffeineBeverageFactory
+{}
+
+class BeverageFactory
+{
+  private CaffeineBeverageFactory[string] m_factories;
 }
