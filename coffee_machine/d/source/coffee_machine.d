@@ -70,21 +70,21 @@ class TeaRecipe : Recipe
     }
 }
 
+struct BoilingWater
+{
+  immutable int amountMl;
+}
+struct Brewing
+{
+  immutable string what;
+}
+struct PouringIntoCup
+{
+  immutable string what;
+}
+
 class CaffeineBeverage
 {
-  struct BoilingWater
-  {
-    const int amountMl;
-  }
-  struct Brewing
-  {
-    const string what;
-  }
-  struct PouringIntoCup
-  {
-    const string what;
-  }
-
   mixin Signal!BoilingWater sigBoilingWater;
   mixin Signal!Brewing sigBrewing;
   mixin Signal!PouringIntoCup sigPouringIntoCup;
@@ -140,17 +140,17 @@ unittest
     string brewingWhat;
     string pouringWhat;
 
-    nothrow void received(CaffeineBeverage.BoilingWater boiling)
+    nothrow void received(BoilingWater boiling)
     {
       amountWaterMl = boiling.amountMl;
     }
 
-    nothrow void received(CaffeineBeverage.Brewing brewing)
+    nothrow void received(Brewing brewing)
     {
       brewingWhat = brewing.what;
     }
 
-    nothrow void received(CaffeineBeverage.PouringIntoCup pouring)
+    nothrow void received(PouringIntoCup pouring)
     {
       pouringWhat = pouring.what;
     }
@@ -200,9 +200,9 @@ class BeverageFactory
   }
 
   CaffeineBeverage create(string beverage,
-			  void delegate(CaffeineBeverage.BoilingWater) boiling,
-			  void delegate(CaffeineBeverage.Brewing) brewing,
-			  void delegate(CaffeineBeverage.PouringIntoCup) pouring)
+			  void delegate(BoilingWater) boiling,
+			  void delegate(Brewing) brewing,
+			  void delegate(PouringIntoCup) pouring)
   {
     auto caff = m_factories[beverage].create();
     caff.sigBoilingWater.connect(boiling);
@@ -218,34 +218,34 @@ class ConsoleWriter
 {
   import std.stdio;
   import std.conv;
-  const void received(CaffeineBeverage.BoilingWater boiling)
+  const void received(BoilingWater boiling)
   {
     writeln("boiling " ~ to!string(boiling.amountMl) ~ "ml water");
   }
 
-  const void received(CaffeineBeverage.Brewing brewing)
+  const void received(Brewing brewing)
   {
     writeln(brewing.what);
   }
 
-  const void received(CaffeineBeverage.PouringIntoCup pouring)
+  const void received(PouringIntoCup pouring)
   {
     writeln("pouring " ~ pouring.what ~ " into cup");
   }
 }
 
-void main()
-{
-  auto consoleWriter = new ConsoleWriter();
-  auto beverageFactory = new BeverageFactory();
-  beverageFactory
-    .create("coffee",
-	    &consoleWriter.received,
-	    &consoleWriter.received,
-	    &consoleWriter.received).prepare();
-  beverageFactory
-    .create("tea",
-	    &consoleWriter.received,
-	    &consoleWriter.received,
-	    &consoleWriter.received).prepare();
-}
+// void main()
+// {
+//   auto consoleWriter = new ConsoleWriter();
+//   auto beverageFactory = new BeverageFactory();
+//   beverageFactory
+//     .create("coffee",
+// 	    &consoleWriter.received,
+// 	    &consoleWriter.received,
+// 	    &consoleWriter.received).prepare();
+//   beverageFactory
+//     .create("tea",
+// 	    &consoleWriter.received,
+// 	    &consoleWriter.received,
+// 	    &consoleWriter.received).prepare();
+// }
