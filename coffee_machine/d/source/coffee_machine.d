@@ -74,9 +74,9 @@ class CaffeineBeverage
   struct PouringIntoCup
   {}
 
-  mixin Signal!BoilingWater;
-  mixin Signal!Brewing;
-  mixin Signal!PouringIntoCup;
+  mixin Signal!BoilingWater sigBoilingWater;
+  mixin Signal!Brewing sigBrewing;
+  mixin Signal!PouringIntoCup sigPouringIntoCup;
 
   this(Recipe recipe, string description)
   {
@@ -117,8 +117,39 @@ class CaffeineBeverage
 
 unittest
 {
-  auto caff = new CaffeineBeverage(null, "Caff");
+  auto coffeeRecipe = new CoffeeRecipe;
+  auto caff = new CaffeineBeverage(coffeeRecipe, "Caff");
   describe("a call to descrption")
     .should("return same text as given in ctor",
   	      (caff.description().must.equal("Caff")));
+  class Observer
+  {
+    int amountWaterMl;
+    string brewingWhat;
+    bool receivedPouringIntoCup;
+
+    void received(CaffeineBeverage.BoilingWater boiling)
+    {
+      amountWaterMl = boiling.amountMl;
+    }
+
+    void received(CaffeineBeverage.Brewing brewing)
+    {
+      brewingWhat = brewing.description;
+    }
+
+    void received(CaffeineBeverage.PouringIntoCup)
+    {
+      receivedPouringIntoCup = true;
+    }
+  }
+
+  auto  o = new Observer;
+  caff.sigBoilingWater.connect(&o.received);
+  caff.sigBrewing.connect(&o.received);
+  caff.sigPouringIntoCup.connect(&o.received);
+  caff.prepare();
+  assert(o.amountWaterMl == coffeeRecipe.amountWaterMl());
+  assert(o.brewingWhat == coffeeRecipe.brew());
+  assert(o.receivedPouringIntoCup);
 }
