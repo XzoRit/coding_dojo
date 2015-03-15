@@ -130,7 +130,7 @@ unittest
   auto coffee = new CaffeineBeverage(coffeeRecipe, "Coffee");
   describe("a call to descrption")
     .should("return same text as given in ctor",
-  	      (coffee.description().must.equal("Coffee")));
+	    (coffee.description().must.equal("Coffee")));
 
   class CaffeineBevergeObserver
   {
@@ -189,13 +189,52 @@ class TeaFactory : CaffeineBeverageFactory
   }
 }
 
-class BeverageFactory
+class BeverageFactory(BeverageObserver)
 {
   this()
   {
-    m_factories["coffee"] = new CoffeeFactory();
-    m_factories["tea"] = new TeaFactory();
+    m_factories["coffee"] = new immutable CoffeeFactory();
+    m_factories["tea"] = new immutable TeaFactory();
+    m_observer = new BeverageObserver();
   }
 
-  private CaffeineBeverageFactory[string] m_factories;
+  CaffeineBeverage create(string beverage)
+  {
+    auto caff = m_factories[beverage].create();
+    caff.sigBoilingWater.connect(&m_observer.received);
+    caff.sigBrewing.connect(&m_observer.received);
+    caff.sigPouringIntoCup.connect(&m_observer.received);
+    return caff;
+  }
+
+  private immutable(CaffeineBeverageFactory)[string] m_factories;
+  private BeverageObserver m_observer;
+}
+
+class ConsoleWriter
+{
+  import std.stdio;
+  import std.conv;
+  void received(CaffeineBeverage.BoilingWater boiling)
+  {
+    writeln("boiling " ~ to!string(boiling.amountMl) ~ "ml water");
+  }
+
+  void received(CaffeineBeverage.Brewing brewing)
+  {
+    writeln(brewing.description);
+  }
+
+  void received(CaffeineBeverage.PouringIntoCup)
+  {
+    writeln("pouring into cup");
+  }
+}
+
+void main()
+{
+  alias ConsoleBeveregeFactory = BeverageFactory!ConsoleWriter; 
+  auto consoleBeverageFactory = new ConsoleBeveregeFactory();
+  consoleBeverageFactory.create("coffee").prepare();
+  consoleBeverageFactory.create("tea").prepare();
 }
