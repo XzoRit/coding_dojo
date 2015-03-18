@@ -30,7 +30,7 @@ class CoffeeRecipe : Recipe
       		(new immutable(CoffeeRecipe)().amountWaterMl().must.equal(175)));
     }
 
-  immutable pure nothrow string brew()
+  string brew() immutable pure nothrow
   {
     return "dripping coffee through filter";
   }
