@@ -3,13 +3,13 @@ import std.signals;
 
 interface Recipe
 {
-  immutable pure nothrow int amountWaterMl()
+  int amountWaterMl() immutable pure nothrow
     out (result)
 	  {
 	    assert(result > 0);
 	  }
 
-  immutable pure nothrow string brew()
+  string brew() immutable pure nothrow
     out (result)
 	  {
 	    assert(result.length > 0);
@@ -18,7 +18,7 @@ interface Recipe
 
 class CoffeeRecipe : Recipe
 {
-  immutable pure nothrow int amountWaterMl()
+  int amountWaterMl() immutable pure nothrow
   {
     return 175;
   }
@@ -27,7 +27,7 @@ class CoffeeRecipe : Recipe
     {
       describe("amount water for coffee")
       	.should("return 175",
-      		(new immutable CoffeeRecipe().amountWaterMl().must.equal(175)));
+      		(new immutable(CoffeeRecipe)().amountWaterMl().must.equal(175)));
     }
 
   immutable pure nothrow string brew()
@@ -39,13 +39,13 @@ class CoffeeRecipe : Recipe
     {
       describe("brew")
       	.should("return brewing coffee",
-      		(new immutable CoffeeRecipe().brew().must.equal("dripping coffee through filter")));
+      		(new immutable(CoffeeRecipe)().brew().must.equal("dripping coffee through filter")));
     }
 }
 
 class TeaRecipe : Recipe
 {
-  immutable pure nothrow int amountWaterMl()
+  int amountWaterMl() immutable pure nothrow
   {
     return 200;
   }
@@ -54,7 +54,7 @@ class TeaRecipe : Recipe
     {
       describe("amount water for tea")
       	.should("be 200ml",
-      		(new immutable TeaRecipe().amountWaterMl().must.equal(200)));
+      		(new immutable(TeaRecipe)().amountWaterMl().must.equal(200)));
     }
 
   immutable pure nothrow string brew()
@@ -66,21 +66,21 @@ class TeaRecipe : Recipe
     {
       describe("brew")
       	.should("return steeping tea",
-      		(new immutable TeaRecipe().brew().must.equal("steeping tea")));
+      		(new immutable(TeaRecipe)().brew().must.equal("steeping tea")));
     }
 }
 
 struct BoilingWater
 {
-  immutable int amountMl;
+  immutable(int) amountMl;
 }
 struct Brewing
 {
-  immutable string what;
+  immutable(string) what;
 }
 struct PouringIntoCup
 {
-  immutable string what;
+  immutable(string) what;
 }
 
 class CaffeineBeverage
@@ -89,13 +89,13 @@ class CaffeineBeverage
   mixin Signal!Brewing sigBrewing;
   mixin Signal!PouringIntoCup sigPouringIntoCup;
 
-  this(immutable Recipe recipe, immutable string description)
+  this(immutable(Recipe) recipe, immutable(string) description)
   {
     m_description = description;
     m_recipe = recipe;
   }
 
-  const pure nothrow string description()
+  string description() const pure nothrow
   {
     return m_description;
   }
@@ -104,7 +104,7 @@ class CaffeineBeverage
   {
     boilWater(m_recipe.amountWaterMl());
     brewing(m_recipe.brew());
-    pourInCup();
+    pouringIntoCup();
   }
 
   private void boilWater(int amountWaterMl)
@@ -117,13 +117,13 @@ class CaffeineBeverage
     emit(Brewing(what));
   }
 
-  private void pourInCup()
+  private void pouringIntoCup()
   {
     emit(PouringIntoCup(m_description));
   }
 
-  private immutable string m_description;
-  private immutable Recipe m_recipe;
+  private immutable(string) m_description;
+  private immutable(Recipe) m_recipe;
 }
 
 unittest
@@ -140,17 +140,17 @@ unittest
     string brewingWhat;
     string pouringWhat;
 
-    nothrow void received(BoilingWater boiling)
+    void received(BoilingWater boiling) nothrow
     {
       amountWaterMl = boiling.amountMl;
     }
 
-    nothrow void received(Brewing brewing)
+    void received(Brewing brewing) nothrow
     {
       brewingWhat = brewing.what;
     }
 
-    nothrow void received(PouringIntoCup pouring)
+    void received(PouringIntoCup pouring) nothrow
     {
       pouringWhat = pouring.what;
     }
@@ -168,7 +168,7 @@ unittest
 
 interface CaffeineBeverageFactory
 {
-  immutable CaffeineBeverage create()
+  CaffeineBeverage create() immutable
     out (result)
 	  {
 	    assert(result !is null);
@@ -177,17 +177,17 @@ interface CaffeineBeverageFactory
 
 class CoffeeFactory : CaffeineBeverageFactory
 {
-  immutable CaffeineBeverage create()
+  CaffeineBeverage create() immutable
   {
-    return new CaffeineBeverage(new immutable CoffeeRecipe(), "Coffee");
+    return new CaffeineBeverage(new immutable(CoffeeRecipe)(), "Coffee");
   }
 }
 
 class TeaFactory : CaffeineBeverageFactory
 {
-  immutable CaffeineBeverage create()
+  CaffeineBeverage create() immutable
   {
-    return new CaffeineBeverage(new immutable TeaRecipe(), "Tea");
+    return new CaffeineBeverage(new immutable(TeaRecipe)(), "Tea");
   }
 }
 
@@ -195,8 +195,8 @@ class BeverageFactory(Observer)
 {
   this()
   {
-    m_factories["coffee"] = new immutable CoffeeFactory();
-    m_factories["tea"] = new immutable TeaFactory();
+    m_factories["coffee"] = new immutable(CoffeeFactory)();
+    m_factories["tea"] = new immutable(TeaFactory)();
     m_observer = new Observer();
   }
 
@@ -209,25 +209,26 @@ class BeverageFactory(Observer)
     return caff;
   }
 
-  private immutable(CaffeineBeverageFactory)[string] m_factories;
-  private const Observer m_observer;
+  private immutable(CaffeineBeverageFactory)[immutable(string)] m_factories;
+  private const(Observer) m_observer;
 }
 
 class ConsoleWriter
 {
   import std.stdio;
   import std.conv;
-  const void opApply(BoilingWater boiling)
+
+  void opApply(BoilingWater boiling) const
   {
     writeln("boiling " ~ to!string(boiling.amountMl) ~ "ml water");
   }
 
-  const void opApply(Brewing brewing)
+  void opApply(Brewing brewing) const
   {
     writeln(brewing.what);
   }
 
-  const void opApply(PouringIntoCup pouring)
+  void opApply(PouringIntoCup pouring) const
   {
     writeln("pouring " ~ pouring.what ~ " into cup");
   }
