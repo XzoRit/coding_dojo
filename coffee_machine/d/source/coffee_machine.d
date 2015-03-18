@@ -191,44 +191,43 @@ class TeaFactory : CaffeineBeverageFactory
   }
 }
 
-class BeverageFactory
+class BeverageFactory(Observer)
 {
   this()
   {
     m_factories["coffee"] = new immutable CoffeeFactory();
     m_factories["tea"] = new immutable TeaFactory();
+    m_observer = new Observer();
   }
 
-  CaffeineBeverage create(string beverage,
-			  void delegate(BoilingWater) boiling,
-			  void delegate(Brewing) brewing,
-			  void delegate(PouringIntoCup) pouring)
+  CaffeineBeverage create(string beverage) const
   {
     auto caff = m_factories[beverage].create();
-    caff.sigBoilingWater.connect(boiling);
-    caff.sigBrewing.connect(brewing);
-    caff.sigPouringIntoCup.connect(pouring);
+    caff.sigBoilingWater.connect(&m_observer.opApply);
+    caff.sigBrewing.connect(&m_observer.opApply);
+    caff.sigPouringIntoCup.connect(&m_observer.opApply);
     return caff;
   }
 
   private immutable(CaffeineBeverageFactory)[string] m_factories;
+  private const Observer m_observer;
 }
 
 class ConsoleWriter
 {
   import std.stdio;
   import std.conv;
-  const void boiling(BoilingWater boiling)
+  const void opApply(BoilingWater boiling)
   {
     writeln("boiling " ~ to!string(boiling.amountMl) ~ "ml water");
   }
 
-  const void brewing(Brewing brewing)
+  const void opApply(Brewing brewing)
   {
     writeln(brewing.what);
   }
 
-  const void pouring(PouringIntoCup pouring)
+  const void opApply(PouringIntoCup pouring)
   {
     writeln("pouring " ~ pouring.what ~ " into cup");
   }
@@ -236,16 +235,7 @@ class ConsoleWriter
 
 void main()
 {
-  auto consoleWriter = new ConsoleWriter();
-  auto beverageFactory = new BeverageFactory();
-  beverageFactory
-    .create("coffee",
-	    &consoleWriter.boiling,
-	    &consoleWriter.brewing,
-	    &consoleWriter.pouring).prepare();
-  beverageFactory
-    .create("tea",
-	    &consoleWriter.boiling,
-	    &consoleWriter.brewing,
-	    &consoleWriter.pouring).prepare();
+  auto const beverageFactory = new BeverageFactory!ConsoleWriter();
+  beverageFactory.create("coffee").prepare();
+  beverageFactory.create("tea").prepare();
 }
