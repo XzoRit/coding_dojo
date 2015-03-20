@@ -242,16 +242,42 @@ class ConsoleWriter
   }
 }
 
+class CoffeeMachine
+{
+  void request(BeveragePreparation preparation)
+  {
+    m_preparations ~= preparation;
+  }
+
+  void prepareBeverages()
+  {
+    foreach(preparation; m_preparations) preparation();
+  }
+
+  private alias BeveragePreparation = void delegate();
+  private alias BeveragePreparations = BeveragePreparation[];
+  private BeveragePreparations m_preparations;
+}
+
+unittest
+{
+  auto coffeeMachine = new CoffeeMachine();
+  bool callbackHasBeenCalled = false;
+  coffeeMachine.request({ callbackHasBeenCalled = true; });
+  coffeeMachine.prepareBeverages();
+  assert(callbackHasBeenCalled);
+}
+
 void main()
 {
   auto const consoleWriter = new ConsoleWriter();
   auto const beverageFactory = new BeverageFactory!ConsoleWriter(consoleWriter);
-  CaffeineBeverage[] beverages;
+  auto coffeeMachine = new CoffeeMachine();
   do
     {
       string beverage;
       if(!consoleWriter.askForBeverage(beverage)) break;
-      beverages ~= beverageFactory.create(beverage);
+      coffeeMachine.request(&beverageFactory.create(beverage).prepare);
   } while(true);
-  foreach(beverage; beverages) beverage.prepare();
+  coffeeMachine.prepareBeverages();
 }
