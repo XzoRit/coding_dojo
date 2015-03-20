@@ -193,11 +193,11 @@ class TeaFactory : CaffeineBeverageFactory
 
 class BeverageFactory(Observer)
 {
-  this()
+  this(const(Observer) observer)
   {
     m_factories["coffee"] = new immutable(CoffeeFactory)();
     m_factories["tea"] = new immutable(TeaFactory)();
-    m_observer = new Observer();
+    m_observer = observer;
   }
 
   CaffeineBeverage create(string beverage) const
@@ -216,10 +216,10 @@ class BeverageFactory(Observer)
 class ConsoleWriter
 {
   import std.stdio;
-  import std.conv;
 
   void opApply(BoilingWater boiling) const
   {
+    import std.conv;
     writeln("boiling " ~ to!string(boiling.amountMl) ~ "ml water");
   }
 
@@ -232,11 +232,26 @@ class ConsoleWriter
   {
     writeln("pouring " ~ pouring.what ~ " into cup");
   }
+
+  bool askForBeverage(out string beverage) const
+  {
+    import std.string;
+    writeln("What beverage would you like to have? (q for quit!)");
+    beverage = chomp(readln());
+    return beverage != "q";
+  }
 }
 
 void main()
 {
-  auto const beverageFactory = new BeverageFactory!ConsoleWriter();
-  beverageFactory.create("coffee").prepare();
-  beverageFactory.create("tea").prepare();
+  auto const consoleWriter = new ConsoleWriter();
+  auto const beverageFactory = new BeverageFactory!ConsoleWriter(consoleWriter);
+  CaffeineBeverage[] beverages;
+  do
+    {
+      string beverage;
+      if(!consoleWriter.askForBeverage(beverage)) break;
+      beverages ~= beverageFactory.create(beverage);
+  } while(true);
+  foreach(beverage; beverages) beverage.prepare();
 }
