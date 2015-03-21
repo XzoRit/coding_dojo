@@ -216,10 +216,10 @@ class BeverageFactory(Observer)
 class ConsoleWriter
 {
   import std.stdio;
+  import std.conv;
 
   void opApply(BoilingWater boiling) const
   {
-    import std.conv;
     writeln("boiling " ~ to!string(boiling.amountMl) ~ "ml water");
   }
 
@@ -233,19 +233,19 @@ class ConsoleWriter
     writeln("pouring " ~ pouring.what ~ " into cup");
   }
 
-  void opApply(Starting)
+  void opApply(Starting starting) const
   {
-    writeln("starting");
+    writeln("starting preparation of " ~ to!string(starting.amount) ~ " beverages");
   }
 
-  void opApply(Preparing)
+  void opApply(Preparing preparing) const
   {
-    writeln("preparing");
+    writeln("preparing beverage " ~ to!string(preparing.current));
   }
 
-  void opApply(Finished)
+  void opApply(Finished finished) const
   {
-    writeln("finished");
+    writeln("finished preparing " ~ to!string(finished.amount) ~ " beverages");
   }
 
   bool askForBeverage(out string beverage) const
@@ -257,9 +257,18 @@ class ConsoleWriter
   }
 }
 
-struct Starting {}
-struct Preparing {}
-struct Finished {}
+struct Starting
+{
+  ulong amount;
+}
+struct Preparing
+{
+  ulong current;
+}
+struct Finished
+{
+  ulong amount;
+}
 
 class CoffeeMachine
 {
@@ -276,27 +285,28 @@ class CoffeeMachine
   void prepareBeverages()
   {
     starting();
-    scope(exit) finished();
-    foreach(preparation; m_preparations)
+    foreach(current, preparation; m_preparations)
       {
-	preparing();
+	preparing(current);
 	preparation();
       }
+    finished();
   }
 
   private void starting()
   {
-    emit(Starting());
+    emit(Starting(m_preparations.length));
   }
 
-  private void preparing()
+  private void preparing(ulong current)
   {
-    emit(Preparing());
+    emit(Preparing(current));
   }
 
   private void finished()
   {
-    emit(Finished());
+    emit(Finished(m_preparations.length));
+    m_preparations.length = 0;
   }
 
   private alias BeveragePreparation = void delegate();
@@ -306,11 +316,47 @@ class CoffeeMachine
 
 unittest
 {
+  class SigReceiver
+  {
+    ulong amountStarting;
+    ulong currentPreparing;
+    ulong amountFinished;
+
+    void received(Starting starting)
+    {
+      amountStarting = starting.amount;
+    }
+
+    void received(Preparing preparing)
+    {
+      currentPreparing = preparing.current;
+    }
+
+    void received(Finished finished)
+    {
+      amountFinished = finished.amount;
+    }
+  }
+
   auto coffeeMachine = new CoffeeMachine();
+  auto sigReceiver = new SigReceiver();
+  coffeeMachine.sigStarting.connect(&sigReceiver.received);
+  coffeeMachine.sigPreparing.connect(&sigReceiver.received);
+  coffeeMachine.sigFinished.connect(&sigReceiver.received);
+  coffeeMachine.prepareBeverages();
+
   bool callbackHasBeenCalled = false;
   coffeeMachine.request({ callbackHasBeenCalled = true; });
   coffeeMachine.prepareBeverages();
   assert(callbackHasBeenCalled);
+  assert(sigReceiver.amountStarting == 1);
+  assert(sigReceiver.currentPreparing == 0);
+  assert(sigReceiver.amountFinished == 1);
+
+  coffeeMachine.prepareBeverages();
+  assert(sigReceiver.amountStarting == 0);
+  assert(sigReceiver.currentPreparing == 0);
+  assert(sigReceiver.amountFinished == 0);
 }
 
 void main()
