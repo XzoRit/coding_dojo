@@ -1,5 +1,4 @@
 import specd.specd;
-import std.signals;
 
 interface Recipe
 {
@@ -85,6 +84,7 @@ struct PouringIntoCup
 
 class CaffeineBeverage
 {
+  import std.signals;
   mixin Signal!BoilingWater sigBoilingWater;
   mixin Signal!Brewing sigBrewing;
   mixin Signal!PouringIntoCup sigPouringIntoCup;
@@ -233,6 +233,21 @@ class ConsoleWriter
     writeln("pouring " ~ pouring.what ~ " into cup");
   }
 
+  void opApply(Starting)
+  {
+    writeln("starting");
+  }
+
+  void opApply(Preparing)
+  {
+    writeln("preparing");
+  }
+
+  void opApply(Finished)
+  {
+    writeln("finished");
+  }
+
   bool askForBeverage(out string beverage) const
   {
     import std.string;
@@ -242,8 +257,17 @@ class ConsoleWriter
   }
 }
 
+struct Starting {}
+struct Preparing {}
+struct Finished {}
+
 class CoffeeMachine
 {
+  import std.signals;
+  mixin Signal!Starting sigStarting;
+  mixin Signal!Preparing sigPreparing;
+  mixin Signal!Finished sigFinished;
+
   void request(BeveragePreparation preparation)
   {
     m_preparations ~= preparation;
@@ -251,7 +275,28 @@ class CoffeeMachine
 
   void prepareBeverages()
   {
-    foreach(preparation; m_preparations) preparation();
+    starting();
+    scope(exit) finished();
+    foreach(preparation; m_preparations)
+      {
+	preparing();
+	preparation();
+      }
+  }
+
+  private void starting()
+  {
+    emit(Starting());
+  }
+
+  private void preparing()
+  {
+    emit(Preparing());
+  }
+
+  private void finished()
+  {
+    emit(Finished());
   }
 
   private alias BeveragePreparation = void delegate();
@@ -273,6 +318,9 @@ void main()
   auto const consoleWriter = new ConsoleWriter();
   auto const beverageFactory = new BeverageFactory!ConsoleWriter(consoleWriter);
   auto coffeeMachine = new CoffeeMachine();
+  coffeeMachine.sigStarting.connect(&consoleWriter.opApply);
+  coffeeMachine.sigPreparing.connect(&consoleWriter.opApply);
+  coffeeMachine.sigFinished.connect(&consoleWriter.opApply);
   do
     {
       string beverage;
