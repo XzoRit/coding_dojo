@@ -69,6 +69,59 @@ class TeaRecipe : Recipe
     }
 }
 
+class Condiment
+{
+  final string description() immutable pure nothrow
+  {
+    if(m_next) return this.onDescription() ~ m_next.description();
+    return this.onDescription();
+  }
+
+  final float price() immutable pure nothrow
+  {
+    if(m_next) return this.onPrice() + m_next.price();
+    return this.onPrice();
+  }
+
+  string onDescription() immutable pure nothrow
+  {
+    return "";
+  }
+
+  float onPrice() immutable pure nothrow
+  {
+    return 0.0;
+  }
+  
+  private immutable(Condiment) m_next;
+}
+
+class Milk : Condiment
+{
+  override string onDescription() immutable pure nothrow
+  {
+    return "-Milk-";
+  }
+
+  override float onPrice() immutable pure nothrow
+  {
+    return 0.11;
+  }
+}
+
+class Sugar : Condiment
+{
+  override string onDescription() immutable pure nothrow
+  {
+    return "-Sugar-";
+  }
+
+  override float onPrice() immutable pure nothrow
+  {
+    return 0.29;
+  }
+}
+
 struct BoilingWater
 {
   immutable(int) amountMl;
@@ -89,14 +142,18 @@ class CaffeineBeverage
   mixin Signal!Brewing sigBrewing;
   mixin Signal!PouringIntoCup sigPouringIntoCup;
 
-  this(immutable(Recipe) recipe, immutable(string) description)
+  this(immutable(Recipe) recipe,
+       immutable(string) description,
+       immutable(Condiment) condiment)
   {
-    m_description = description;
     m_recipe = recipe;
+    m_description = description;
+    m_condiments = condiment;
   }
 
   string description() const pure nothrow
   {
+    if(m_condiments) return m_description ~ m_condiments.description();
     return m_description;
   }
 
@@ -124,6 +181,7 @@ class CaffeineBeverage
 
   private immutable(string) m_description;
   private immutable(Recipe) m_recipe;
+  private immutable(Condiment) m_condiments;
 }
 
 unittest
@@ -177,17 +235,21 @@ interface CaffeineBeverageFactory
 
 class CoffeeFactory : CaffeineBeverageFactory
 {
-  CaffeineBeverage create() immutable
+  override CaffeineBeverage create() immutable
   {
-    return new CaffeineBeverage(new immutable(CoffeeRecipe)(), "Coffee");
+    return new CaffeineBeverage(new immutable(CoffeeRecipe)(),
+				"Coffee",
+				new immutable(Condiment)());
   }
 }
 
 class TeaFactory : CaffeineBeverageFactory
 {
-  CaffeineBeverage create() immutable
+  override CaffeineBeverage create() immutable
   {
-    return new CaffeineBeverage(new immutable(TeaRecipe)(), "Tea");
+    return new CaffeineBeverage(new immutable(TeaRecipe)(),
+				"Tea",
+				new immutable(Condiment)());
   }
 }
 
@@ -372,6 +434,6 @@ void main()
       string beverage;
       if(!consoleWriter.askForBeverage(beverage)) break;
       coffeeMachine.request(&beverageFactory.create(beverage).prepare);
-  } while(true);
+    } while(true);
   coffeeMachine.prepareBeverages();
 }
