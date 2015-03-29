@@ -2,13 +2,13 @@ import specd.specd;
 
 interface Recipe
 {
-  int amountWaterMl() immutable pure nothrow
+  int amountWaterMl() const pure nothrow
     out (result)
 	  {
 	    assert(result > 0);
 	  }
 
-  string brew() immutable pure nothrow
+  string brew() const pure nothrow
     out (result)
 	  {
 	    assert(result.length > 0);
@@ -17,7 +17,7 @@ interface Recipe
 
 class CoffeeRecipe : Recipe
 {
-  int amountWaterMl() immutable pure nothrow
+  int amountWaterMl() const pure nothrow
   {
     return 175;
   }
@@ -26,10 +26,10 @@ class CoffeeRecipe : Recipe
     {
       describe("amount water for coffee")
       	.should("return 175",
-      		(new immutable(CoffeeRecipe)().amountWaterMl().must.equal(175)));
+      		(new const(CoffeeRecipe)().amountWaterMl().must.equal(175)));
     }
 
-  string brew() immutable pure nothrow
+  string brew() const pure nothrow
   {
     return "dripping coffee through filter";
   }
@@ -38,13 +38,13 @@ class CoffeeRecipe : Recipe
     {
       describe("brew")
       	.should("return brewing coffee",
-      		(new immutable(CoffeeRecipe)().brew().must.equal("dripping coffee through filter")));
+      		(new const(CoffeeRecipe)().brew().must.equal("dripping coffee through filter")));
     }
 }
 
 class TeaRecipe : Recipe
 {
-  int amountWaterMl() immutable pure nothrow
+  int amountWaterMl() const pure nothrow
   {
     return 200;
   }
@@ -53,10 +53,10 @@ class TeaRecipe : Recipe
     {
       describe("amount water for tea")
       	.should("be 200ml",
-      		(new immutable(TeaRecipe)().amountWaterMl().must.equal(200)));
+      		(new const(TeaRecipe)().amountWaterMl().must.equal(200)));
     }
 
-  immutable pure nothrow string brew()
+  const pure nothrow string brew()
   {
     return "steeping tea";
   }
@@ -65,45 +65,55 @@ class TeaRecipe : Recipe
     {
       describe("brew")
       	.should("return steeping tea",
-      		(new immutable(TeaRecipe)().brew().must.equal("steeping tea")));
+      		(new const(TeaRecipe)().brew().must.equal("steeping tea")));
     }
 }
 
 class Condiment
 {
-  final string description() immutable pure nothrow
+  this()
+  {
+    m_next = null;
+  }
+
+  this(const Condiment next)
+  {
+    m_next = next;
+  }
+
+  final string description() const pure nothrow
   {
     if(m_next) return this.onDescription() ~ m_next.description();
     return this.onDescription();
   }
 
-  final float price() immutable pure nothrow
+  final float price() const pure nothrow
   {
     if(m_next) return this.onPrice() + m_next.price();
     return this.onPrice();
   }
 
-  string onDescription() immutable pure nothrow
+  string onDescription() const pure nothrow
   {
     return "";
   }
 
-  float onPrice() immutable pure nothrow
+  float onPrice() const pure nothrow
   {
     return 0.0;
   }
   
-  private immutable(Condiment) m_next;
+  private const(Condiment) m_next;
 }
 
 class Milk : Condiment
 {
-  override string onDescription() immutable pure nothrow
+  override string onDescription() const pure nothrow
   {
     return "-Milk-";
   }
 
-  override float onPrice() immutable pure nothrow
+  override float onPrice() const pure nothrow
   {
     return 0.11;
   }
@@ -111,12 +121,12 @@ class Milk : Condiment
 
 class Sugar : Condiment
 {
-  override string onDescription() immutable pure nothrow
+  override string onDescription() const pure nothrow
   {
     return "-Sugar-";
   }
 
-  override float onPrice() immutable pure nothrow
+  override float onPrice() const pure nothrow
   {
     return 0.29;
   }
@@ -124,15 +134,15 @@ class Sugar : Condiment
 
 struct BoilingWater
 {
-  immutable(int) amountMl;
+  const(int) amountMl;
 }
 struct Brewing
 {
-  immutable(string) what;
+  const(string) what;
 }
 struct PouringIntoCup
 {
-  immutable(string) what;
+  const(string) what;
 }
 
 class CaffeineBeverage
@@ -142,9 +152,9 @@ class CaffeineBeverage
   mixin Signal!Brewing sigBrewing;
   mixin Signal!PouringIntoCup sigPouringIntoCup;
 
-  this(immutable(Recipe) recipe,
-       immutable(string) description,
-       immutable(Condiment) condiment)
+  this(const(Recipe) recipe,
+       const(string) description,
+       const(Condiment) condiment)
   {
     m_recipe = recipe;
     m_description = description;
@@ -179,14 +189,14 @@ class CaffeineBeverage
     emit(PouringIntoCup(m_description));
   }
 
-  private immutable(string) m_description;
-  private immutable(Recipe) m_recipe;
-  private immutable(Condiment) m_condiments;
+  private const(string) m_description;
+  private const(Recipe) m_recipe;
+  private const(Condiment) m_condiments;
 }
 
 unittest
 {
-  immutable coffeeRecipe = new CoffeeRecipe;
+  const coffeeRecipe = new CoffeeRecipe;
   auto coffee = new CaffeineBeverage(coffeeRecipe, "Coffee");
   describe("a call to descrption")
     .should("return same text as given in ctor",
@@ -226,7 +236,7 @@ unittest
 
 interface CaffeineBeverageFactory
 {
-  CaffeineBeverage create() immutable
+  CaffeineBeverage create() const
     out (result)
 	  {
 	    assert(result !is null);
@@ -235,21 +245,21 @@ interface CaffeineBeverageFactory
 
 class CoffeeFactory : CaffeineBeverageFactory
 {
-  override CaffeineBeverage create() immutable
+  override CaffeineBeverage create() const
   {
-    return new CaffeineBeverage(new immutable(CoffeeRecipe)(),
+    return new CaffeineBeverage(new const(CoffeeRecipe)(),
 				"Coffee",
-				new immutable(Condiment)());
+				new const(Condiment)());
   }
 }
 
 class TeaFactory : CaffeineBeverageFactory
 {
-  override CaffeineBeverage create() immutable
+  override CaffeineBeverage create() const
   {
-    return new CaffeineBeverage(new immutable(TeaRecipe)(),
+    return new CaffeineBeverage(new const(TeaRecipe)(),
 				"Tea",
-				new immutable(Condiment)());
+				new const(Condiment)());
   }
 }
 
@@ -257,8 +267,8 @@ class BeverageFactory(Observer)
 {
   this(const(Observer) observer)
   {
-    m_factories["coffee"] = new immutable(CoffeeFactory)();
-    m_factories["tea"] = new immutable(TeaFactory)();
+    m_factories["coffee"] = new const(CoffeeFactory)();
+    m_factories["tea"] = new const(TeaFactory)();
     m_observer = observer;
   }
 
@@ -271,7 +281,7 @@ class BeverageFactory(Observer)
     return caff;
   }
 
-  private immutable(CaffeineBeverageFactory)[immutable(string)] m_factories;
+  private const(CaffeineBeverageFactory)[const(string)] m_factories;
   private const(Observer) m_observer;
 }
 
