@@ -56,7 +56,7 @@ class TeaRecipe : Recipe
       		(new const(TeaRecipe)().amountWaterMl().must.equal(200)));
     }
 
-  const pure nothrow string brew()
+  string brew() const pure nothrow
   {
     return "steeping tea";
   }
