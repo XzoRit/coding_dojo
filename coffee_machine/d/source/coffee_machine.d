@@ -265,9 +265,9 @@ class BeverageFactory(Observer)
   CaffeineBeverage create(string beverage) const
   {
     auto caff = m_factories[beverage].create();
-    caff.sigBoilingWater.connect(&m_observer.opApply);
-    caff.sigBrewing.connect(&m_observer.opApply);
-    caff.sigPouringIntoCup.connect(&m_observer.opApply);
+    caff.sigBoilingWater.connect(&m_observer.opCall);
+    caff.sigBrewing.connect(&m_observer.opCall);
+    caff.sigPouringIntoCup.connect(&m_observer.opCall);
     return caff;
   }
 
@@ -280,32 +280,32 @@ class ConsoleWriter
   import std.stdio;
   import std.conv;
 
-  void opApply(BoilingWater boiling) const
+  void opCall(BoilingWater boiling) const
   {
     writeln("boiling " ~ to!string(boiling.amountMl) ~ "ml water");
   }
 
-  void opApply(Brewing brewing) const
+  void opCall(Brewing brewing) const
   {
     writeln(brewing.what);
   }
 
-  void opApply(PouringIntoCup pouring) const
+  void opCall(PouringIntoCup pouring) const
   {
     writeln("pouring " ~ pouring.what ~ " into cup");
   }
 
-  void opApply(Starting starting) const
+  void opCall(Starting starting) const
   {
     writeln("starting preparation of " ~ to!string(starting.amount) ~ " beverages");
   }
 
-  void opApply(Preparing preparing) const
+  void opCall(Preparing preparing) const
   {
     writeln("preparing beverage " ~ to!string(preparing.current));
   }
 
-  void opApply(Finished finished) const
+  void opCall(Finished finished) const
   {
     writeln("finished preparing " ~ to!string(finished.amount) ~ " beverages");
   }
@@ -426,9 +426,9 @@ void main()
   auto const consoleWriter = new ConsoleWriter();
   auto const beverageFactory = new BeverageFactory!ConsoleWriter(consoleWriter);
   auto coffeeMachine = new CoffeeMachine();
-  coffeeMachine.sigStarting.connect(&consoleWriter.opApply);
-  coffeeMachine.sigPreparing.connect(&consoleWriter.opApply);
-  coffeeMachine.sigFinished.connect(&consoleWriter.opApply);
+  coffeeMachine.sigStarting.connect(&consoleWriter.opCall);
+  coffeeMachine.sigPreparing.connect(&consoleWriter.opCall);
+  coffeeMachine.sigFinished.connect(&consoleWriter.opCall);
   do
     {
       string beverage;
