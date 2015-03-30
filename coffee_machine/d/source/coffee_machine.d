@@ -108,6 +108,11 @@ class Condiment
 
 class Milk : Condiment
 {
+  this(const Condiment next)
+  {
+    super(next);
+  }
+
   override string onDescription() const pure nothrow
   {
     return "-Milk-";
@@ -121,6 +126,11 @@ class Milk : Condiment
 
 class Sugar : Condiment
 {
+  this(const Condiment next)
+  {
+    super(next);
+  }
+
   override string onDescription() const pure nothrow
   {
     return "-Sugar-";
@@ -130,6 +140,43 @@ class Sugar : Condiment
   {
     return 0.29;
   }
+}
+
+interface CaffeineCondimentFactory
+{
+  Condiment create(const Condiment next) const;
+}
+
+class MilkFactory : CaffeineCondimentFactory
+{
+  override Condiment create(const Condiment next) const
+  {
+    return new Milk(next);
+  }
+}
+
+class SugarFactory : CaffeineCondimentFactory
+{
+  override Condiment create(const Condiment next) const
+  {
+    return new Sugar(next);
+  }
+}
+
+class CondimentFactory
+{
+  this()
+  {
+    m_factories["milk"] = new MilkFactory();
+    m_factories["sugar"] = new SugarFactory();
+  }
+
+  Condiment create(const string condiment, const Condiment next) const
+  {
+    return m_factories[condiment].create(next);
+  }
+
+  private const(CaffeineCondimentFactory)[const string] m_factories;
 }
 
 struct BoilingWater
@@ -236,7 +283,7 @@ unittest
 
 interface CaffeineBeverageFactory
 {
-  CaffeineBeverage create() const
+  CaffeineBeverage create(const Condiment) const
     out (result)
 	  {
 	    assert(result !is null);
@@ -245,21 +292,21 @@ interface CaffeineBeverageFactory
 
 class CoffeeFactory : CaffeineBeverageFactory
 {
-  override CaffeineBeverage create() const
+  override CaffeineBeverage create(const Condiment condiment) const
   {
     return new CaffeineBeverage(new const(CoffeeRecipe)(),
 				"Coffee",
-				new const(Condiment)());
+				condiment);
   }
 }
 
 class TeaFactory : CaffeineBeverageFactory
 {
-  override CaffeineBeverage create() const
+  override CaffeineBeverage create(const Condiment condiment) const
   {
     return new CaffeineBeverage(new const(TeaRecipe)(),
 				"Tea",
-				new const(Condiment)());
+				condiment);
   }
 }
 
@@ -272,9 +319,9 @@ class BeverageFactory(Observer)
     m_observer = observer;
   }
 
-  CaffeineBeverage create(string beverage) const
+  CaffeineBeverage create(string beverage, const Condiment condiment) const
   {
-    auto caff = m_factories[beverage].create();
+    auto caff = m_factories[beverage].create(condiment);
     caff.sigBoilingWater.connect(&m_observer.opCall);
     caff.sigBrewing.connect(&m_observer.opCall);
     caff.sigPouringIntoCup.connect(&m_observer.opCall);
@@ -289,6 +336,7 @@ class ConsoleWriter
 {
   import std.stdio;
   import std.conv;
+  import std.string;
 
   void opCall(BoilingWater boiling) const
   {
@@ -322,10 +370,16 @@ class ConsoleWriter
 
   bool askForBeverage(out string beverage) const
   {
-    import std.string;
     writeln("What beverage would you like to have? (q for quit!)");
     beverage = chomp(readln());
     return beverage != "q";
+  }
+
+  bool askForCondiment(out string condiment) const
+  {
+    writeln("What condiment would you like to have? (q for quit!)");
+    condiment = chomp(readln());
+    return condiment != "q";
   }
 }
 
@@ -435,6 +489,7 @@ void main()
 {
   auto const consoleWriter = new ConsoleWriter();
   auto const beverageFactory = new BeverageFactory!ConsoleWriter(consoleWriter);
+  auto const condimentFactory = new CondimentFactory();
   auto coffeeMachine = new CoffeeMachine();
   coffeeMachine.sigStarting.connect(&consoleWriter.opCall);
   coffeeMachine.sigPreparing.connect(&consoleWriter.opCall);
@@ -443,7 +498,14 @@ void main()
     {
       string beverage;
       if(!consoleWriter.askForBeverage(beverage)) break;
-      coffeeMachine.request(&beverageFactory.create(beverage).prepare);
+      Condiment condiments;
+      do
+	{
+	  string condiment;
+	  if(!consoleWriter.askForCondiment(condiment)) break;
+	  condiments = condimentFactory.create(condiment, condiments);
+	} while(true);
+      coffeeMachine.request(&beverageFactory.create(beverage, condiments).prepare);
     } while(true);
   coffeeMachine.prepareBeverages();
 }
