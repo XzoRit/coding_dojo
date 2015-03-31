@@ -241,6 +241,8 @@ class CaffeineBeverage
   private const(Condiment) m_condiments;
 }
 
+alias const(CaffeineBeverage)[] Beverages;
+
 unittest
 {
   const coffeeRecipe = new CoffeeRecipe;
@@ -381,6 +383,14 @@ class ConsoleWriter
     condiment = chomp(readln());
     return condiment != "q";
   }
+
+  void theBill(in Beverages beverages) const
+  {
+    foreach(const beverage; beverages)
+      {
+	writeln(beverage.description());
+      } 
+  }
 }
 
 struct Starting
@@ -494,6 +504,7 @@ void main()
   coffeeMachine.sigStarting.connect(&consoleWriter.opCall);
   coffeeMachine.sigPreparing.connect(&consoleWriter.opCall);
   coffeeMachine.sigFinished.connect(&consoleWriter.opCall);
+  Beverages beverages;
   do
     {
       string beverage;
@@ -505,7 +516,9 @@ void main()
 	  if(!consoleWriter.askForCondiment(condiment)) break;
 	  condiments = condimentFactory.create(condiment, condiments);
 	} while(true);
-      coffeeMachine.request(&beverageFactory.create(beverage, condiments).prepare);
+      beverages ~= beverageFactory.create(beverage, condiments);
+      coffeeMachine.request(&beverages[$-1].prepare);
     } while(true);
   coffeeMachine.prepareBeverages();
+  consoleWriter.theBill(beverages);
 }
