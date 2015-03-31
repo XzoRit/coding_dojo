@@ -169,13 +169,16 @@ class CondimentFactory
   {
     m_factories["milk"] = new MilkFactory();
     m_factories["sugar"] = new SugarFactory();
+    m_funcfactories["milk"] = (const(Condiment) next) => new Milk(next);
+    m_funcfactories["sugar"] = (const(Condiment) next) => new Sugar(next);
   }
 
   Condiment create(const string condiment, const Condiment next) const
   {
-    return m_factories[condiment].create(next);
+    return m_funcfactories[condiment](next);
   }
 
+  private Condiment function(const(Condiment))[string] m_funcfactories;
   private const(CaffeineCondimentFactory)[const string] m_factories;
 }
 
