@@ -312,6 +312,14 @@ class CoffeeFactory : CaffeineBeverageFactory
   }
 }
 
+CaffeineBeverage createCoffee(const(Condiment) condiment)
+{
+    return new CaffeineBeverage(new const(CoffeeRecipe)(),
+				"Coffee",
+				1.50,
+				condiment);
+}
+
 class TeaFactory : CaffeineBeverageFactory
 {
   override CaffeineBeverage create(const Condiment condiment) const
@@ -323,6 +331,14 @@ class TeaFactory : CaffeineBeverageFactory
   }
 }
 
+CaffeineBeverage createTea(const Condiment condiment)
+{
+  return new CaffeineBeverage(new const(TeaRecipe)(),
+			      "Tea",
+			      1.20,
+			      condiment);
+}
+
 class BeverageFactory(Observer)
 {
   this(const(Observer) observer)
@@ -330,11 +346,13 @@ class BeverageFactory(Observer)
     m_factories["coffee"] = new const(CoffeeFactory)();
     m_factories["tea"] = new const(TeaFactory)();
     m_observer = observer;
+    m_funcfactories["coffee"] = &createCoffee;
+    m_funcfactories["tea"] = &createTea;
   }
 
   CaffeineBeverage create(string beverage, const Condiment condiment) const
   {
-    auto caff = m_factories[beverage].create(condiment);
+    auto caff = m_funcfactories[beverage](condiment);
     caff.sigBoilingWater.connect(&m_observer.opCall);
     caff.sigBrewing.connect(&m_observer.opCall);
     caff.sigPouringIntoCup.connect(&m_observer.opCall);
@@ -342,6 +360,7 @@ class BeverageFactory(Observer)
   }
 
   private const(CaffeineBeverageFactory)[const(string)] m_factories;
+  private CaffeineBeverage function(const(Condiment))[const(string)] m_funcfactories;
   private const(Observer) m_observer;
 }
 
