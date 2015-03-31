@@ -397,11 +397,15 @@ class ConsoleWriter
 
   void theBill(in Beverages beverages) const
   {
+    writeln("The bill:");
     foreach(const beverage; beverages)
       {
 	writeln(beverage.description());
 	writeln(beverage.price());
-      } 
+      }
+    import std.algorithm;
+    immutable sum = reduce!((a, b) => a + b)(0.0f, map!(a => a.price())(beverages));
+    writeln("The sum: " ~ to!string(sum));
   }
 }
 
