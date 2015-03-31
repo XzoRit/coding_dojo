@@ -201,10 +201,12 @@ class CaffeineBeverage
 
   this(const(Recipe) recipe,
        const(string) description,
+       const(float) price,
        const(Condiment) condiment)
   {
     m_recipe = recipe;
     m_description = description;
+    m_price = price;
     m_condiments = condiment;
   }
 
@@ -212,6 +214,12 @@ class CaffeineBeverage
   {
     if(m_condiments) return m_description ~ m_condiments.description();
     return m_description;
+  }
+
+  float price() const pure nothrow
+  {
+    if(m_condiments) return m_price + m_condiments.price();
+    return m_price;
   }
 
   void prepare()
@@ -236,8 +244,9 @@ class CaffeineBeverage
     emit(PouringIntoCup(m_description));
   }
 
-  private const(string) m_description;
   private const(Recipe) m_recipe;
+  private const(string) m_description;
+  private const(float) m_price;
   private const(Condiment) m_condiments;
 }
 
@@ -298,6 +307,7 @@ class CoffeeFactory : CaffeineBeverageFactory
   {
     return new CaffeineBeverage(new const(CoffeeRecipe)(),
 				"Coffee",
+				1.50,
 				condiment);
   }
 }
@@ -308,6 +318,7 @@ class TeaFactory : CaffeineBeverageFactory
   {
     return new CaffeineBeverage(new const(TeaRecipe)(),
 				"Tea",
+				1.20,
 				condiment);
   }
 }
@@ -389,6 +400,7 @@ class ConsoleWriter
     foreach(const beverage; beverages)
       {
 	writeln(beverage.description());
+	writeln(beverage.price());
       } 
   }
 }
