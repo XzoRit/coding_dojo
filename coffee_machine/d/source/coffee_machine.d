@@ -1,5 +1,3 @@
-import specd.specd;
-
 class Recipe
 {
   alias FuncAmountWaterMlType = int delegate() pure nothrow;
@@ -245,9 +243,7 @@ unittest
 {
   const coffeeRecipe = Recipes.coffee();
   auto coffee = new CaffeineBeverage(coffeeRecipe, "Coffee", 1.17, new Condiments());
-  describe("a call to descrption")
-    .should("return same text as given in ctor",
-	    (coffee.description().must.equal("Coffee")));
+  assert(coffee.description() == "Coffee");
 
   class CaffeineBevergeObserver
   {
