@@ -5,8 +5,8 @@ class Recipe
   alias FuncAmountWaterMlType = int delegate() pure nothrow;
   alias FuncBrewType = string delegate() pure nothrow;
 
-  this(FuncAmountWaterMlType funcAmountWaterMl,
-       FuncBrewType funcBrew) pure nothrow
+  this(const(FuncAmountWaterMlType) funcAmountWaterMl,
+       const(FuncBrewType) funcBrew) pure nothrow
   {
     m_amountWaterMl = funcAmountWaterMl;
     m_brew = funcBrew;
@@ -32,8 +32,8 @@ class Recipe
       return m_brew();
     }
 
-  private FuncAmountWaterMlType m_amountWaterMl;
-  private FuncBrewType m_brew;
+  private const(FuncAmountWaterMlType) m_amountWaterMl;
+  private const(FuncBrewType) m_brew;
 }
 
 struct Recipes
