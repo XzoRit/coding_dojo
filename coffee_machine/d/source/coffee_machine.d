@@ -13,20 +13,20 @@ class Recipe
   }
 
   int amountWaterMl() const pure nothrow
-    out (result)
-	  {
-	    assert(result > 0);
-	  }
+  out (result)
+    {
+      assert(result > 0);
+    }
   body
     {
       return m_amountWaterMl();
     }
 
   string brew() const pure nothrow
-    out (result)
-	  {
-	    assert(result.length > 0);
-	  }
+  out (result)
+    {
+      assert(result.length > 0);
+    }
   body
     {
       return m_brew();
@@ -40,16 +40,14 @@ struct Recipes
 {
   static Recipe tea() pure nothrow
   {
-    auto recipe = new Recipe(() => amountWaterMl(200),
-			     () => brewTea());
-    return recipe;
+    return new Recipe(() => amountWaterMl(200),
+		      () => brewTea());
   }
 
   static Recipe coffee() pure nothrow
   {
-    auto recipe = new Recipe(() => amountWaterMl(175),
-			     () => brewCoffee());
-    return recipe;
+    return new Recipe(() => amountWaterMl(175),
+		      () => brewCoffee());
   }
 
   static int amountWaterMl(int amount) pure nothrow
