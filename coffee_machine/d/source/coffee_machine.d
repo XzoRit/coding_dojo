@@ -358,6 +358,12 @@ class ConsoleWriter
     writeln("finished preparing " ~ to!string(finished.amount) ~ " beverages");
   }
 
+  bool placeOrders() const
+  {
+    writeln("Please press ENTER for placing orders! (q for quit!)");
+    return chomp(readln()) != "q";
+  }
+
   bool askForBeverage(out string beverage) const
   {
     writeln("What beverage would you like to have? (q for quit!)");
@@ -497,21 +503,25 @@ void main()
   coffeeMachine.sigStarting.connect(&consoleWriter.opCall);
   coffeeMachine.sigPreparing.connect(&consoleWriter.opCall);
   coffeeMachine.sigFinished.connect(&consoleWriter.opCall);
-  Beverages beverages;
   do
     {
-      string beverage;
-      if(!consoleWriter.askForBeverage(beverage)) break;
-      Condiments condiments = new Condiments();
+      if(!consoleWriter.placeOrders()) break;
+      Beverages beverages;
       do
 	{
-	  string condiment;
-	  if(!consoleWriter.askForCondiment(condiment)) break;
-	  condiments.add(condimentFactory.create(condiment));
+	  string beverage;
+	  if(!consoleWriter.askForBeverage(beverage)) break;
+	  Condiments condiments = new Condiments();
+	  do
+	    {
+	      string condiment;
+	      if(!consoleWriter.askForCondiment(condiment)) break;
+	      condiments.add(condimentFactory.create(condiment));
+	    } while(true);
+	  beverages ~= beverageFactory.create(beverage, condiments);
+	  coffeeMachine.request(&beverages[$-1].prepare);
 	} while(true);
-      beverages ~= beverageFactory.create(beverage, condiments);
-      coffeeMachine.request(&beverages[$-1].prepare);
+      coffeeMachine.prepareBeverages();
+      consoleWriter.theBill(beverages);
     } while(true);
-  coffeeMachine.prepareBeverages();
-  consoleWriter.theBill(beverages);
 }
