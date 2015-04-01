@@ -237,7 +237,7 @@ class CaffeineBeverage
   private const(Condiments) m_condiments;
 }
 
-alias const(CaffeineBeverage)[] Beverages;
+alias Beverages = const(CaffeineBeverage)[];
 
 unittest
 {
@@ -277,32 +277,38 @@ unittest
   assert(o.pouringWhat == coffee.description());
 }
 
-CaffeineBeverage createCoffee(const(Condiments) condiments)
+class Coffee : CaffeineBeverage
 {
-  return new CaffeineBeverage(Recipes.coffee(),
-			      "Coffee",
-			      1.50,
-			      condiments);
+  this(const(Condiments) condiments)
+    {
+      super(Recipes.coffee(),
+	    "Coffee",
+	    1.50,
+	    condiments);
+    }
 }
 
-CaffeineBeverage createTea(const(Condiments) condiments)
+class Tea : CaffeineBeverage
 {
-  return new CaffeineBeverage(Recipes.tea(),
-			      "Tea",
-			      1.20,
-			      condiments);
+  this(const(Condiments) condiments)
+    {
+      super(Recipes.tea(),
+	    "Tea",
+	    1.20,
+	    condiments);
+    }
 }
 
 class BeverageFactory(Observer)
 {
   this(const(Observer) observer)
   {
-    m_factories["coffee"] = &createCoffee;
-    m_factories["tea"] = &createTea;
+    m_factories["coffee"] = (const(Condiments) condiments) => new Coffee(condiments);
+    m_factories["tea"] = (const(Condiments) condiments) => new Tea(condiments);
     m_observer = observer;
   }
 
-  CaffeineBeverage create(string beverage, const Condiments condiments) const
+  CaffeineBeverage create(string beverage, const(Condiments) condiments) const
   {
     auto caff = m_factories[beverage](condiments);
     caff.sigBoilingWater.connect(&m_observer.opCall);
