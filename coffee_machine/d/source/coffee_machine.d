@@ -2,11 +2,14 @@ import specd.specd;
 
 class Recipe
 {
-  this(int delegate() pure nothrow funcAmountWaterMl,
-       string delegate() pure nothrow funcBrew) pure nothrow
+  alias FuncAmountWaterMlType = int delegate() pure nothrow;
+  alias FuncBrewType = string delegate() pure nothrow;
+
+  this(FuncAmountWaterMlType funcAmountWaterMl,
+       FuncBrewType funcBrew) pure nothrow
   {
-    FamountWaterMl = funcAmountWaterMl;
-    Fbrew = funcBrew;
+    m_amountWaterMl = funcAmountWaterMl;
+    m_brew = funcBrew;
   }
 
   int amountWaterMl() const pure nothrow
@@ -16,7 +19,7 @@ class Recipe
 	  }
   body
     {
-      return FamountWaterMl();
+      return m_amountWaterMl();
     }
 
   string brew() const pure nothrow
@@ -26,11 +29,11 @@ class Recipe
 	  }
   body
     {
-      return Fbrew();
+      return m_brew();
     }
 
-  int delegate() pure nothrow FamountWaterMl;
-  string delegate() pure nothrow Fbrew;
+  private FuncAmountWaterMlType m_amountWaterMl;
+  private FuncBrewType m_brew;
 }
 
 struct Recipes
