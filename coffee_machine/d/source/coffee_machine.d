@@ -71,25 +71,13 @@ class TeaRecipe : Recipe
 
 class Condiment
 {
-  this()
-  {
-    m_next = null;
-  }
-
-  this(const Condiment next)
-  {
-    m_next = next;
-  }
-
   final string description() const pure nothrow
   {
-    if(m_next) return this.onDescription() ~ m_next.description();
     return this.onDescription();
   }
 
   final float price() const pure nothrow
   {
-    if(m_next) return this.onPrice() + m_next.price();
     return this.onPrice();
   }
 
@@ -102,17 +90,10 @@ class Condiment
   {
     return 0.0;
   }
-  
-  private const(Condiment) m_next;
 }
 
 class Milk : Condiment
 {
-  this(const Condiment next)
-  {
-    super(next);
-  }
-
   override string onDescription() const pure nothrow
   {
     return "-Milk-";
@@ -126,11 +107,6 @@ class Milk : Condiment
 
 class Sugar : Condiment
 {
-  this(const Condiment next)
-  {
-    super(next);
-  }
-
   override string onDescription() const pure nothrow
   {
     return "-Sugar-";
@@ -142,20 +118,58 @@ class Sugar : Condiment
   }
 }
 
+class Condiments
+{
+  import std.algorithm;
+
+  void add(const(Condiment) condiment)
+  {
+    m_condiments ~= condiment;
+  }
+
+  string description() const pure nothrow
+  {
+    return reduce!((a, b) => a ~ b.description())("", m_condiments);
+  }
+
+  float price() const pure nothrow
+  {
+    return reduce!((a, b) => a + b.price())(0.0, m_condiments);
+  }
+
+  private alias ContainerType = const(Condiment)[];
+  private ContainerType m_condiments;
+}
+
+unittest
+{
+  auto condiments = new Condiments();
+  assert(condiments.description() == "");
+  assert(condiments.price() == 0.0);
+  auto const milk = new Milk();
+  condiments.add(milk);
+  assert(condiments.description() == milk.description());
+  assert(condiments.price() == milk.price());
+  auto const sugar = new Sugar();
+  condiments.add(sugar);
+  assert(condiments.description() == milk.description() ~ sugar.description());
+  assert(condiments.price() == milk.price() + sugar.price());
+}
+
 class CondimentFactory
 {
   this()
   {
-    m_factories["milk"] = (const(Condiment) next) => new Milk(next);
-    m_factories["sugar"] = (const(Condiment) next) => new Sugar(next);
+    m_factories["milk"] = () => new Milk();
+    m_factories["sugar"] = () => new Sugar();
   }
 
-  Condiment create(string condiment, const(Condiment) next) const
+  Condiment create(string condiment) const
   {
-    return m_factories[condiment](next);
+    return m_factories[condiment]();
   }
 
-  private alias FactoryFunc = Condiment function(const(Condiment));
+  private alias FactoryFunc = Condiment function();
   private FactoryFunc[string] m_factories;
 }
 
@@ -182,24 +196,22 @@ class CaffeineBeverage
   this(const(Recipe) recipe,
        const(string) description,
        const(float) price,
-       const(Condiment) condiment)
+       const(Condiments) condiments)
   {
     m_recipe = recipe;
     m_description = description;
     m_price = price;
-    m_condiments = condiment;
+    m_condiments = condiments;
   }
 
   string description() const pure nothrow
   {
-    if(m_condiments) return m_description ~ m_condiments.description();
-    return m_description;
+    return m_description ~ m_condiments.description();
   }
 
   float price() const pure nothrow
   {
-    if(m_condiments) return m_price + m_condiments.price();
-    return m_price;
+    return m_price + m_condiments.price();
   }
 
   void prepare()
@@ -227,7 +239,7 @@ class CaffeineBeverage
   private const(Recipe) m_recipe;
   private const(string) m_description;
   private const(float) m_price;
-  private const(Condiment) m_condiments;
+  private const(Condiments) m_condiments;
 }
 
 alias const(CaffeineBeverage)[] Beverages;
@@ -235,7 +247,7 @@ alias const(CaffeineBeverage)[] Beverages;
 unittest
 {
   const coffeeRecipe = new CoffeeRecipe;
-  auto coffee = new CaffeineBeverage(coffeeRecipe, "Coffee");
+  auto coffee = new CaffeineBeverage(coffeeRecipe, "Coffee", 1.17, new Condiments());
   describe("a call to descrption")
     .should("return same text as given in ctor",
 	    (coffee.description().must.equal("Coffee")));
@@ -272,20 +284,20 @@ unittest
   assert(o.pouringWhat == coffee.description());
 }
 
-CaffeineBeverage createCoffee(const(Condiment) condiment)
+CaffeineBeverage createCoffee(const(Condiments) condiments)
 {
     return new CaffeineBeverage(new const(CoffeeRecipe)(),
 				"Coffee",
 				1.50,
-				condiment);
+				condiments);
 }
 
-CaffeineBeverage createTea(const Condiment condiment)
+CaffeineBeverage createTea(const(Condiments) condiments)
 {
   return new CaffeineBeverage(new const(TeaRecipe)(),
 			      "Tea",
 			      1.20,
-			      condiment);
+			      condiments);
 }
 
 class BeverageFactory(Observer)
@@ -297,17 +309,17 @@ class BeverageFactory(Observer)
     m_observer = observer;
   }
 
-  CaffeineBeverage create(string beverage, const Condiment condiment) const
+  CaffeineBeverage create(string beverage, const Condiments condiments) const
   {
-    auto caff = m_factories[beverage](condiment);
+    auto caff = m_factories[beverage](condiments);
     caff.sigBoilingWater.connect(&m_observer.opCall);
     caff.sigBrewing.connect(&m_observer.opCall);
     caff.sigPouringIntoCup.connect(&m_observer.opCall);
     return caff;
   }
 
-  private alias FactoryFunc = CaffeineBeverage function(const(Condiment));
-  private FactoryFunc[const(string)] m_factories;
+  private alias FactoryFunc = CaffeineBeverage function(const(Condiments));
+  private FactoryFunc[string]m_factories;
   private const(Observer) m_observer;
 }
 
@@ -491,12 +503,12 @@ void main()
     {
       string beverage;
       if(!consoleWriter.askForBeverage(beverage)) break;
-      Condiment condiments;
+      Condiments condiments = new Condiments();
       do
 	{
 	  string condiment;
 	  if(!consoleWriter.askForCondiment(condiment)) break;
-	  condiments = condimentFactory.create(condiment, condiments);
+	  condiments.add(condimentFactory.create(condiment));
 	} while(true);
       beverages ~= beverageFactory.create(beverage, condiments);
       coffeeMachine.request(&beverages[$-1].prepare);
