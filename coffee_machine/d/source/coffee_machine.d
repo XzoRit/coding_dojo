@@ -1,72 +1,68 @@
 import specd.specd;
 
-interface Recipe
+class Recipe
 {
+  this(int delegate() pure nothrow funcAmountWaterMl,
+       string delegate() pure nothrow funcBrew) pure nothrow
+  {
+    FamountWaterMl = funcAmountWaterMl;
+    Fbrew = funcBrew;
+  }
+
   int amountWaterMl() const pure nothrow
     out (result)
 	  {
 	    assert(result > 0);
 	  }
+  body
+    {
+      return FamountWaterMl();
+    }
 
   string brew() const pure nothrow
     out (result)
 	  {
 	    assert(result.length > 0);
 	  }
+  body
+    {
+      return Fbrew();
+    }
+
+  int delegate() pure nothrow FamountWaterMl;
+  string delegate() pure nothrow Fbrew;
 }
 
-class CoffeeRecipe : Recipe
+struct Recipes
 {
-  int amountWaterMl() const pure nothrow
+  static Recipe tea() pure nothrow
   {
-    return 175;
+    auto recipe = new Recipe(() => amountWaterMl(200),
+			     () => brewTea());
+    return recipe;
   }
 
-  unittest
-    {
-      describe("amount water for coffee")
-      	.should("return 175",
-      		(new const(CoffeeRecipe)().amountWaterMl().must.equal(175)));
-    }
-
-  string brew() const pure nothrow
+  static Recipe coffee() pure nothrow
   {
-    return "dripping coffee through filter";
+    auto recipe = new Recipe(() => amountWaterMl(175),
+			     () => brewCoffee());
+    return recipe;
   }
 
-  unittest
-    {
-      describe("brew")
-      	.should("return brewing coffee",
-      		(new const(CoffeeRecipe)().brew().must.equal("dripping coffee through filter")));
-    }
-}
-
-class TeaRecipe : Recipe
-{
-  int amountWaterMl() const pure nothrow
+  static int amountWaterMl(int amount) pure nothrow
   {
-    return 200;
+    return amount;
   }
 
-  unittest
-    {
-      describe("amount water for tea")
-      	.should("be 200ml",
-      		(new const(TeaRecipe)().amountWaterMl().must.equal(200)));
-    }
-
-  string brew() const pure nothrow
+  static string brewTea() pure nothrow
   {
     return "steeping tea";
   }
 
-  unittest
-    {
-      describe("brew")
-      	.should("return steeping tea",
-      		(new const(TeaRecipe)().brew().must.equal("steeping tea")));
-    }
+  static string brewCoffee() pure nothrow
+  {
+    return "dripping coffee through filter";
+  }
 }
 
 class Condiment
@@ -246,7 +242,7 @@ alias const(CaffeineBeverage)[] Beverages;
 
 unittest
 {
-  const coffeeRecipe = new CoffeeRecipe;
+  const coffeeRecipe = Recipes.coffee();
   auto coffee = new CaffeineBeverage(coffeeRecipe, "Coffee", 1.17, new Condiments());
   describe("a call to descrption")
     .should("return same text as given in ctor",
@@ -286,15 +282,15 @@ unittest
 
 CaffeineBeverage createCoffee(const(Condiments) condiments)
 {
-    return new CaffeineBeverage(new const(CoffeeRecipe)(),
-				"Coffee",
-				1.50,
-				condiments);
+  return new CaffeineBeverage(Recipes.coffee(),
+			      "Coffee",
+			      1.50,
+			      condiments);
 }
 
 CaffeineBeverage createTea(const(Condiments) condiments)
 {
-  return new CaffeineBeverage(new const(TeaRecipe)(),
+  return new CaffeineBeverage(Recipes.tea(),
 			      "Tea",
 			      1.20,
 			      condiments);
