@@ -498,10 +498,10 @@ class CoffeeMachineApp
 {
   this()
   {
-    m_consoleWriter = new ConsoleWriter();
-    m_beverageFactory = new BeverageFactory!ConsoleWriter(m_consoleWriter);
     m_condimentFactory = new CondimentFactory();
     m_coffeeMachine = new CoffeeMachine();
+    m_consoleWriter = new ConsoleWriter();
+    m_beverageFactory = new BeverageFactory!ConsoleWriter(m_consoleWriter);
     m_coffeeMachine.sigStarting.connect(&m_consoleWriter.opCall);
     m_coffeeMachine.sigPreparing.connect(&m_consoleWriter.opCall);
     m_coffeeMachine.sigFinished.connect(&m_consoleWriter.opCall);
