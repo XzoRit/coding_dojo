@@ -494,34 +494,52 @@ unittest
   assert(sigReceiver.amountFinished == 0);
 }
 
-void main()
+class CoffeeMachineApp
 {
-  auto const consoleWriter = new ConsoleWriter();
-  auto const beverageFactory = new BeverageFactory!ConsoleWriter(consoleWriter);
-  auto const condimentFactory = new CondimentFactory();
-  auto coffeeMachine = new CoffeeMachine();
-  coffeeMachine.sigStarting.connect(&consoleWriter.opCall);
-  coffeeMachine.sigPreparing.connect(&consoleWriter.opCall);
-  coffeeMachine.sigFinished.connect(&consoleWriter.opCall);
+  this()
+  {
+    m_consoleWriter = new ConsoleWriter();
+    m_beverageFactory = new BeverageFactory!ConsoleWriter(m_consoleWriter);
+    m_condimentFactory = new CondimentFactory();
+    m_coffeeMachine = new CoffeeMachine();
+    m_coffeeMachine.sigStarting.connect(&m_consoleWriter.opCall);
+    m_coffeeMachine.sigPreparing.connect(&m_consoleWriter.opCall);
+    m_coffeeMachine.sigFinished.connect(&m_consoleWriter.opCall);
+  }
+
+  void run()
+  {
   do
     {
-      if(!consoleWriter.placeOrders()) break;
+      if(!m_consoleWriter.placeOrders()) break;
       Beverages beverages;
       do
 	{
 	  string beverage;
-	  if(!consoleWriter.askForBeverage(beverage)) break;
+	  if(!m_consoleWriter.askForBeverage(beverage)) break;
 	  Condiments condiments = new Condiments();
 	  do
 	    {
 	      string condiment;
-	      if(!consoleWriter.askForCondiment(condiment)) break;
-	      condiments.add(condimentFactory.create(condiment));
+	      if(!m_consoleWriter.askForCondiment(condiment)) break;
+	      condiments.add(m_condimentFactory.create(condiment));
 	    } while(true);
-	  beverages ~= beverageFactory.create(beverage, condiments);
-	  coffeeMachine.request(&beverages[$-1].prepare);
+	  beverages ~= m_beverageFactory.create(beverage, condiments);
+	  m_coffeeMachine.request(&beverages[$-1].prepare);
 	} while(true);
-      coffeeMachine.prepareBeverages();
-      consoleWriter.theBill(beverages);
+      m_coffeeMachine.prepareBeverages();
+      m_consoleWriter.theBill(beverages);
     } while(true);
+  }
+
+  private const ConsoleWriter m_consoleWriter;
+  private const BeverageFactory!ConsoleWriter m_beverageFactory;
+  private const CondimentFactory m_condimentFactory;
+  private CoffeeMachine m_coffeeMachine;
+}
+
+void main()
+{
+  auto coffeeMachineApp = new CoffeeMachineApp();
+  coffeeMachineApp.run();
 }
