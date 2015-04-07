@@ -1,5 +1,5 @@
 defmodule StringCalculator do
 	def add (_) do
-		17
+		0
 	end
 end
