@@ -17,4 +17,8 @@ defmodule StringCalculatorTest do
 	test "numbers can be separeted by comma or newline" do
 		assert add("0\n1,22\n333") == 356
 	end
+
+	test "separator character can be specified" do
+		assert add("//*\n1*22*333") == 356
+	end
 end
