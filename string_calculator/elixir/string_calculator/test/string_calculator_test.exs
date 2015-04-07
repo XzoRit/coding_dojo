@@ -12,4 +12,8 @@ defmodule StringCalculatorTest do
 	test "string with comma separated numbers returns the sum" do
 		assert StringCalculator.add("1,22,333") == 356
 	end
+
+	test "numbers can be separeted by comma or newline" do
+		assert StringCalculator.add("0\n1,22\n333") == 356
+	end
 end
