@@ -9,15 +9,15 @@ defmodule StringCalculator do
 	end
 
 	defp splitBySeparator(numsAsString) do
-		[nums, separator] = extractSeparator(numsAsString)
+		{nums, separator} = extractSeparator(numsAsString)
 		String.split(nums, separator)
 	end
 
 	defp extractSeparator(numsAsString) do
 		if String.starts_with?(numsAsString, "//") do
-			[String.slice(numsAsString, 4 .. String.length(numsAsString) - 1), String.at(numsAsString, 2)]
+			{String.slice(numsAsString, 4 .. String.length(numsAsString) - 1), String.at(numsAsString, 2)}
 		else
-			[String.replace(numsAsString, "\n", ","), ","]
+			{String.replace(numsAsString, "\n", ","), ","}
 		end
 	end
 end
