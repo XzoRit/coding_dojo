@@ -1,12 +1,17 @@
 defmodule StringCalculator do
-	def add ("") do
+	def add("") do
 		0
 	end
 
-	def add (numsAsString) do
-		splitBySeparator(numsAsString)
+	def add(numsAsString) do
+		{negs, pos} = splitBySeparator(numsAsString)
 		|> Enum.map(&(String.to_integer/1))
-		|> Enum.reduce(&(+/2))
+    |> Enum.partition(&(&1 < 0))
+		if Enum.empty?(negs) do
+			Enum.reduce(pos, &(+/2))
+		else
+			raise(ArgumentError, message: "negative numbers not allowed")
+		end
 	end
 
 	defp splitBySeparator(numsAsString) do

@@ -25,4 +25,8 @@ defmodule StringCalculatorTest do
 	test "separator string can be specified" do
 		assert add("//,.-\n1,.-22,.-333") == 356
 	end
+
+	test "negative numbers cause an exception" do
+		assert_raise(ArgumentError, fn -> add("-1") end)
+	end
 end
