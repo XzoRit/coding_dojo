@@ -1,11 +1,12 @@
 defmodule StringCalculator do
+	def add ("") do
+		0
+	end
+
 	def add (numsAsString) do
-		case String.length(numsAsString) do
-			0 ->	0
-			_ -> splitBySeparator(numsAsString)
-					 |> Enum.map(&(String.to_integer/1))
-					 |> Enum.reduce(&(+/2))
-		end
+		splitBySeparator(numsAsString)
+		|> Enum.map(&(String.to_integer/1))
+		|> Enum.reduce(&(+/2))
 	end
 
 	defp splitBySeparator(numsAsString) do
