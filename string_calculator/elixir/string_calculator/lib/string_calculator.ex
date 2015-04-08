@@ -15,9 +15,8 @@ defmodule StringCalculator do
 	end
 
 	defp sum({negs, _}) do
-		nums = Enum.map(negs, &(to_string/1))
-		msg = Enum.reduce(nums, "negative numbers (", &(&2 <> " " <> &1)) <> " ) not allowed"
-		raise(ArgumentError, message: msg)
+		negsAsString = Enum.map(negs, &(to_string/1)) |> Enum.reduce(&(&2 <> " " <> &1))
+		raise(ArgumentError, message: "negative numbers ( " <> negsAsString <> " ) not allowed")
 	end
 
 	defp splitBySeparator(numsAsString) do
