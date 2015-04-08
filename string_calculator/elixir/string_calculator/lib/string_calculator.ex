@@ -4,14 +4,18 @@ defmodule StringCalculator do
 	end
 
 	def add(numsAsString) do
-		{negs, pos} = splitBySeparator(numsAsString)
-		|> Enum.map(&(String.to_integer/1))
-    |> Enum.partition(&(&1 < 0))
-		if Enum.empty?(negs) do
-			Enum.reduce(pos, &(+/2))
-		else
-			raise(ArgumentError, message: "negative numbers not allowed")
-		end
+		sum(
+			splitBySeparator(numsAsString)
+			|> Enum.map(&(String.to_integer/1))
+			|> Enum.partition(&(&1 < 0)))
+	end
+
+	defp sum({[], pos}) do
+		Enum.reduce(pos, &(+/2))
+	end
+
+	defp sum({_, _}) do
+		raise(ArgumentError, message: "negative numbers not allowed")
 	end
 
 	defp splitBySeparator(numsAsString) do
