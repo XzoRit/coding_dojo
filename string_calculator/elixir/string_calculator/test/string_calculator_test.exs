@@ -21,4 +21,8 @@ defmodule StringCalculatorTest do
 	test "separator character can be specified" do
 		assert add("//*\n1*22*333") == 356
 	end
+
+	test "separator string can be specified" do
+		assert add("//,.-\n1,.-22,.-333") == 356
+	end
 end
