@@ -14,12 +14,12 @@ defmodule StringCalculator do
 		String.split(nums, separator)
 	end
 
+	defp extractSeparator("//" <> rest) do
+		[sepSpec, nums] = String.split(rest)
+		{nums, sepSpec}
+	end
+
 	defp extractSeparator(numsAsString) do
-		if String.starts_with?(numsAsString, "//") do
-			[sepSpec, nums] = String.split(numsAsString)
-			{nums, String.slice(sepSpec, 2..-1)}
-		else
-			{String.replace(numsAsString, "\n", ","), ","}
-		end
+		{String.replace(numsAsString, "\n", ","), ","}
 	end
 end
