@@ -4,14 +4,11 @@ import org.scalatest._
 
 class StringCalculator {
 
+  val ExtractSepAndNums = """//(.*)\n(.*)""".r
+
   def extractNumbers(numbers: String) = numbers match {
-    case numbers.startsWith("//") =>
-      val endOfSepSpec = numbers.indexOf("\n")
-      val separator = numbers slice(2, endOfSepSpec)
-      val numsWithoutSepSpec = numbers.drop(endOfSepSpec + 1)
-      separator.r.split(numsWithoutSepSpec)
-    case otherwise =>
-      ",".r.split(numbers.replaceAll("\n", ","))
+    case ExtractSepAndNums(sep, nums) => sep.r.split(nums)
+    case otherwise => ",".r.split(numbers.replaceAll("\n", ","))
   }
 
   def add(numbers: String) = numbers match {
