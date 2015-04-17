@@ -4,25 +4,23 @@ import org.scalatest._
 
 class StringCalculator {
 
-  def extractNumbers(numbers: String) = {
-    if(numbers.startsWith("//")) {
+  def extractNumbers(numbers: String) = numbers match {
+    case numbers.startsWith("//") =>
       val endOfSepSpec = numbers.indexOf("\n")
       val separator = numbers slice(2, endOfSepSpec)
       val numsWithoutSepSpec = numbers.drop(endOfSepSpec + 1)
       separator.r.split(numsWithoutSepSpec)
-    }
-    else {
+    case otherwise =>
       ",".r.split(numbers.replaceAll("\n", ","))
-    }
   }
 
-  def add(numbers: String) = {
-    if(numbers.isEmpty) 0 else {
+  def add(numbers: String) = numbers match {
+    case "" => 0
+    case otherwise =>
       val (negs, pos) = extractNumbers(numbers).map{_.toInt}.partition{_ < 0}
       if(negs.isEmpty) pos.foldLeft(0){_ + _} else {	
 	throw new IllegalArgumentException(negs.map{_.toString}.foldLeft("Negative numbers not allowed: "){_ ++ _ ++ " "})
       }
-    }
   }
 }
 
