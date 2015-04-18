@@ -4,17 +4,17 @@ defmodule StringCalculator do
 	end
 
 	def add(numsAsString) do
-		sum(
 			splitBySeparator(numsAsString)
 			|> Enum.map(&(String.to_integer/1))
-			|> Enum.partition(&(&1 < 0)))
+			|> Enum.partition(&(&1 < 0))
+			|> sumPositives
 	end
 
-	defp sum({[], pos}) do
+	defp sumPositives({[], pos}) do
 		Enum.reduce(pos, &(+/2))
 	end
 
-	defp sum({negs, _}) do
+	defp sumPositives({negs, _}) do
 		negsAsString = Enum.map(negs, &(to_string/1)) |> Enum.reduce(&(&2 <> " " <> &1))
 		raise(ArgumentError, message: "negative numbers ( " <> negsAsString <> " ) not allowed")
 	end
