@@ -14,9 +14,15 @@ class StringCalculator {
   def add(numbers: String) = numbers match {
     case "" => 0
     case otherwise =>
-      val (negs, pos) = extractNumbers(numbers).map{_.toInt}.partition{_ < 0}
-      if(negs.isEmpty) pos.foldLeft(0){_ + _} else {	
-	throw new IllegalArgumentException(negs.map{_.toString}.foldLeft("Negative numbers not allowed: "){_ ++ _ ++ " "})
+      extractNumbers(numbers)
+	.map{_.toInt}
+	.partition{_ < 0} match {
+	case (negs, pos) if negs.isEmpty => pos.foldLeft(0){_ + _}
+	case (negs, _) =>
+	  throw new IllegalArgumentException(
+	    negs
+	      .map{_.toString}
+	      .foldLeft("Negative numbers not allowed: "){_ ++ _ ++ " "})
       }
   }
 }
