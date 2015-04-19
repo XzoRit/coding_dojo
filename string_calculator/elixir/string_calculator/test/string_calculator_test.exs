@@ -35,7 +35,7 @@ defmodule StringCalculatorTest do
 	test "negative numbers shall be included in exception message" do
 		assert_raise(
 			ArgumentError,
-			"negative numbers ( -1 -333 ) not allowed",
+			"negative numbers not allowed: -1 -333",
 			fn -> add("0,-1,22,-333") end)
 	end
 end

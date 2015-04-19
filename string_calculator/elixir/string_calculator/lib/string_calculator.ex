@@ -29,7 +29,10 @@ defmodule StringCalculator do
 	end
 
 	defp sumPositives({negs, _}) do
-		negsAsString = Enum.map(negs, &(to_string/1)) |> Enum.reduce(&(&2 <> " " <> &1))
-		raise(ArgumentError, message: "negative numbers ( " <> negsAsString <> " ) not allowed")
+		errorMsg =
+			negs
+		  |> Enum.map(&(to_string/1))
+			|> Enum.reduce("negative numbers not allowed:", &(&2 <> " " <> &1))
+		raise(ArgumentError, message: errorMsg)
 	end
 end
