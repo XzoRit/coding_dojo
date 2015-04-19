@@ -12,12 +12,12 @@ defmodule StringCalculator do
 		|> sumPositives
 	end
 
-	defp extractSepAndNums(numsAsString) do
-		[",", String.replace(numsAsString, "\n", ",")]
-	end
-
 	defp extractSepAndNums("//" <> rest) do
 		String.split(rest)
+	end
+
+	defp extractSepAndNums(numsAsString) do
+		[",", String.replace(numsAsString, "\n", ",")]
 	end
 
 	defp splitNumsBySep([sep, nums]) do
