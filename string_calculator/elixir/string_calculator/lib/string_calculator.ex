@@ -12,6 +12,18 @@ defmodule StringCalculator do
 		|> sumPositives
 	end
 
+	defp extractSepAndNums(numsAsString) do
+		[",", String.replace(numsAsString, "\n", ",")]
+	end
+
+	defp extractSepAndNums("//" <> rest) do
+		String.split(rest)
+	end
+
+	defp splitNumsBySep([sep, nums]) do
+		String.split(nums, sep)
+	end
+
 	defp sumPositives({[], pos}) do
 		Enum.reduce(pos, &(+/2))
 	end
@@ -19,17 +31,5 @@ defmodule StringCalculator do
 	defp sumPositives({negs, _}) do
 		negsAsString = Enum.map(negs, &(to_string/1)) |> Enum.reduce(&(&2 <> " " <> &1))
 		raise(ArgumentError, message: "negative numbers ( " <> negsAsString <> " ) not allowed")
-	end
-
-	defp splitNumsBySep([sep, nums]) do
-		String.split(nums, sep)
-	end
-
-	defp extractSepAndNums("//" <> rest) do
-		String.split(rest)
-	end
-
-	defp extractSepAndNums(numsAsString) do
-		[",", String.replace(numsAsString, "\n", ",")]
 	end
 end
