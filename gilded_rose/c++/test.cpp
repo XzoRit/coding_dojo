@@ -98,3 +98,20 @@ SCENARIO("days pass for aged brie")
 	}
     }
 }
+
+SCENARIO("days pass for backstage pass")
+{
+  GIVEN("a backstage pass")
+    {
+      Item const item("Backstage pass for ac/dc", 11, 48);
+      AppHolder app(item);
+      WHEN("one day passes")
+	{
+	  app.oneDayPassed();
+	  THEN("quality increases by one")
+	    {
+	      CHECK(app.itemQuality() == 49);
+	    }
+	}
+    }
+}

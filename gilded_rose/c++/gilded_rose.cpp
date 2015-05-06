@@ -7,7 +7,7 @@ void GildedRose::updateQuality()
 {
     for (int i = 0; i < items.size(); i++)
     {
-        if (items[i].name != "Aged Brie" && items[i].name != "Backstage passes to a TAFKAL80ETC concert")
+        if (items[i].name != "Aged Brie" && items[i].name.substr(0, 14) != "Backstage pass")
         {
             if (items[i].quality > 0)
             {
@@ -23,7 +23,7 @@ void GildedRose::updateQuality()
             {
                 items[i].quality = items[i].quality + 1;
 
-                if (items[i].name == "Backstage passes to a TAFKAL80ETC concert")
+                if (items[i].name.substr(0, 14) == "Backstage pass")
                 {
                     if (items[i].sellIn < 11)
                     {
@@ -53,7 +53,7 @@ void GildedRose::updateQuality()
         {
             if (items[i].name != "Aged Brie")
             {
-                if (items[i].name != "Backstage passes to a TAFKAL80ETC concert")
+                if (items[i].name.substr(0, 14) != "Backstage pass")
                 {
                     if (items[i].quality > 0)
                     {
