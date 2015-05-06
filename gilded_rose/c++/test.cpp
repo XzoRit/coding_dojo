@@ -28,6 +28,11 @@ public:
     items.front().sellIn = newValue;
   }
 
+  void setQualityTo(int newValue)
+  {
+    items.front().quality = newValue;
+  }
+
 private:
   std::vector<Item> items;
   GildedRose app;
@@ -47,7 +52,7 @@ SCENARIO("days pass for an item")
 	      CHECK(app.itemQuality() == 1);
 	    }
 	}
-      WHEN("sellin value becomes 0")
+      WHEN("sellin value is 0")
 	{
 	  app.setSellInTo(0);
 	  app.oneDayPassed();
@@ -69,30 +74,37 @@ SCENARIO("days pass for an item")
 
 SCENARIO("days pass for aged brie")
 {
-  GIVEN("an aged brie")
+  GIVEN("an aged brie with positive sellin value")
     {
-      Item const item("Aged Brie", 1, 48);
+      Item const item("Aged Brie", 1, 17);
       AppHolder app(item);
       WHEN("one day passes")
 	{
 	  app.oneDayPassed();
 	  THEN("quality increases by one")
 	    {
-	      CHECK(app.itemQuality() == 49);
+	      CHECK(app.itemQuality() == 18);
 	    }
-	  AND_WHEN("sellin day passes")
+	}
+      WHEN("sellin value is 0")
+	{
+	  app.setSellInTo(0);
+	  CAPTURE(app.itemQuality());
+	  app.oneDayPassed();
+	  THEN("quality increases by one")
+	    {
+	      CHECK(app.itemQuality() == 18);
+	    }
+	}
+      WHEN("quality value is 50")
+	{
+	  app.setQualityTo(50);
+	  AND_WHEN("quality is updated")
 	    {
 	      app.oneDayPassed();
-	      THEN("quality still increases by one")
+	      THEN("quality value does not change")
 		{
 		  CHECK(app.itemQuality() == 50);
-		}
-	      AND_WHEN("another day passes")
-		{
-		  THEN("quality value does not become greater than 50")
-		    {
-		      CHECK(app.itemQuality() == 50);
-		    }
 		}
 	    }
 	}
