@@ -176,7 +176,7 @@ SCENARIO("days pass for backstage pass")
 		}
 	    }
 	}
-      WHEN("cancert is over")
+      WHEN("concert is over")
 	{
 	  app.setSellInTo(0);
 	  AND_WHEN("quality is updated")
