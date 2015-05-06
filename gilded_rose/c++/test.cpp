@@ -46,7 +46,7 @@ SCENARIO("days pass for an item")
   GIVEN("an item with positve sellin value")
     {
       int const quality = 7;
-      Item const item("item", 1, 7);
+      Item const item("item", 16, 7);
       AppHolder app(item);
       WHEN("quality is updated")
 	{
@@ -58,7 +58,7 @@ SCENARIO("days pass for an item")
 	}
       WHEN("sellin value is 0")
 	{
-	  app.setSellInTo(MinQuality);
+	  app.setSellInTo(0);
 	  AND_WHEN("quality is updated")
 	    {
 	      app.updateQuality();
@@ -88,7 +88,7 @@ SCENARIO("days pass for aged brie")
   GIVEN("an aged brie with positive sellin value")
     {
       int const quality = 28;
-      Item const item("Aged Brie", 1, quality);
+      Item const item("Aged Brie", 11, quality);
       AppHolder app(item);
       WHEN("quality is updated")
 	{
