@@ -28,6 +28,11 @@ public:
     app.updateQuality();
   }
 
+  void setSellInTo(int newValue)
+  {
+    items.front().sellIn = newValue;
+  }
+
 private:
   std::vector<Item> items;
   GildedRose app;
@@ -103,60 +108,56 @@ SCENARIO("days pass for backstage pass")
 {
   GIVEN("a backstage pass")
     {
-      Item const item("Backstage pass for ac/dc", 11, 44);
+      Item const item("Backstage pass for ac/dc", 11, 47);
       AppHolder app(item);
       WHEN("one day passes")
 	{
 	  app.oneDayPassed();
 	  THEN("quality increases by one")
 	    {
-	      CHECK(app.itemQuality() == 45);
+	      CHECK(app.itemQuality() == 48);
 	    }
-	  AND_WHEN("sellin value is equal to 10")
+	}
+      WHEN("sellin value is equal to 10")
+	{
+	  app.setSellInTo(10);
+	  app.oneDayPassed();
+	  THEN("quality increaes by two")
+	    {
+	      CHECK(app.itemQuality() == 49);
+	    }
+	}
+      WHEN("sellin value is equal to 5")
+	{
+	  app.setSellInTo(5);
+	  app.oneDayPassed();
+	  THEN("quality increases by 3")
+	    {
+	      CHECK(app.itemQuality() == 50);
+	    }
+	  AND_WHEN("another day passes")
 	    {
 	      app.oneDayPassed();
-	      THEN("quality increaes by two")
+	      THEN("quality value does not become greater than 50")
 		{
-		  CHECK(app.itemQuality() == 47);
+		  CHECK(app.itemQuality() == 50);
 		}
-	      AND_WHEN("sellin value is equal to 5")
+	    }
+	}
+      WHEN("cancert is over")
+	{
+	  app.setSellInTo(0);
+	  app.oneDayPassed();
+	  THEN("quality value is 0")
+	    {
+	      CHECK(app.itemQuality() == 0);
+	    }
+	  AND_WHEN("another day passes")
+	    {
+	      app.oneDayPassed();
+	      THEN("quality value does not become negative")
 		{
-		  app.oneDayPassed();
-		  app.oneDayPassed();
-		  app.oneDayPassed();
-		  app.oneDayPassed();
-		  app.oneDayPassed();
-		  THEN("quality increases by 3")
-		    {
-		      CHECK(app.itemQuality() == 50);
-		    }
-		  AND_WHEN("another day passes")
-		    {
-		      app.oneDayPassed();
-		      THEN("quality value does not become greater than 50")
-			{
-			  CHECK(app.itemQuality() == 50);
-			}
-		      AND_WHEN("cancert is over")
-			{
-			  app.oneDayPassed();
-			  app.oneDayPassed();
-			  app.oneDayPassed();
-			  app.oneDayPassed();
-			  THEN("quality value is 0")
-			    {
-			      CHECK(app.itemQuality() == 0);
-			    }
-			  AND_WHEN("another day passes")
-			    {
-			      app.oneDayPassed();
-			      THEN("quality value does not become negative")
-				{
-				  CHECK(app.itemQuality() == 0);
-				}
-			    }
-			}
-		    }
+		  CHECK(app.itemQuality() == 0);
 		}
 	    }
 	}
