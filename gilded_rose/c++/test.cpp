@@ -35,31 +35,32 @@ private:
 
 SCENARIO("days pass for an item")
 {
-  GIVEN("an item with sellin value of 1")
+  GIVEN("an item with positve sellin value")
     {
-      Item const item("item", 1, 3);
+      Item const item("item", 1, 2);
       AppHolder app(item);
       WHEN("one day passes")
 	{
 	  app.oneDayPassed();
 	  THEN("quality value is decremented by one")
 	    {
-	      CHECK(app.itemQuality() == 2);
+	      CHECK(app.itemQuality() == 1);
 	    }
-	  AND_WHEN("a second day passes")
+	}
+      WHEN("sellin value becomes 0")
+	{
+	  app.setSellInTo(0);
+	  app.oneDayPassed();
+	  THEN("quality value is decremented by two")
+	    {
+	      CHECK(app.itemQuality() == 0);
+	    }
+	  AND_WHEN("another day passes")
 	    {
 	      app.oneDayPassed();
-	      THEN("quality value is decremented by two")
+	      THEN("quality value does not become negativ")
 		{
 		  CHECK(app.itemQuality() == 0);
-		}
-	      AND_WHEN("a third day passes")
-		{
-		  app.oneDayPassed();
-		  THEN("quality value does not become negativ")
-		    {
-		      CHECK(app.itemQuality() == 0);
-		    }
 		}
 	    }
 	}
