@@ -66,3 +66,35 @@ SCENARIO("days pass for an item")
 	}
     }
 }
+
+SCENARIO("days pass for aged brie")
+{
+  GIVEN("an aged brie")
+    {
+      Item const item("Aged Brie", 1, 48);
+      AppHolder app(item);
+      WHEN("one day passes")
+	{
+	  app.oneDayPassed();
+	  THEN("quality increases by one")
+	    {
+	      CHECK(app.itemQuality() == 49);
+	    }
+	  AND_WHEN("sellin day passes")
+	    {
+	      app.oneDayPassed();
+	      THEN("quality still increases by one")
+		{
+		  CHECK(app.itemQuality() == 50);
+		}
+	      AND_WHEN("another day passes")
+		{
+		  THEN("quality value does not become greater than 50")
+		    {
+		      CHECK(app.itemQuality() == 50);
+		    }
+		}
+	    }
+	}
+    }
+}
