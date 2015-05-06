@@ -4,6 +4,8 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
+int const MaxQuality = 50;
+
 class AppHolder
 {
 public:
@@ -105,15 +107,15 @@ SCENARIO("days pass for aged brie")
 		}
 	    }
 	}
-      WHEN("quality value is 50")
+      WHEN("quality value is set to max")
 	{
-	  app.setQualityTo(50);
+	  app.setQualityTo(MaxQuality);
 	  AND_WHEN("quality is updated")
 	    {
 	      app.updateQuality();
 	      THEN("quality value does not change")
 		{
-		  CHECK(app.itemQuality() == 50);
+		  CHECK(app.itemQuality() == MaxQuality);
 		}
 	    }
 	}
@@ -154,19 +156,19 @@ SCENARIO("days pass for backstage pass")
 	      app.updateQuality();
 	      THEN("quality increases by 3")
 		{
-		  CHECK(app.itemQuality() == 50);
+		  CHECK(app.itemQuality() == MaxQuality);
 		}
 	    }
 	}
-      WHEN("quality value is 50")
+      WHEN("quality value is set to max")
 	{
-	  app.setQualityTo(50);
+	  app.setQualityTo(MaxQuality);
 	  AND_WHEN("quality is updated")
 	    {
 	      app.updateQuality();
 	      THEN("quality value does not change")
 		{
-		  CHECK(app.itemQuality() == 50);
+		  CHECK(app.itemQuality() == MaxQuality);
 		}
 	    }
 	}
