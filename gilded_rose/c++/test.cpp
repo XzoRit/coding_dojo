@@ -98,7 +98,7 @@ SCENARIO("days pass for aged brie")
 	      CHECK(app.itemQuality() == quality + 1);
 	    }
 	}
-      WHEN("sellin value is is set to min")
+      WHEN("sellin value is 0")
 	{
 	  app.setSellInTo(0);
 	  AND_WHEN("quality is updated")
