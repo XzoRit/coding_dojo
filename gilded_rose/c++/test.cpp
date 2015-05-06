@@ -5,6 +5,7 @@
 #include <catch.hpp>
 
 int const MaxQuality = 50;
+int const MinQuality = 0;
 
 class AppHolder
 {
@@ -57,7 +58,7 @@ SCENARIO("days pass for an item")
 	}
       WHEN("sellin value is 0")
 	{
-	  app.setSellInTo(0);
+	  app.setSellInTo(MinQuality);
 	  AND_WHEN("quality is updated")
 	    {
 	      app.updateQuality();
@@ -67,16 +68,15 @@ SCENARIO("days pass for an item")
 		}
 	    }
 	}
-      WHEN("quality value is 0")
+      WHEN("quality value is is set to min")
 	{
-	  int const quality = 0;
-	  app.setQualityTo(quality);
+	  app.setQualityTo(MinQuality);
 	  AND_WHEN("quality is updated")
 	    {
 	      app.updateQuality();
 	      THEN("quality value does change")
 		{
-		  CHECK(app.itemQuality() == quality);
+		  CHECK(app.itemQuality() == MinQuality);
 		}
 	    }
 	}
@@ -98,7 +98,7 @@ SCENARIO("days pass for aged brie")
 	      CHECK(app.itemQuality() == quality + 1);
 	    }
 	}
-      WHEN("sellin value is 0")
+      WHEN("sellin value is is set to min")
 	{
 	  app.setSellInTo(0);
 	  AND_WHEN("quality is updated")
@@ -182,20 +182,20 @@ SCENARIO("days pass for backstage pass")
 	  AND_WHEN("quality is updated")
 	    {
 	      app.updateQuality();
-	      THEN("quality value is 0")
+	      THEN("quality value is is set to min")
 		{
-		  CHECK(app.itemQuality() == 0);
+		  CHECK(app.itemQuality() == MinQuality);
 		}
 	    }
-	  AND_WHEN("quality value is 0")
+	  AND_WHEN("quality value is is set to min")
 	    {
-	      app.setQualityTo(0);
+	      app.setQualityTo(MinQuality);
 	      AND_WHEN("quality is updated")
 		{
 		  app.updateQuality();
 		  THEN("quality value does not change")
 		    {
-		      CHECK(app.itemQuality() == 0);
+		      CHECK(app.itemQuality() == MinQuality);
 		    }
 		}
 	    }
