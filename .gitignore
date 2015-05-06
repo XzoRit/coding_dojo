@@ -10,3 +10,9 @@ leap_year/c++/build
 /string_calculator/d/string_calculator
 /string_calculator/d/dub.*.json
 /string_calculator/d/__test__library__
+/gilded_rose/c++/CMakeCache.txt
+/gilded_rose/c++/CMakeFiles/
+/gilded_rose/c++/Makefile
+/gilded_rose/c++/cmake_install.cmake
+/gilded_rose/c++/gilded_rose_main
+/gilded_rose/c++/gilded_rose_test
