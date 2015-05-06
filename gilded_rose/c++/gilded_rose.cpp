@@ -11,7 +11,7 @@ void GildedRose::updateQuality()
         {
             if (items[i].quality > 0)
             {
-                if (items[i].name != "Sulfuras, Hand of Ragnaros")
+                if (items[i].name.substr(0, 8) != "Sulfuras")
                 {
                     items[i].quality = items[i].quality - 1;
                 }
@@ -44,7 +44,7 @@ void GildedRose::updateQuality()
             }
         }
 
-        if (items[i].name != "Sulfuras, Hand of Ragnaros")
+        if (items[i].name.substr(0, 8) != "Sulfuras")
         {
             items[i].sellIn = items[i].sellIn - 1;
         }
@@ -57,7 +57,7 @@ void GildedRose::updateQuality()
                 {
                     if (items[i].quality > 0)
                     {
-                        if (items[i].name != "Sulfuras, Hand of Ragnaros")
+                        if (items[i].name.substr(0, 8) != "Sulfuras")
                         {
                             items[i].quality = items[i].quality - 1;
                         }

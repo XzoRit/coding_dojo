@@ -6,6 +6,7 @@
 
 int const MaxQuality = 50;
 int const MinQuality = 0;
+int const SulfurasQuality = 80;
 
 class AppHolder
 {
@@ -197,6 +198,47 @@ SCENARIO("days pass for backstage pass")
 		    {
 		      CHECK(app.itemQuality() == MinQuality);
 		    }
+		}
+	    }
+	}
+    }
+}
+
+SCENARIO("days pass for sulfuras")
+{
+  GIVEN("sulfuras with positive sellin value")
+    {
+      Item const item("Sulfuras, some strange stuff", 23, SulfurasQuality);
+      AppHolder app(item);
+      WHEN("quality is updated")
+	{
+	  app.updateQuality();
+	  THEN("quality does not change")
+	    {
+	      CHECK(app.itemQuality() == SulfurasQuality);
+	    }
+	}
+      WHEN("sellin value is 0")
+	{
+	  app.setSellInTo(0);
+	  AND_WHEN("quality is updated")
+	    {
+	      app.updateQuality();
+	      THEN("quality does not change")
+		{
+		  CHECK(app.itemQuality() == SulfurasQuality);
+		}
+	    }
+	}
+      WHEN("sellin value is negative")
+	{
+	  app.setSellInTo(-5);
+	  AND_WHEN("quality is updated")
+	    {
+	      app.updateQuality();
+	      THEN("quality does not change")
+		{
+		  CHECK(app.itemQuality() == SulfurasQuality);
 		}
 	    }
 	}
