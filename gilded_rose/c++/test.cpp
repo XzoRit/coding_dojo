@@ -44,14 +44,15 @@ SCENARIO("days pass for an item")
 {
   GIVEN("an item with positve sellin value")
     {
-      Item const item("item", 1, 2);
+      int const quality = 7;
+      Item const item("item", 1, 7);
       AppHolder app(item);
       WHEN("quality is updated")
 	{
 	  app.updateQuality();
 	  THEN("quality value is decremented by one")
 	    {
-	      CHECK(app.itemQuality() == 1);
+	      CHECK(app.itemQuality() == quality - 1);
 	    }
 	}
       WHEN("sellin value is 0")
@@ -62,19 +63,20 @@ SCENARIO("days pass for an item")
 	      app.updateQuality();
 	      THEN("quality value is decremented by two")
 		{
-		  CHECK(app.itemQuality() == 0);
+		  CHECK(app.itemQuality() == quality - 2);
 		}
 	    }
 	}
       WHEN("quality value is 0")
 	{
-	  app.setQualityTo(0);
+	  int const quality = 0;
+	  app.setQualityTo(quality);
 	  AND_WHEN("quality is updated")
 	    {
 	      app.updateQuality();
 	      THEN("quality value does change")
 		{
-		  CHECK(app.itemQuality() == 0);
+		  CHECK(app.itemQuality() == quality);
 		}
 	    }
 	}
@@ -85,14 +87,15 @@ SCENARIO("days pass for aged brie")
 {
   GIVEN("an aged brie with positive sellin value")
     {
-      Item const item("Aged Brie", 1, 17);
+      int const quality = 28;
+      Item const item("Aged Brie", 1, quality);
       AppHolder app(item);
       WHEN("quality is updated")
 	{
 	  app.updateQuality();
 	  THEN("quality increases by one")
 	    {
-	      CHECK(app.itemQuality() == 18);
+	      CHECK(app.itemQuality() == quality + 1);
 	    }
 	}
       WHEN("sellin value is 0")
@@ -103,7 +106,7 @@ SCENARIO("days pass for aged brie")
 	      app.updateQuality();
 	      THEN("quality increases by one")
 		{
-		  CHECK(app.itemQuality() == 18);
+		  CHECK(app.itemQuality() == quality + 1);
 		}
 	    }
 	}
@@ -126,14 +129,15 @@ SCENARIO("days pass for backstage pass")
 {
   GIVEN("a backstage pass with positive sellin value")
     {
-      Item const item("Backstage pass for ac/dc", 11, 47);
+      int const quality = 41;
+      Item const item("Backstage pass for ac/dc", 11, quality);
       AppHolder app(item);
       WHEN("quality is updated")
 	{
 	  app.updateQuality();
 	  THEN("quality increases by one")
 	    {
-	      CHECK(app.itemQuality() == 48);
+	      CHECK(app.itemQuality() == quality + 1);
 	    }
 	}
       WHEN("sellin value is equal to 10")
@@ -144,7 +148,7 @@ SCENARIO("days pass for backstage pass")
 	      app.updateQuality();
 	      THEN("quality increaes by two")
 		{
-		  CHECK(app.itemQuality() == 49);
+		  CHECK(app.itemQuality() == quality + 2);
 		}
 	    }
 	}
@@ -156,7 +160,7 @@ SCENARIO("days pass for backstage pass")
 	      app.updateQuality();
 	      THEN("quality increases by 3")
 		{
-		  CHECK(app.itemQuality() == MaxQuality);
+		  CHECK(app.itemQuality() == quality + 3);
 		}
 	    }
 	}
