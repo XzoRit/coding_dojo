@@ -18,11 +18,6 @@ public:
     return items.front().quality;
   }
 
-  int itemSellIn() const
-  {
-    return items.front().sellIn;
-  }
-
   void oneDayPassed()
   {
     app.updateQuality();
@@ -47,9 +42,8 @@ SCENARIO("days pass for an item")
       WHEN("one day passes")
 	{
 	  app.oneDayPassed();
-	  THEN("sellin and quality values are decremented by one")
+	  THEN("quality value is decremented by one")
 	    {
-	      CHECK(app.itemSellIn() == 0);
 	      CHECK(app.itemQuality() == 2);
 	    }
 	  AND_WHEN("a second day passes")
