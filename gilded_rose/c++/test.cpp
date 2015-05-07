@@ -153,6 +153,18 @@ SCENARIO("days pass for backstage pass")
 		  CHECK(app.itemQuality() == quality + 2);
 		}
 	    }
+	  AND_WHEN("quality is one under max")
+	    {
+	      app.setQualityTo(MaxQuality - 1);
+	      AND_WHEN("quality is updated")
+		{
+		  app.updateQuality();
+		  THEN("quality is not greater than max")
+		    {
+		      CHECK(app.itemQuality() == MaxQuality);
+		    }
+		}
+	    }
 	}
       WHEN("sellin value is equal to 5")
 	{
@@ -163,6 +175,18 @@ SCENARIO("days pass for backstage pass")
 	      THEN("quality increases by 3")
 		{
 		  CHECK(app.itemQuality() == quality + 3);
+		}
+	    }
+	  AND_WHEN("quality is one under max")
+	    {
+	      app.setQualityTo(MaxQuality - 1);
+	      AND_WHEN("quality is updated")
+		{
+		  app.updateQuality();
+		  THEN("quality is not greater than max")
+		    {
+		      CHECK(app.itemQuality() == MaxQuality);
+		    }
 		}
 	    }
 	}
