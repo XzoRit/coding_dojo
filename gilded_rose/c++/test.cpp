@@ -23,6 +23,11 @@ public:
     return items.front().quality;
   }
 
+  int itemSellIn() const
+  {
+    return items.front().sellIn;
+  }
+
   void updateQuality()
   {
     app.updateQuality();
@@ -233,37 +238,43 @@ SCENARIO("days pass for sulfuras")
 {
   GIVEN("sulfuras with positive sellin value")
     {
-      Item const item("Sulfuras, some strange stuff", 23, SulfurasQuality);
+      int const sellIn = 23;
+      Item const item("Sulfuras, some strange stuff", sellIn, SulfurasQuality);
       AppHolder app(item);
       WHEN("quality is updated")
 	{
 	  app.updateQuality();
-	  THEN("quality does not change")
+	  THEN("quality and sellin do not change")
 	    {
 	      CHECK(app.itemQuality() == SulfurasQuality);
+	      CHECK(app.itemSellIn() == sellIn);
 	    }
 	}
       WHEN("sellin value is 0")
 	{
-	  app.setSellInTo(0);
+	  int const sellIn = 0;
+	  app.setSellInTo(sellIn);
 	  AND_WHEN("quality is updated")
 	    {
 	      app.updateQuality();
-	      THEN("quality does not change")
+	      THEN("quality and sellin do not change")
 		{
 		  CHECK(app.itemQuality() == SulfurasQuality);
+		  CHECK(app.itemSellIn() == sellIn);
 		}
 	    }
 	}
       WHEN("sellin value is negative")
 	{
-	  app.setSellInTo(-5);
+	  int const sellIn = -5;
+	  app.setSellInTo(sellIn);
 	  AND_WHEN("quality is updated")
 	    {
 	      app.updateQuality();
-	      THEN("quality does not change")
+	      THEN("quality and sellin do not change")
 		{
 		  CHECK(app.itemQuality() == SulfurasQuality);
+		  CHECK(app.itemSellIn() == sellIn);
 		}
 	    }
 	}
