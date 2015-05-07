@@ -1,12 +1,13 @@
 #include "gilded_rose.hpp"
+#include "quality.hpp"
 #include <vector>
 
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-int const MaxQuality = 50;
-int const MinQuality = 0;
-int const SulfurasQuality = 80;
+int const MaxQuality = Quality::max();
+int const MinQuality = Quality::min();
+int const SulfurasQuality = Quality::sulfuras();
 
 class AppHolder
 {
