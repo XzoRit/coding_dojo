@@ -59,16 +59,11 @@ void GildedRose::updateQuality()
         {
           if (it->quality > Quality::min())
             {
-                  it->quality = it->quality - 1;
+	      it->quality = it->quality - 1;
 	    }
         }
 
-      if (!isSulfuras(*it))
-        {
-          it->sellIn = it->sellIn - 1;
-        }
-
-      if (it->sellIn < 0)
+      if (it->sellIn <= 0)
         {
           if (!isAgedBrie(*it))
             {
@@ -88,5 +83,11 @@ void GildedRose::updateQuality()
                 }
             }
         }
+
+      if (!isSulfuras(*it))
+        {
+          it->sellIn = it->sellIn - 1;
+        }
+
     }
 }
