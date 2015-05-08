@@ -22,19 +22,6 @@ GildedRose::GildedRose(vector<Item>& items)
   : items(items)
 {}
     
-static void updateSulfuras(Item& it)
-{
-}
-
-static void updateAgedBrie(Item& it)
-{
-  if (it.quality < Quality::max())
-    {
-      ++it.quality;
-    }
-  --it.sellIn;
-}
-
 static void updateBackstagePass(Item& it)
 {
   if (it.sellIn <= 0)
@@ -105,6 +92,27 @@ private:
   Item& item;
 };
 
+class AgedBrie
+{
+public:
+  explicit AgedBrie(Item& it)
+    : item(it)
+  {
+  }
+
+  void update()
+  {
+    if (item.quality < Quality::max())
+      {
+	++item.quality;
+      }
+    --item.sellIn;
+  }
+
+private:
+  Item& item;
+};
+
 void GildedRose::updateQuality() 
 {
   for (vector<Item>::iterator it = items.begin(); it < items.end(); ++it)
@@ -115,7 +123,7 @@ void GildedRose::updateQuality()
 	}
       else if (isAgedBrie(*it))
 	{
-	  updateAgedBrie(*it);
+	  AgedBrie(*it).update();
 	}
       else if (isBackstagePass(*it))
 	{
