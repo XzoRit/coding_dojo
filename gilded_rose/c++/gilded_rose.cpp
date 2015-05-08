@@ -33,22 +33,22 @@ void GildedRose::updateQuality()
         {
           if (it->quality < Quality::max())
             {
-              it->quality = it->quality + 1;
+              ++it->quality;
 	    }
         }
       else if (isBackstagePass(*it))
         {
 	  if (it->sellIn < 6)
 	    {
-	      it->quality = it->quality + 3;
+	      it->quality += 3;
 	    }
 	  else if (it->sellIn < 11)
 	    {
-	      it->quality = it->quality + 2;
+	      it->quality += 2;
 	    }
 	  else
 	    {
-	      it->quality = it->quality + 1;
+	      ++it->quality;
 	    }
           if (it->quality > Quality::max())
             {
@@ -59,7 +59,7 @@ void GildedRose::updateQuality()
         {
           if (it->quality > Quality::min())
             {
-	      it->quality = it->quality - 1;
+	      --it->quality;
 	    }
         }
 
@@ -73,20 +73,20 @@ void GildedRose::updateQuality()
                     {
                       if (!isSulfuras(*it))
                         {
-                          it->quality = it->quality - 1;
+                          --it->quality;
                         }
                     }
                 }
               else
                 {
-                  it->quality = it->quality - it->quality;
+                  it->quality = 0;
                 }
             }
         }
 
       if (!isSulfuras(*it))
         {
-          it->sellIn = it->sellIn - 1;
+          --it->sellIn;
         }
 
     }
