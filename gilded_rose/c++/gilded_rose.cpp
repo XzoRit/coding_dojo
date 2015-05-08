@@ -1,5 +1,6 @@
 #include "gilded_rose.hpp"
 #include "quality.hpp"
+#include "article.hpp"
 
 using namespace std;
 
@@ -22,35 +23,6 @@ GildedRose::GildedRose(vector<Item>& items)
   : items(items)
 {}
     
-class Article
-{
-public:
-  explicit Article(Item& it)
-    : item(it)
-  {
-  }
-
-  void update()
-  {
-    if (item.sellIn > 0)
-      {
-	--item.quality;
-      }
-    else
-      {
-	item.quality -= 2;
-      }
-    if (item.quality < Quality::min())
-      {
-	item.quality = Quality::min();
-      }
-    --item.sellIn;
-  }
-
-private:
-  Item& item;
-};
-
 class Sulfuras
 {
 public:

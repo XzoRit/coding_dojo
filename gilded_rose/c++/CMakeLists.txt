@@ -5,7 +5,10 @@ project(gilded_rose)
 include_directories("/opt/local/include")
 
 set (${PROJECT_NAME}_headers "")
-set (${PROJECT_NAME}_sources "gilded_rose.cpp")
+set (${PROJECT_NAME}_sources
+  "gilded_rose.cpp"
+  "item.cpp"
+  "article.cpp")
 
 add_executable(${PROJECT_NAME}_main
   ${${PROJECT_NAME}_headers} ""
