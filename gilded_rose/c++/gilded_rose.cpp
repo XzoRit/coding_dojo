@@ -2,6 +2,7 @@
 #include "quality.hpp"
 #include "article.hpp"
 #include "aged_brie.hpp"
+#include "backstage_pass.hpp"
 
 using namespace std;
 
@@ -34,43 +35,6 @@ public:
 
   void update()
   {
-  }
-
-private:
-  Item& item;
-};
-
-class BackstagePass
-{
-public:
-  explicit BackstagePass(Item& it)
-    : item(it)
-  {
-  }
-
-  void update()
-  {
-    if (item.sellIn <= 0)
-      {
-	item.quality = Quality::min();
-      }
-    else if (item.sellIn < 6)
-      {
-	item.quality += 3;
-      }
-    else if (item.sellIn < 11)
-      {
-	item.quality += 2;
-      }
-    else
-      {
-	++item.quality;
-      }
-    if (item.quality > Quality::max())
-      {
-	item.quality = Quality::max();
-      }
-    --item.sellIn;
   }
 
 private:
