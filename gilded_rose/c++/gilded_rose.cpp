@@ -22,31 +22,6 @@ GildedRose::GildedRose(vector<Item>& items)
   : items(items)
 {}
     
-static void updateBackstagePass(Item& it)
-{
-  if (it.sellIn <= 0)
-    {
-      it.quality = Quality::min();
-    }
-  else if (it.sellIn < 6)
-    {
-      it.quality += 3;
-    }
-  else if (it.sellIn < 11)
-    {
-      it.quality += 2;
-    }
-  else
-    {
-      ++it.quality;
-    }
-  if (it.quality > Quality::max())
-    {
-      it.quality = Quality::max();
-    }
-  --it.sellIn;
-}
-
 class Article
 {
 public:
@@ -113,6 +88,43 @@ private:
   Item& item;
 };
 
+class BackstagePass
+{
+public:
+  explicit BackstagePass(Item& it)
+    : item(it)
+  {
+  }
+
+  void update()
+  {
+    if (item.sellIn <= 0)
+      {
+	item.quality = Quality::min();
+      }
+    else if (item.sellIn < 6)
+      {
+	item.quality += 3;
+      }
+    else if (item.sellIn < 11)
+      {
+	item.quality += 2;
+      }
+    else
+      {
+	++item.quality;
+      }
+    if (item.quality > Quality::max())
+      {
+	item.quality = Quality::max();
+      }
+    --item.sellIn;
+  }
+
+private:
+  Item& item;
+};
+
 void GildedRose::updateQuality() 
 {
   for (vector<Item>::iterator it = items.begin(); it < items.end(); ++it)
@@ -127,7 +139,7 @@ void GildedRose::updateQuality()
 	}
       else if (isBackstagePass(*it))
 	{
-	  updateBackstagePass(*it);
+	  BackstagePass(*it).update();
 	}
       else
 	{
