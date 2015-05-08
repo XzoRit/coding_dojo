@@ -27,18 +27,23 @@ void GildedRose::updateQuality()
   for (vector<Item>::iterator it = items.begin(); it < items.end(); ++it)
     {
       if (isSulfuras(*it))
-	{
-	}
+        {
+        }
       else if (isAgedBrie(*it))
         {
           if (it->quality < Quality::max())
             {
               ++it->quality;
 	    }
+          --it->sellIn;
         }
       else if (isBackstagePass(*it))
         {
-	  if (it->sellIn < 6)
+	  if (it->sellIn <= 0)
+	    {
+	      it->quality = Quality::min();
+	    }
+	  else if (it->sellIn < 6)
 	    {
 	      it->quality += 3;
 	    }
@@ -54,40 +59,23 @@ void GildedRose::updateQuality()
             {
 	      it->quality = Quality::max();
 	    }
+          --it->sellIn;
 	}
       else
         {
-          if (it->quality > Quality::min())
-            {
+	  if (it->sellIn > 0)
+	    {
 	      --it->quality;
 	    }
-        }
-
-      if (it->sellIn <= 0)
-        {
-          if (!isAgedBrie(*it))
+          else
             {
-              if (!isBackstagePass(*it))
-                {
-                  if (it->quality > Quality::min())
-                    {
-                      if (!isSulfuras(*it))
-                        {
-                          --it->quality;
-                        }
-                    }
-                }
-              else
-                {
-                  it->quality = 0;
-                }
-            }
-        }
-
-      if (!isSulfuras(*it))
-        {
+	      it->quality -= 2;
+	    }
+	  if (it->quality < Quality::min())
+	    {
+	      it->quality = Quality::min();
+	    }
           --it->sellIn;
         }
-
     }
 }
