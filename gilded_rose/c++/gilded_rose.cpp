@@ -3,6 +3,7 @@
 #include "article.hpp"
 #include "aged_brie.hpp"
 #include "backstage_pass.hpp"
+#include "sulfuras.hpp"
 
 using namespace std;
 
@@ -25,22 +26,6 @@ GildedRose::GildedRose(vector<Item>& items)
   : items(items)
 {}
     
-class Sulfuras
-{
-public:
-  explicit Sulfuras(Item& it)
-    : item(it)
-  {
-  }
-
-  void update()
-  {
-  }
-
-private:
-  Item& item;
-};
-
 #include <boost/variant.hpp>
 #include <vector>
 

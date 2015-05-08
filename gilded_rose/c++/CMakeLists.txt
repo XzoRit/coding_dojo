@@ -10,7 +10,8 @@ set (${PROJECT_NAME}_sources
   "item.cpp"
   "article.cpp"
   "aged_brie.cpp"
-  "backstage_pass.cpp")
+  "backstage_pass.cpp"
+  "sulfuras.cpp")
 
 add_executable(${PROJECT_NAME}_main
   ${${PROJECT_NAME}_headers} ""
