@@ -1,6 +1,7 @@
 #include "gilded_rose.hpp"
 #include "quality.hpp"
 #include "article.hpp"
+#include "aged_brie.hpp"
 
 using namespace std;
 
@@ -33,27 +34,6 @@ public:
 
   void update()
   {
-  }
-
-private:
-  Item& item;
-};
-
-class AgedBrie
-{
-public:
-  explicit AgedBrie(Item& it)
-    : item(it)
-  {
-  }
-
-  void update()
-  {
-    if (item.quality < Quality::max())
-      {
-	++item.quality;
-      }
-    --item.sellIn;
   }
 
 private:

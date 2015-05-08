@@ -8,7 +8,8 @@ set (${PROJECT_NAME}_headers "")
 set (${PROJECT_NAME}_sources
   "gilded_rose.cpp"
   "item.cpp"
-  "article.cpp")
+  "article.cpp"
+  "aged_brie.cpp")
 
 add_executable(${PROJECT_NAME}_main
   ${${PROJECT_NAME}_headers} ""
