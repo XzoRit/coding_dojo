@@ -60,42 +60,55 @@ static void updateBackstagePass(Item& it)
   --it.sellIn;
 }
 
-static void updateItem(Item& it)
+class Article
 {
-  if (it.sellIn > 0)
-    {
-      --it.quality;
-    }
-  else
-    {
-      it.quality -= 2;
-    }
-  if (it.quality < Quality::min())
-    {
-      it.quality = Quality::min();
-    }
-  --it.sellIn;
-}
+public:
+  explicit Article(Item& it)
+    : item(it)
+  {
+  }
+
+  void update()
+  {
+    if (item.sellIn > 0)
+      {
+	--item.quality;
+      }
+    else
+      {
+	item.quality -= 2;
+      }
+    if (item.quality < Quality::min())
+      {
+	item.quality = Quality::min();
+      }
+    --item.sellIn;
+  }
+
+private:
+  Item& item;
+};
 
 void GildedRose::updateQuality() 
 {
   for (vector<Item>::iterator it = items.begin(); it < items.end(); ++it)
     {
       if (isSulfuras(*it))
-        {
+	{
 	  updateSulfuras(*it);
-        }
+	}
       else if (isAgedBrie(*it))
-        {
+	{
 	  updateAgedBrie(*it);
-        }
+	}
       else if (isBackstagePass(*it))
-        {
+	{
 	  updateBackstagePass(*it);
 	}
       else
-        {
-	  updateItem(*it);
-        }
+	{
+	  Article a(*it);
+	  a.update();
+	}
     }
 }
