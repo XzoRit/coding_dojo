@@ -89,13 +89,29 @@ private:
   Item& item;
 };
 
+class Sulfuras
+{
+public:
+  explicit Sulfuras(Item& it)
+    : item(it)
+  {
+  }
+
+  void update()
+  {
+  }
+
+private:
+  Item& item;
+};
+
 void GildedRose::updateQuality() 
 {
   for (vector<Item>::iterator it = items.begin(); it < items.end(); ++it)
     {
       if (isSulfuras(*it))
 	{
-	  updateSulfuras(*it);
+	  Sulfuras(*it).update();
 	}
       else if (isAgedBrie(*it))
 	{
@@ -107,8 +123,7 @@ void GildedRose::updateQuality()
 	}
       else
 	{
-	  Article a(*it);
-	  a.update();
+	  Article(*it).update();
 	}
     }
 }
