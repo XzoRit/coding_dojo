@@ -1,9 +1,8 @@
 #include "gilded_rose.hpp"
-#include "quality.hpp"
-#include "article.hpp"
-#include "aged_brie.hpp"
-#include "backstage_pass.hpp"
-#include "sulfuras.hpp"
+#include "articles.hpp"
+#include <boost/variant/static_visitor.hpp>
+#include <boost/variant/apply_visitor.hpp>
+#include <algorithm>
 
 using namespace std;
 
@@ -22,21 +21,6 @@ static bool isSulfuras(Item const& it)
   return it.name.substr(0, 8) == "Sulfuras";
 }
 
-GildedRose::GildedRose(vector<Item>& items)
-  : items(items)
-{}
-    
-#include <boost/variant.hpp>
-#include <vector>
-
-typedef std::vector<
-  boost::variant<
-    Article,
-    AgedBrie,
-    BackstagePass,
-    Sulfuras > >
-Articles;
-
 class Updater : public boost::static_visitor<>
 {
 public:
@@ -47,8 +31,10 @@ public:
   }
 };
 
-#include <algorithm>
-
+GildedRose::GildedRose(vector<Item>& items)
+  : items(items)
+{}
+    
 void GildedRose::updateQuality() 
 {
   Articles articles;
