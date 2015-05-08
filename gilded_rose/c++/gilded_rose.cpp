@@ -125,25 +125,51 @@ private:
   Item& item;
 };
 
+#include <boost/variant.hpp>
+#include <vector>
+
+typedef std::vector<
+  boost::variant<
+    Article,
+    AgedBrie,
+    BackstagePass,
+    Sulfuras > >
+Articles;
+
+class Updater : public boost::static_visitor<>
+{
+public:
+  template<class T>
+  void operator()(T& t)
+  {
+    t.update();
+  }
+};
+
+#include <algorithm>
+
 void GildedRose::updateQuality() 
 {
+  Articles articles;
   for (vector<Item>::iterator it = items.begin(); it < items.end(); ++it)
     {
       if (isSulfuras(*it))
 	{
-	  Sulfuras(*it).update();
+	  articles.push_back(Sulfuras(*it));
 	}
       else if (isAgedBrie(*it))
 	{
-	  AgedBrie(*it).update();
+	  articles.push_back(AgedBrie(*it));
 	}
       else if (isBackstagePass(*it))
 	{
-	  BackstagePass(*it).update();
+	  articles.push_back(BackstagePass(*it));
 	}
       else
 	{
-	  Article(*it).update();
+	  articles.push_back(Article(*it));
 	}
     }
+  Updater u;
+  std::for_each(articles.begin(), articles.end(), boost::apply_visitor(u));
 }
