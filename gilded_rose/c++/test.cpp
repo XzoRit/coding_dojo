@@ -10,49 +10,6 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-int const MaxQuality = Quality::max();
-int const MinQuality = Quality::min();
-int const SulfurasQuality = Quality::sulfuras();
-
-class AppHolder
-{
-public:
-  AppHolder(Item it)
-    : items(1, it)
-    , app(items)
-  {
-  }
-
-  int itemQuality() const
-  {
-    return items.front().quality;
-  }
-
-  int itemSellIn() const
-  {
-    return items.front().sellIn;
-  }
-
-  void updateQuality()
-  {
-    app.updateQuality();
-  }
-
-  void setSellInTo(int newValue)
-  {
-    items.front().sellIn = newValue;
-  }
-
-  void setQualityTo(int newValue)
-  {
-    items.front().quality = newValue;
-  }
-
-private:
-  std::vector<Item> items;
-  GildedRose app;
-};
-
 SCENARIO("article with positive sellin is updated")
 {
   GIVEN("an article with positive sellin")
