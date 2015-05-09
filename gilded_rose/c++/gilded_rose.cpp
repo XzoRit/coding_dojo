@@ -42,7 +42,7 @@ void GildedRose::updateQuality()
     {
       if (isSulfuras(*it))
 	{
-	  articles.push_back(Sulfuras(*it));
+	  articles.push_back(Sulfuras());
 	}
       else if (isAgedBrie(*it))
 	{

@@ -3,6 +3,7 @@
 #include "article.hpp"
 #include "aged_brie.hpp"
 #include "backstage_pass.hpp"
+#include "sulfuras.hpp"
 
 #include <vector>
 
@@ -272,48 +273,16 @@ SCENARIO("backstage pass for a passed concert is updated")
     }
  }
 
-SCENARIO("days pass for sulfuras")
+SCENARIO("sulfuras is updated")
 {
-  GIVEN("sulfuras with positive sellin value")
+  GIVEN("sulfuras")
     {
-      int const sellIn = 23;
-      Item const item("Sulfuras, some strange stuff", sellIn, SulfurasQuality);
-      AppHolder app(item);
-      WHEN("quality is updated")
+      Sulfuras s;
+      WHEN("it is updated")
 	{
-	  app.updateQuality();
-	  THEN("quality and sellin do not change")
+	  s.update();
+	  THEN("neither quality nor sellin change")
 	    {
-	      CHECK(app.itemQuality() == SulfurasQuality);
-	      CHECK(app.itemSellIn() == sellIn);
-	    }
-	}
-      WHEN("sellin value is 0")
-	{
-	  int const sellIn = 0;
-	  app.setSellInTo(sellIn);
-	  AND_WHEN("quality is updated")
-	    {
-	      app.updateQuality();
-	      THEN("quality and sellin do not change")
-		{
-		  CHECK(app.itemQuality() == SulfurasQuality);
-		  CHECK(app.itemSellIn() == sellIn);
-		}
-	    }
-	}
-      WHEN("sellin value is negative")
-	{
-	  int const sellIn = -5;
-	  app.setSellInTo(sellIn);
-	  AND_WHEN("quality is updated")
-	    {
-	      app.updateQuality();
-	      THEN("quality and sellin do not change")
-		{
-		  CHECK(app.itemQuality() == SulfurasQuality);
-		  CHECK(app.itemSellIn() == sellIn);
-		}
 	    }
 	}
     }
