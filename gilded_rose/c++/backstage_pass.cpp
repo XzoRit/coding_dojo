@@ -1,33 +1,46 @@
 #include "backstage_pass.hpp"
-#include "item.hpp"
 #include "quality.hpp"
 
-BackstagePass::BackstagePass(Item& it)
-  : item(it)
+BackstagePass::BackstagePass(std::string concert, int sellIn, int quality)
+  : concert(concert)
+  , sellIn(sellIn)
+  , quality(quality)
 {
+}
+
+bool BackstagePass::operator==(BackstagePass const& other) const
+{
+  return (quality == other.quality) &&
+    (sellIn == other.sellIn) &&
+    (concert == other.concert);
+}
+
+bool BackstagePass::operator!=(BackstagePass const& other) const
+{
+  return !(*this == other);
 }
 
 void BackstagePass::update()
 {
-  if (item.sellIn <= 0)
+  if (sellIn <= 0)
     {
-      item.quality = Quality::min();
+      quality = Quality::min();
     }
-  else if (item.sellIn < 6)
+  else if (sellIn < 6)
     {
-      item.quality += 3;
+      quality += 3;
     }
-  else if (item.sellIn < 11)
+  else if (sellIn < 11)
     {
-      item.quality += 2;
+      quality += 2;
     }
   else
     {
-      ++item.quality;
+      ++quality;
     }
-  if (item.quality > Quality::max())
+  if (quality > Quality::max())
     {
-      item.quality = Quality::max();
+      quality = Quality::max();
     }
-  --item.sellIn;
+  --sellIn;
 }

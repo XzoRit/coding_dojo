@@ -50,7 +50,7 @@ void GildedRose::updateQuality()
 	}
       else if (isBackstagePass(*it))
 	{
-	  articles.push_back(BackstagePass(*it));
+	  articles.push_back(BackstagePass(it->name, it->sellIn, it->quality));
 	}
       else
 	{

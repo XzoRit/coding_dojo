@@ -2,6 +2,7 @@
 #include "quality.hpp"
 #include "article.hpp"
 #include "aged_brie.hpp"
+#include "backstage_pass.hpp"
 
 #include <vector>
 
@@ -140,107 +141,136 @@ SCENARIO("aged brie with max quality is updated")
     }
 }
 
-SCENARIO("days pass for backstage pass")
+SCENARIO("backstage pass with sellin over 10 is updated")
 {
-  GIVEN("a backstage pass with positive sellin value")
+  GIVEN("a backstage pass with sellin over 10")
     {
       int const quality = 41;
-      Item const item("Backstage pass for ac/dc", 11, quality);
-      AppHolder app(item);
-      WHEN("quality is updated")
+      int const sellIn = 11;
+      std::string const concert = "x.y.u.";
+      BackstagePass b(concert, sellIn, quality);
+      WHEN("it is updated")
 	{
-	  app.updateQuality();
-	  THEN("quality increases by one")
+	  b.update();
+	  THEN("quality increases by 1 and sellin decreases by 1")
 	    {
-	      CHECK(app.itemQuality() == quality + 1);
-	    }
-	}
-      WHEN("sellin value is equal to 10")
-	{
-	  app.setSellInTo(10);
-	  AND_WHEN("quality is updated")
-	    {
-	      app.updateQuality();
-	      THEN("quality increaes by two")
-		{
-		  CHECK(app.itemQuality() == quality + 2);
-		}
-	    }
-	  AND_WHEN("quality is one under max")
-	    {
-	      app.setQualityTo(MaxQuality - 1);
-	      AND_WHEN("quality is updated")
-		{
-		  app.updateQuality();
-		  THEN("quality is not greater than max")
-		    {
-		      CHECK(app.itemQuality() == MaxQuality);
-		    }
-		}
-	    }
-	}
-      WHEN("sellin value is equal to 5")
-	{
-	  app.setSellInTo(5);
-	  AND_WHEN("quality is updated")
-	    {
-	      app.updateQuality();
-	      THEN("quality increases by 3")
-		{
-		  CHECK(app.itemQuality() == quality + 3);
-		}
-	    }
-	  AND_WHEN("quality is one under max")
-	    {
-	      app.setQualityTo(MaxQuality - 1);
-	      AND_WHEN("quality is updated")
-		{
-		  app.updateQuality();
-		  THEN("quality is not greater than max")
-		    {
-		      CHECK(app.itemQuality() == MaxQuality);
-		    }
-		}
-	    }
-	}
-      WHEN("quality value is set to max")
-	{
-	  app.setQualityTo(MaxQuality);
-	  AND_WHEN("quality is updated")
-	    {
-	      app.updateQuality();
-	      THEN("quality value does not change")
-		{
-		  CHECK(app.itemQuality() == MaxQuality);
-		}
-	    }
-	}
-      WHEN("concert is over")
-	{
-	  app.setSellInTo(0);
-	  AND_WHEN("quality is updated")
-	    {
-	      app.updateQuality();
-	      THEN("quality value is is set to min")
-		{
-		  CHECK(app.itemQuality() == MinQuality);
-		}
-	    }
-	  AND_WHEN("quality value is is set to min")
-	    {
-	      app.setQualityTo(MinQuality);
-	      AND_WHEN("quality is updated")
-		{
-		  app.updateQuality();
-		  THEN("quality value does not change")
-		    {
-		      CHECK(app.itemQuality() == MinQuality);
-		    }
-		}
+	      CHECK(b == BackstagePass(concert, sellIn - 1, quality + 1));
 	    }
 	}
     }
 }
+
+SCENARIO("backstage pass with sellin over 10 and max quality is updated")
+{
+  GIVEN("a backstage pass with sellin over 10 and max quality")
+    {
+      int const sellIn = 11;
+      std::string const concert = "x.y.u.";
+      BackstagePass b(concert, sellIn, Quality::max());
+      WHEN("it is updated")
+	{
+	  b.update();
+	  THEN("quality increases does not change and sellin decreases by 1")
+	    {
+	      CHECK(b == BackstagePass(concert, sellIn - 1, Quality::max()));
+	    }
+	}
+    }
+}
+
+SCENARIO("backstage pass with sellin of 10 is updated")
+{
+  GIVEN("a backstage with sellin of 10")
+    {
+      int const quality = 41;
+      int const sellIn = 10;
+      std::string const concert = "x.y.u.";
+      BackstagePass b(concert, sellIn, quality);
+      WHEN("it is updated")
+	{
+	  b.update();
+	  THEN("quality increaes by 2 and sellin decreases by 1")
+	    {
+	      CHECK(b == BackstagePass(concert, sellIn - 1, quality + 2));
+	    }
+	}
+    }
+}
+
+SCENARIO("backstage pass with sellin of 10 and quality 1 under max is updated")
+{
+  GIVEN("a backstage pass with sellin of 10 and quality 1 under max")
+    {
+      int const quality = Quality::max() - 1;
+      int const sellIn = 10;
+      std::string const concert = "x.y.u.";
+      BackstagePass b(concert, sellIn, quality);
+      WHEN("it is updated")
+	{
+	  b.update();
+	  THEN("quality is set to max and selllin decreases by 1")
+	    {
+	      CHECK(b == BackstagePass(concert, sellIn - 1, Quality::max()));
+	    }
+	}
+    }
+}
+SCENARIO("backstage pass with sellin of 5 is updated")
+{
+  GIVEN("a backstage with sellin of 5")
+    {
+      int const quality = 41;
+      int const sellIn = 5;
+      std::string const concert = "x.y.u.";
+      BackstagePass b(concert, sellIn, quality);
+      WHEN("it is updated")
+	{
+	  b.update();
+	  THEN("quality increaes by 3 and sellin decreases by 1")
+	    {
+	      CHECK(b == BackstagePass(concert, sellIn - 1, quality + 3));
+	    }
+	}
+    }
+}
+
+SCENARIO("backstage pass with sellin of 5 and quality 1 under max is updated")
+{
+  GIVEN("a backstage pass with sellin of 5 and quality 1 under max")
+    {
+      int const quality = Quality::max() - 1;
+      int const sellIn = 5;
+      std::string const concert = "x.y.u.";
+      BackstagePass b(concert, sellIn, quality);
+      WHEN("it is updated")
+	{
+	  b.update();
+	  THEN("quality is set to max and selllin decreases by 1")
+	    {
+	      CHECK(b == BackstagePass(concert, sellIn - 1, Quality::max()));
+	    }
+	}
+    }
+}
+
+SCENARIO("backstage pass for a passed concert is updated")
+{
+  GIVEN("a backstage pass with sellin of 0")
+    {  
+      int const quality = 41;
+      int const sellIn = 0;
+      std::string const concert = "x.y.u.";
+      BackstagePass b(concert, sellIn, quality);
+      WHEN("it is updated")
+	{
+	  b.update();
+	  THEN("quality value is is set to min and sellin is decreased by 1")
+	    {
+	      CHECK(b == BackstagePass(concert, sellIn - 1, Quality::min()));
+	    }
+	}
+    }
+ }
 
 SCENARIO("days pass for sulfuras")
 {

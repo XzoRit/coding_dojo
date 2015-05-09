@@ -1,17 +1,19 @@
 #ifndef _BACKSTAGE_PASS_HPP_
 #define _BACKSTAGE_PASS_HPP_
 
-class Item;
+#include <string>
 
 class BackstagePass
 {
 public:
-  explicit BackstagePass(Item& it);
-
+  BackstagePass(std::string concert, int sellIn, int quality);
+  bool operator==(BackstagePass const& other) const;
+  bool operator!=(BackstagePass const& other) const;
   void update();
-
 private:
-  Item& item;
+  std::string concert;
+  int sellIn;
+  int quality;
 };
 
 #endif
