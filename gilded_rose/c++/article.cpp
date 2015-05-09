@@ -2,24 +2,38 @@
 #include "item.hpp"
 #include "quality.hpp"
 
-Article::Article(Item& it)
-  : item(it)
+Article::Article(std::string name, int sellIn, int quality)
+  : name(name)
+  , sellIn(sellIn)
+  , quality(quality)
 {
+}
+
+bool Article::operator==(Article const& other) const
+{
+  return (sellIn == other.sellIn) &&
+    (quality == other.quality) &&
+    (name == other.name);
+}
+
+bool Article::operator!=(Article const& other) const
+{
+  return !(*this == other);
 }
 
 void Article::update()
 {
-  if (item.sellIn > 0)
+  if (sellIn > 0)
     {
-      --item.quality;
+      --quality;
     }
   else
     {
-      item.quality -= 2;
+      quality -= 2;
     }
-  if (item.quality < Quality::min())
+  if (quality < Quality::min())
     {
-      item.quality = Quality::min();
+      quality = Quality::min();
     }
-  --item.sellIn;
+  --sellIn;
 }

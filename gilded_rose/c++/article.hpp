@@ -1,17 +1,19 @@
 #ifndef _ARTICLE_HPP_
 #define _ARTICLE_HPP_
 
-class Item;
+#include <string>
 
 class Article
 {
 public:
-  explicit Article(Item& it);
-
+  Article(std::string name, int sellIn, int quality);
   void update();
-
+  bool operator==(Article const&) const;
+  bool operator!=(Article const&) const;
 private:
-  Item& item;
+  std::string const name;
+  int sellIn;
+  int quality;
 };
 
 #endif

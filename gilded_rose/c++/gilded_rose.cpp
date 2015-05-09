@@ -54,7 +54,7 @@ void GildedRose::updateQuality()
 	}
       else
 	{
-	  articles.push_back(Article(*it));
+	  articles.push_back(Article(it->name, it->sellIn, it->quality));
 	}
     }
   Updater u;

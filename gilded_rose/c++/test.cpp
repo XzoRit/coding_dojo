@@ -1,5 +1,6 @@
 #include "gilded_rose.hpp"
 #include "quality.hpp"
+#include "article.hpp"
 #include <vector>
 
 #define CATCH_CONFIG_MAIN
@@ -48,43 +49,57 @@ private:
   GildedRose app;
 };
 
-SCENARIO("days pass for an item")
+SCENARIO("article with positive sellin is updated")
 {
-  GIVEN("an item with positve sellin value")
+  GIVEN("an article with positive sellin")
     {
       int const quality = 7;
-      Item const item("item", 16, 7);
-      AppHolder app(item);
-      WHEN("quality is updated")
+      int const sellIn = 16;
+      std::string const name = "article";
+      Article a(name, sellIn, quality);
+      WHEN("it is updated")
 	{
-	  app.updateQuality();
-	  THEN("quality value is decremented by one")
+	  a.update();
+	  THEN("quality and sellin are decremented by 1")
 	    {
-	      CHECK(app.itemQuality() == quality - 1);
+	      CHECK(a == Article(name, sellIn - 1, quality - 1));
 	    }
 	}
-      WHEN("sellin value is 0")
+    }
+}
+
+SCENARIO("article with sellin of 0 is updated")
+{
+  GIVEN("an aritcle with a sellin value of 0")
+    {
+      int const quality = 7;
+      int const sellIn = 0;
+      std::string const name = "article";
+      Article a(name, sellIn, quality);
+      WHEN("it is updated")
 	{
-	  app.setSellInTo(0);
-	  AND_WHEN("quality is updated")
+	  a.update();
+	  THEN("quality is decremented by 2 and sellin is decremented by 1")
 	    {
-	      app.updateQuality();
-	      THEN("quality value is decremented by two")
-		{
-		  CHECK(app.itemQuality() == quality - 2);
-		}
+	      CHECK(a == Article(name, sellIn - 1, quality - 2));
 	    }
 	}
-      WHEN("quality value is is set to min")
+    }
+}
+
+SCENARIO("article with min quality is updated")
+{
+  GIVEN("an article with min quality")
+    {
+      int const sellIn = 0;
+      std::string const name = "article";
+      Article a(name, sellIn, Quality::min());
+      WHEN("it is updated")
 	{
-	  app.setQualityTo(MinQuality);
-	  AND_WHEN("quality is updated")
+	  a.update();
+	  THEN("quality does not change and sellin is decremented by 1")
 	    {
-	      app.updateQuality();
-	      THEN("quality value does change")
-		{
-		  CHECK(app.itemQuality() == MinQuality);
-		}
+	      CHECK(a == Article(name, sellIn - 1, Quality::min()));
 	    }
 	}
     }
