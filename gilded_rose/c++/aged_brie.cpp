@@ -1,17 +1,25 @@
 #include "aged_brie.hpp"
-#include "item.hpp"
 #include "quality.hpp"
 
-AgedBrie::AgedBrie(Item& it)
-  : item(it)
+AgedBrie::AgedBrie(int quality)
+  : quality(quality)
 {
+}
+
+bool AgedBrie::operator==(AgedBrie const& other) const
+{
+  return quality == other.quality;
+}
+
+bool AgedBrie::operator!=(AgedBrie const& other) const
+{
+  return !(*this == other);
 }
 
 void AgedBrie::update()
 {
-  if (item.quality < Quality::max())
+  if (quality < Quality::max())
     {
-      ++item.quality;
+      ++quality;
     }
-  --item.sellIn;
 }

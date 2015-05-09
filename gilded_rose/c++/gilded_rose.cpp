@@ -46,7 +46,7 @@ void GildedRose::updateQuality()
 	}
       else if (isAgedBrie(*it))
 	{
-	  articles.push_back(AgedBrie(*it));
+	  articles.push_back(AgedBrie(it->quality));
 	}
       else if (isBackstagePass(*it))
 	{

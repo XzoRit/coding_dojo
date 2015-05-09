@@ -1,6 +1,8 @@
 #include "gilded_rose.hpp"
 #include "quality.hpp"
 #include "article.hpp"
+#include "aged_brie.hpp"
+
 #include <vector>
 
 #define CATCH_CONFIG_MAIN
@@ -105,43 +107,34 @@ SCENARIO("article with min quality is updated")
     }
 }
 
-SCENARIO("days pass for aged brie")
+SCENARIO("aged brie is updated")
 {
-  GIVEN("an aged brie with positive sellin value")
+  GIVEN("an aged brie")
     {
       int const quality = 28;
-      Item const item("Aged Brie", 11, quality);
-      AppHolder app(item);
-      WHEN("quality is updated")
+      AgedBrie a(quality);
+      WHEN("it is updated")
 	{
-	  app.updateQuality();
-	  THEN("quality increases by one")
+	  a.update();
+	  THEN("quality increases by 1")
 	    {
-	      CHECK(app.itemQuality() == quality + 1);
+	      CHECK(a == AgedBrie(quality + 1));
 	    }
 	}
-      WHEN("sellin value is 0")
+    }
+}
+
+SCENARIO("aged brie with max quality is updated")
+{
+  GIVEN("an aged brie with max quality")
+    {
+      AgedBrie a(Quality::max());
+      WHEN("it is updated")
 	{
-	  app.setSellInTo(0);
-	  AND_WHEN("quality is updated")
+	  a.update();
+	  THEN("quality does not change")
 	    {
-	      app.updateQuality();
-	      THEN("quality increases by one")
-		{
-		  CHECK(app.itemQuality() == quality + 1);
-		}
-	    }
-	}
-      WHEN("quality value is set to max")
-	{
-	  app.setQualityTo(MaxQuality);
-	  AND_WHEN("quality is updated")
-	    {
-	      app.updateQuality();
-	      THEN("quality value does not change")
-		{
-		  CHECK(app.itemQuality() == MaxQuality);
-		}
+	      CHECK(a == AgedBrie(Quality::max()));
 	    }
 	}
     }

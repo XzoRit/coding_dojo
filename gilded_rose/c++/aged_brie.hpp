@@ -1,17 +1,15 @@
 #ifndef _AGED_BRIE_HPP_
 #define _AGED_BRIE_HPP_
 
-class Item;
-
 class AgedBrie
 {
 public:
-  explicit AgedBrie(Item& it);
-  
+  AgedBrie(int quality);
+  bool operator==(AgedBrie const& other) const;
+  bool operator!=(AgedBrie const& other) const;
   void update();
-
 private:
-  Item& item;
+  int quality;
 };
 
 #endif
