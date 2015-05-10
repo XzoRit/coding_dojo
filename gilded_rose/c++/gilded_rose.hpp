@@ -1,12 +1,15 @@
-#include "item.hpp"
-#include <string>
-#include <vector>
+#ifndef _GILDED_ROSE_HPP_
+#define _GILDED_ROSE_HPP_
+
+#include "articles.hpp"
 
 class GildedRose
 {
 public:
-  std::vector<Item>& items;
-  GildedRose(std::vector<Item>& items);
-    
+  explicit GildedRose(Articles articles);    
   void updateQuality();
+private:
+  Articles articles;
 };
+
+#endif
