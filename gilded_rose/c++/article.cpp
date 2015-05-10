@@ -1,5 +1,4 @@
 #include "article.hpp"
-#include "item.hpp"
 #include "quality.hpp"
 
 std::ostream& operator<<(std::ostream& o, Article const& a)

@@ -7,7 +7,6 @@ include_directories("/opt/local/include")
 set (${PROJECT_NAME}_headers "")
 set (${PROJECT_NAME}_sources
   "gilded_rose.cpp"
-  "item.cpp"
   "article.cpp"
   "aged_brie.cpp"
   "backstage_pass.cpp"
