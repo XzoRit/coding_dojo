@@ -15,7 +15,7 @@ int main()
   articles.push_back(BackstagePass("TAFKAL80ETC concert", 15, 20));
   articles.push_back(BackstagePass("TAFKAL80ETC concert", 10, 49));
   articles.push_back(BackstagePass("TAFKAL80ETC concert", 5, 49));
-  GildedRose app(articles);
+  GildedRose<Articles> app(articles);
 
   cout << "OMGHAI!" << endl;
 
