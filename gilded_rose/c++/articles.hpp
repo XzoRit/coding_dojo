@@ -5,6 +5,7 @@
 #include "aged_brie.hpp"
 #include "backstage_pass.hpp"
 #include "sulfuras.hpp"
+#include "conjured.hpp"
 #include <boost/variant.hpp>
 #include <vector>
 
@@ -13,7 +14,8 @@ typedef std::vector<
     Article,
     AgedBrie,
     BackstagePass,
-    Sulfuras > >
+    Sulfuras,
+    Conjured > >
 Articles;
 
 #endif
