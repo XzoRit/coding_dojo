@@ -1,6 +1,12 @@
 #include "backstage_pass.hpp"
 #include "quality.hpp"
 
+std::ostream& operator<<(std::ostream& o, BackstagePass const& b)
+{
+  o << "Backstage pass for " << b.concert << ", " << b.sellIn << ", " << b.quality;
+  return o;
+}
+
 BackstagePass::BackstagePass(std::string concert, int sellIn, int quality)
   : concert(concert)
   , sellIn(sellIn)

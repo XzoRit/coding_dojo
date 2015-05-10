@@ -1,6 +1,12 @@
 #include "aged_brie.hpp"
 #include "quality.hpp"
 
+std::ostream& operator<<(std::ostream& o, AgedBrie const& a)
+{
+  o << "Aged Brie, " << a.quality;
+  return o;
+}
+
 AgedBrie::AgedBrie(int quality)
   : quality(quality)
 {

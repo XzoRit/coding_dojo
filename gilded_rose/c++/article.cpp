@@ -2,6 +2,12 @@
 #include "item.hpp"
 #include "quality.hpp"
 
+std::ostream& operator<<(std::ostream& o, Article const& a)
+{
+  o << a.name << ", " << a.sellIn << ", " << a.quality;
+  return o;
+}
+
 Article::Article(std::string name, int sellIn, int quality)
   : name(name)
   , sellIn(sellIn)

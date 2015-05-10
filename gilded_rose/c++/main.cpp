@@ -21,7 +21,8 @@ int main()
 
   for (int day = 0; day <= 30; day++)
     {
-      //cout << app << "\n\n";
+      cout << "-------- day " << day << " --------\n";
+      cout << app << "\n\n";
       app.updateQuality();
     }
 }

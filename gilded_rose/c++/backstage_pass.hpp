@@ -2,6 +2,7 @@
 #define _BACKSTAGE_PASS_HPP_
 
 #include <string>
+#include <ostream>
 
 class BackstagePass
 {
@@ -11,6 +12,7 @@ public:
   bool operator!=(BackstagePass const& other) const;
   void update();
 private:
+  friend std::ostream& operator<<(std::ostream& o, BackstagePass const& b);
   std::string concert;
   int sellIn;
   int quality;
