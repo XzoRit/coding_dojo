@@ -4,6 +4,7 @@
 #include "aged_brie.hpp"
 #include "backstage_pass.hpp"
 #include "sulfuras.hpp"
+#include "conjured.hpp"
 
 #include <vector>
 
@@ -240,6 +241,62 @@ SCENARIO("sulfuras is updated")
 	  s.update();
 	  THEN("neither quality nor sellin change")
 	    {
+	    }
+	}
+    }
+}
+
+SCENARIO("conjured article with positive sellin is updated")
+{
+  GIVEN("a conjured article with positive sellin")
+    {
+      int const quality = 7;
+      int const sellIn = 16;
+      std::string const name = "conjured article";
+      Conjured c(name, sellIn, quality);
+      WHEN("it is updated")
+	{
+	  c.update();
+	  THEN("quality is decremented by 2 and sellin is decremented by 1")
+	    {
+	      CHECK(c == Conjured(name, sellIn - 1, quality - 2));
+	    }
+	}
+    }
+}
+
+SCENARIO("conjured article with sellin of 0 is updated")
+{
+  GIVEN("a conjured aritcle with a sellin value of 0")
+    {
+      int const quality = 7;
+      int const sellIn = 0;
+      std::string const name = "conjured article";
+      Conjured c(name, sellIn, quality);
+      WHEN("it is updated")
+	{
+	  c.update();
+	  THEN("quality is decremented by 4 and sellin is decremented by 1")
+	    {
+	      CHECK(c == Conjured(name, sellIn - 1, quality - 4));
+	    }
+	}
+    }
+}
+
+SCENARIO("conjured article with min quality is updated")
+{
+  GIVEN("a conjured article with min quality")
+    {
+      int const sellIn = 0;
+      std::string const name = "conjured article";
+      Conjured c(name, sellIn, Quality::min());
+      WHEN("it is updated")
+	{
+	  c.update();
+	  THEN("quality does not change and sellin is decremented by 1")
+	    {
+	      CHECK(c == Conjured(name, sellIn - 1, Quality::min()));
 	    }
 	}
     }
