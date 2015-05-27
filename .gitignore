@@ -16,3 +16,6 @@ leap_year/c++/build
 /gilded_rose/c++/cmake_install.cmake
 /gilded_rose/c++/gilded_rose_main
 /gilded_rose/c++/gilded_rose_test
+/coffee_machine/d/.dub/
+/coffee_machine/d/coffee_machine
+/coffee_machine/d/dub.selections.json
