@@ -74,3 +74,79 @@ TEST_CASE("9 equals IX")
 {
   CHECK(arabaic_to_roman(9) == "IX");
 }
+
+int roman_to_arabic(std::string roman)
+{
+  const std::vector<std::pair<std::string, int>> roman_chars
+  {
+    {"X", 10},
+    {"IX", 9},
+    {"V", 5},
+    {"IV", 4},
+    {"I", 1}
+  };
+  int arabic{};
+
+  for(const auto it : roman_chars)
+    {
+      const auto size_of_roman_chars = it.first.size();
+      while(roman.substr(0, size_of_roman_chars) == it.first)
+	{
+	  arabic += it.second;
+	  roman.erase(0, size_of_roman_chars);
+	}
+    }
+
+  return arabic;
+}
+
+
+TEST_CASE("I equals 1")
+{
+  CHECK(roman_to_arabic("I") == 1);
+}
+
+TEST_CASE("II equals 2")
+{
+  CHECK(roman_to_arabic("II") == 2);
+}
+
+TEST_CASE("III equals 3")
+{
+  CHECK(roman_to_arabic("III") == 3);
+}
+
+TEST_CASE("V equals 5")
+{
+  CHECK(roman_to_arabic("V") == 5);
+}
+
+TEST_CASE("VI equals 6")
+{
+  CHECK(roman_to_arabic("VI") == 6);
+}
+
+TEST_CASE("VII equals 7")
+{
+  CHECK(roman_to_arabic("VII") == 7);
+}
+
+TEST_CASE("X equals 10")
+{
+  CHECK(roman_to_arabic("X") == 10);
+}
+
+TEST_CASE("XX equals 20")
+{
+  CHECK(roman_to_arabic("XX") == 20);
+}
+
+TEST_CASE("IV equals 4")
+{
+  CHECK(roman_to_arabic("IV") == 4);
+}
+
+TEST_CASE("IX equals 9")
+{
+  CHECK(roman_to_arabic("IX") == 9);
+}
