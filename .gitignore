@@ -19,3 +19,6 @@ leap_year/c++/build
 /coffee_machine/d/.dub/
 /coffee_machine/d/coffee_machine
 /coffee_machine/d/dub.selections.json
+/roman_numerals/c++/roman_numerals
+/roman_numerals/c++/bin/
+/roman_numerals/c++/roman_numerals.dSYM/
