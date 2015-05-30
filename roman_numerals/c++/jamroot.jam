@@ -1,0 +1,9 @@
+exe roman_numerals
+    : roman_numerals.cpp
+    : <cxxflags>-std=c++14
+    :
+    : <variant>debug ;
+install install_roman_numerals
+    : roman_numerals
+    : <location>. ;
+    
