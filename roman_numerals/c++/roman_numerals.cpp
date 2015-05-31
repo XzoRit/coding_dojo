@@ -89,11 +89,10 @@ int roman_to_arabic(std::string roman)
 
   for(const auto it : roman_chars)
     {
-      const auto size_of_roman_chars = it.first.size();
-      while(roman.substr(0, size_of_roman_chars) == it.first)
+      while(std::equal(std::begin(it.first), std::end(it.first), std::begin(roman)))
 	{
 	  arabic += it.second;
-	  roman.erase(0, size_of_roman_chars);
+	  roman.erase(0, it.first.size());
 	}
     }
 
