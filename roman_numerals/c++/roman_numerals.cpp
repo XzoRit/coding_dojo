@@ -5,24 +5,37 @@ std::string arabaic_to_roman(int arabic)
 {
   const std::vector<std::pair<int, std::string>> roman_chars
   {
+    {20, "XX"},
     {10, "X"},
     {9, "IX"},
+    {8, "VIII"},
+    {7, "VII"},
+    {6, "VI"},
     {5, "V"},
     {4, "IV"},
+    {3, "III"},
+    {2, "II"},
     {1, "I"}
   };
-  std::string roman;
+
+  struct Data
+  {
+    std::string roman;
+    int arabic;
+  } data;
+
+  data.arabic = arabic;
 
   for(const auto it : roman_chars)
     {
-      while(arabic >= it.first)
+      if(data.arabic >= it.first)
 	{
-	  roman += it.second;
-	  arabic -= it.first;
+	  data.roman += it.second;
+	  data.arabic -= it.first;
 	}
     }
 
-  return roman;
+  return data.roman;
 }
 
 TEST_CASE("1 equals I")
