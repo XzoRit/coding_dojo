@@ -22,20 +22,22 @@ std::string arabaic_to_roman(int arabic)
   {
     std::string roman;
     int arabic;
-  } data;
+  };
 
-  data.arabic = arabic;
+  auto result =
+    std::accumulate(std::cbegin(roman_chars), std::cend(roman_chars),
+		    Data{"", arabic},
+		    [](auto acc, auto it)
+		    {
+		      if(acc.arabic >= it.first)
+			{
+			  acc.roman += it.second;
+			  acc.arabic -= it.first;
+			}
+		      return acc;
+		    });
 
-  for(const auto it : roman_chars)
-    {
-      if(data.arabic >= it.first)
-	{
-	  data.roman += it.second;
-	  data.arabic -= it.first;
-	}
-    }
-
-  return data.roman;
+  return result.roman;
 }
 
 TEST_CASE("1 equals I")
