@@ -94,17 +94,23 @@ int roman_to_arabic(std::string roman)
 {
   const std::vector<std::pair<std::string, int>> roman_chars
   {
+    {"XX", 20},
     {"X", 10},
     {"IX", 9},
+    {"VIII", 8},
+    {"VII", 7},
+    {"VI", 6},
     {"V", 5},
     {"IV", 4},
+    {"III", 3},
+    {"II", 2},
     {"I", 1}
   };
   int arabic{};
 
   for(const auto it : roman_chars)
     {
-      while(std::equal(std::begin(it.first), std::end(it.first), std::begin(roman)))
+      if(std::equal(std::begin(it.first), std::end(it.first), std::begin(roman)))
 	{
 	  arabic += it.second;
 	  roman.erase(0, it.first.size());
