@@ -106,18 +106,30 @@ int roman_to_arabic(std::string roman)
     {"II", 2},
     {"I", 1}
   };
-  int arabic{};
 
-  for(const auto it : roman_chars)
-    {
-      if(std::equal(std::begin(it.first), std::end(it.first), std::begin(roman)))
-	{
-	  arabic += it.second;
-	  roman.erase(0, it.first.size());
-	}
-    }
+  struct Data
+  {
+    std::string roman;
+    int arabic;
+  };
 
-  return arabic;
+  auto result =
+    std::accumulate(std::cbegin(roman_chars), std::cend(roman_chars),
+		    Data{roman, {}},
+		    [](auto acc, auto it)
+		    {
+		      if(std::equal(
+				    std::begin(it.first),
+				    std::end(it.first),
+				    std::begin(acc.roman)))
+			{
+			  acc.arabic += it.second;
+			  acc.roman.erase(0, it.first.size());
+			}
+		      return acc;
+		    });
+
+  return result.arabic;
 }
 
 
