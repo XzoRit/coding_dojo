@@ -3,7 +3,9 @@
 
 std::string arabaic_to_roman(int arabic)
 {
-  const std::vector<std::pair<int, std::string>> roman_chars
+  using TranslationItem = std::pair<int, std::string>;
+  using TranslationMap = std::vector<TranslationItem>;
+  const TranslationMap roman_chars
   {
     {20, "XX"},
     {10, "X"},
@@ -18,26 +20,17 @@ std::string arabaic_to_roman(int arabic)
     {1, "I"}
   };
 
-  struct Data
-  {
-    std::string roman;
-    int arabic;
-  };
-
-  auto result =
-    std::accumulate(std::cbegin(roman_chars), std::cend(roman_chars),
-		    Data{"", arabic},
-		    [](auto acc, auto it)
-		    {
-		      if(acc.arabic >= it.first)
-			{
-			  acc.roman += it.second;
-			  acc.arabic -= it.first;
-			}
-		      return acc;
-		    });
-
-  return result.roman;
+  return std::accumulate(std::cbegin(roman_chars), std::cend(roman_chars),
+			 TranslationItem{arabic, {}},
+			 [](auto acc, auto it)
+			 {
+			   if(acc.first >= it.first)
+			     {
+			       acc.second += it.second;
+			       acc.first -= it.first;
+			     }
+			   return acc;
+			 }).second;
 }
 
 TEST_CASE("1 equals I")
