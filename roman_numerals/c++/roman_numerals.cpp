@@ -1,36 +1,37 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-template<class T, class U, class F>
-auto translate(T toBeTranslated, U TranslationMap, F Advice)
+template<class From, class Map, class Advice>
+auto translate(From toBeTranslated,
+	       Map TranslationMap,
+	       Advice advice)
 {
-  return std::accumulate(std::cbegin(TranslationMap),
-			 std::cend(TranslationMap),
-  			 typename U::value_type{toBeTranslated, {}},
-                         Advice).second;
+  return std::get<1>(std::accumulate(std::cbegin(TranslationMap),
+				     std::cend(TranslationMap),
+				     typename Map::value_type{toBeTranslated, {}},
+				     advice));
 }
 
 std::string arabaic_to_roman(int arabic)
 {
-  using TranslationItem = std::pair<int, std::string>;
-  using TranslationMap = std::vector<TranslationItem>;
-  const TranslationMap roman_chars
-  {
-    {20, "XX"},
-    {10, "X"},
-    {9, "IX"},
-    {8, "VIII"},
-    {7, "VII"},
-    {6, "VI"},
-    {5, "V"},
-    {4, "IV"},
-    {3, "III"},
-    {2, "II"},
-    {1, "I"}
-  };
+  const std::vector<std::pair<int, std::string>>
+    translationMap =
+    {
+      {20, "XX"},
+      {10, "X"},
+      {9, "IX"},
+      {8, "VIII"},
+      {7, "VII"},
+      {6, "VI"},
+      {5, "V"},
+      {4, "IV"},
+      {3, "III"},
+      {2, "II"},
+      {1, "I"}
+    };
 
   return translate(arabic,
-		   roman_chars,
+		   translationMap,
 		   [](auto acc, auto it)
 		   {
 		     if(acc.first >= it.first)
@@ -40,17 +41,6 @@ std::string arabaic_to_roman(int arabic)
 		       }
 		     return acc;
 		   });
-  // return std::accumulate(std::cbegin(roman_chars), std::cend(roman_chars),
-  // 			 TranslationItem{arabic, {}},
-  // 			 [](auto acc, auto it)
-  // 			 {
-  // 			   if(acc.first >= it.first)
-  // 			     {
-  // 			       acc.second += it.second;
-  // 			       acc.first -= it.first;
-  // 			     }
-  // 			   return acc;
-  // 			 }).second;
 }
 
 TEST_CASE("1 equals I")
