@@ -14,24 +14,23 @@ auto translate(From toBeTranslated,
 
 std::string arabaic_to_roman(int arabic)
 {
-  const std::vector<std::pair<int, std::string>>
-    translationMap =
-    {
-      {20, "XX"},
-      {10, "X"},
-      {9, "IX"},
-      {8, "VIII"},
-      {7, "VII"},
-      {6, "VI"},
-      {5, "V"},
-      {4, "IV"},
-      {3, "III"},
-      {2, "II"},
-      {1, "I"}
-    };
+  const std::vector<std::pair<int, std::string>> translation_map
+  {
+    {20, "XX"},
+    {10, "X"},
+    {9, "IX"},
+    {8, "VIII"},
+    {7, "VII"},
+    {6, "VI"},
+    {5, "V"},
+    {4, "IV"},
+    {3, "III"},
+    {2, "II"},
+    {1, "I"}
+  };
 
   return translate(arabic,
-		   translationMap,
+		   translation_map,
 		   [](auto acc, auto it)
 		   {
 		     if(acc.first >= it.first)
@@ -95,9 +94,7 @@ TEST_CASE("9 equals IX")
 
 int roman_to_arabic(std::string roman)
 {
-  using TranslationItem = std::pair<std::string, int>;
-  using TranslationMap = std::vector<TranslationItem>;
-  const TranslationMap roman_chars
+  const std::vector<std::pair<std::string, int>> translation_map
   {
     {"XX", 20},
     {"X", 10},
@@ -112,23 +109,19 @@ int roman_to_arabic(std::string roman)
     {"I", 1}
   };
 
-  auto result =
-    std::accumulate(std::cbegin(roman_chars), std::cend(roman_chars),
-		    TranslationItem{roman, {}},
-		    [](auto acc, auto it)
-		    {
-		      if(std::equal(
-				    std::begin(it.first),
-				    std::end(it.first),
-				    std::begin(acc.first)))
-			{
-			  acc.second += it.second;
-			  acc.first.erase(0, it.first.size());
-			}
-		      return acc;
-		    });
-
-  return result.second;
+  return translate(roman,
+		   translation_map,
+		   [](auto acc, auto it)
+		   {
+		     if(std::equal(std::begin(it.first),
+				   std::end(it.first),
+				   std::begin(acc.first)))
+		       {
+			 acc.second += it.second;
+			 acc.first.erase(0, it.first.size());
+		       }
+		     return acc;
+		   });
 }
 
 
