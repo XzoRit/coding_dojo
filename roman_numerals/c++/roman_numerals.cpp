@@ -85,7 +85,9 @@ TEST_CASE("9 equals IX")
 
 int roman_to_arabic(std::string roman)
 {
-  const std::vector<std::pair<std::string, int>> roman_chars
+  using TranslationItem = std::pair<std::string, int>;
+  using TranslationMap = std::vector<TranslationItem>;
+  const TranslationMap roman_chars
   {
     {"XX", 20},
     {"X", 10},
@@ -100,29 +102,23 @@ int roman_to_arabic(std::string roman)
     {"I", 1}
   };
 
-  struct Data
-  {
-    std::string roman;
-    int arabic;
-  };
-
   auto result =
     std::accumulate(std::cbegin(roman_chars), std::cend(roman_chars),
-		    Data{roman, {}},
+		    TranslationItem{roman, {}},
 		    [](auto acc, auto it)
 		    {
 		      if(std::equal(
 				    std::begin(it.first),
 				    std::end(it.first),
-				    std::begin(acc.roman)))
+				    std::begin(acc.first)))
 			{
-			  acc.arabic += it.second;
-			  acc.roman.erase(0, it.first.size());
+			  acc.second += it.second;
+			  acc.first.erase(0, it.first.size());
 			}
 		      return acc;
 		    });
 
-  return result.arabic;
+  return result.second;
 }
 
 
