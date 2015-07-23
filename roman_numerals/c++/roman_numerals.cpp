@@ -1,16 +1,42 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
+#include <boost/bimap.hpp>
 
 template<class From, class Map, class Advice>
 auto translate(From toBeTranslated,
 	       Map TranslationMap,
 	       Advice advice)
 {
-  return std::get<1>(std::accumulate(std::cbegin(TranslationMap),
-				     std::cend(TranslationMap),
-				     typename Map::value_type{toBeTranslated, {}},
-				     advice));
+  return std::accumulate(std::cbegin(TranslationMap),
+			 std::cend(TranslationMap),
+			 typename Map::value_type{toBeTranslated, {}},
+			 advice);
 }
+
+class TranslationMap
+{
+public:
+  TranslationMap()
+    : map{}
+  {
+    map.insert(Value(20, "XX"));
+    map.insert(Value(10, "X"));
+    map.insert(Value(9, "IX"));
+    map.insert(Value(8, "VIII"));
+    map.insert(Value(7, "VII"));
+    map.insert(Value(6, "VI"));
+    map.insert(Value(5, "V"));
+    map.insert(Value(4, "IV"));
+    map.insert(Value(3, "III"));
+    map.insert(Value(2, "II"));
+    map.insert(Value(1, "I"));
+  }
+  
+  using MapType = boost::bimap<int, std::string>;
+  using Value = MapType::value_type;
+  
+  MapType map;
+};
 
 std::string arabaic_to_roman(int arabic)
 {
@@ -39,7 +65,7 @@ std::string arabaic_to_roman(int arabic)
 			 acc.first -= it.first;
 		       }
 		     return acc;
-		   });
+		   }).second;
 }
 
 TEST_CASE("1 equals I")
@@ -121,7 +147,7 @@ int roman_to_arabic(std::string roman)
 			 acc.first.erase(0, it.first.size());
 		       }
 		     return acc;
-		   });
+		   }).second;
 }
 
 
