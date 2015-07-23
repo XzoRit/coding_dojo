@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 #include <boost/bimap.hpp>
+#include <boost/bimap/vector_of.hpp>
 
 template<class From, class Map, class Advice>
 auto translate(From toBeTranslated,
@@ -19,20 +20,22 @@ public:
   TranslationMap()
     : map{}
   {
-    map.insert(Value(20, "XX"));
-    map.insert(Value(10, "X"));
-    map.insert(Value(9, "IX"));
-    map.insert(Value(8, "VIII"));
-    map.insert(Value(7, "VII"));
-    map.insert(Value(6, "VI"));
-    map.insert(Value(5, "V"));
-    map.insert(Value(4, "IV"));
-    map.insert(Value(3, "III"));
-    map.insert(Value(2, "II"));
-    map.insert(Value(1, "I"));
+    map.push_back(Value(20, "XX"));
+    map.push_back(Value(10, "X"));
+    map.push_back(Value(9, "IX"));
+    map.push_back(Value(8, "VIII"));
+    map.push_back(Value(7, "VII"));
+    map.push_back(Value(6, "VI"));
+    map.push_back(Value(5, "V"));
+    map.push_back(Value(4, "IV"));
+    map.push_back(Value(3, "III"));
+    map.push_back(Value(2, "II"));
+    map.push_back(Value(1, "I"));
   }
   
-  using MapType = boost::bimap<int, std::string>;
+  using MapType = boost::bimap<
+    boost::bimaps::vector_of<int>,
+    boost::bimaps::vector_of<std::string>>;
   using Value = MapType::value_type;
   
   MapType map;
@@ -40,23 +43,8 @@ public:
 
 std::string arabaic_to_roman(int arabic)
 {
-  const std::vector<std::pair<int, std::string>> translation_map
-  {
-    {20, "XX"},
-    {10, "X"},
-    {9, "IX"},
-    {8, "VIII"},
-    {7, "VII"},
-    {6, "VI"},
-    {5, "V"},
-    {4, "IV"},
-    {3, "III"},
-    {2, "II"},
-    {1, "I"}
-  };
-
   return translate(arabic,
-		   translation_map,
+		   TranslationMap{}.map.left,
 		   [](auto acc, auto it)
 		   {
 		     if(acc.first >= it.first)
@@ -120,23 +108,8 @@ TEST_CASE("9 equals IX")
 
 int roman_to_arabic(std::string roman)
 {
-  const std::vector<std::pair<std::string, int>> translation_map
-  {
-    {"XX", 20},
-    {"X", 10},
-    {"IX", 9},
-    {"VIII", 8},
-    {"VII", 7},
-    {"VI", 6},
-    {"V", 5},
-    {"IV", 4},
-    {"III", 3},
-    {"II", 2},
-    {"I", 1}
-  };
-
   return translate(roman,
-		   translation_map,
+		   TranslationMap{}.map.right,
 		   [](auto acc, auto it)
 		   {
 		     if(std::equal(std::begin(it.first),
