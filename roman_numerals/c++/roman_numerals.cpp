@@ -1,6 +1,15 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
+template<class T, class U, class F>
+auto translate(T toBeTranslated, U TranslationMap, F Advice)
+{
+  return std::accumulate(std::cbegin(TranslationMap),
+			 std::cend(TranslationMap),
+  			 typename U::value_type{toBeTranslated, {}},
+                         Advice).second;
+}
+
 std::string arabaic_to_roman(int arabic)
 {
   using TranslationItem = std::pair<int, std::string>;
@@ -20,17 +29,28 @@ std::string arabaic_to_roman(int arabic)
     {1, "I"}
   };
 
-  return std::accumulate(std::cbegin(roman_chars), std::cend(roman_chars),
-			 TranslationItem{arabic, {}},
-			 [](auto acc, auto it)
-			 {
-			   if(acc.first >= it.first)
-			     {
-			       acc.second += it.second;
-			       acc.first -= it.first;
-			     }
-			   return acc;
-			 }).second;
+  return translate(arabic,
+		   roman_chars,
+		   [](auto acc, auto it)
+		   {
+		     if(acc.first >= it.first)
+		       {
+			 acc.second += it.second;
+			 acc.first -= it.first;
+		       }
+		     return acc;
+		   });
+  // return std::accumulate(std::cbegin(roman_chars), std::cend(roman_chars),
+  // 			 TranslationItem{arabic, {}},
+  // 			 [](auto acc, auto it)
+  // 			 {
+  // 			   if(acc.first >= it.first)
+  // 			     {
+  // 			       acc.second += it.second;
+  // 			       acc.first -= it.first;
+  // 			     }
+  // 			   return acc;
+  // 			 }).second;
 }
 
 TEST_CASE("1 equals I")
