@@ -3,15 +3,15 @@
 #include <boost/bimap.hpp>
 #include <boost/bimap/vector_of.hpp>
 
-template<class From, class Map, class Advice>
+template<class From, class Map, class Order>
 auto translate(From toBeTranslated,
 	       Map TranslationMap,
-	       Advice advice)
+	       Order order)
 {
   return std::accumulate(std::cbegin(TranslationMap),
 			 std::cend(TranslationMap),
 			 typename Map::value_type{toBeTranslated, {}},
-			 advice);
+			 order);
 }
 
 class TranslationMap
@@ -56,14 +56,14 @@ std::string arabaic_to_roman(int arabic)
 {
   return translate(arabic,
 		   TranslationMap{}.arabic_to_roman(),
-		   [](auto acc, auto it)
+		   [](auto result, auto order)
 		   {
-		     if(acc.first == it.first)
+		     if(result.first == order.first)
 		       {
-			 acc.second += it.second;
-			 acc.first -= it.first;
+			 result.second += order.second;
+			 result.first -= order.first;
 		       }
-		     return acc;
+		     return result;
 		   }).second;
 }
 
@@ -121,16 +121,16 @@ int roman_to_arabic(std::string roman)
 {
   return translate(roman,
 		   TranslationMap{}.roman_to_arabic(),
-		   [](auto acc, auto it)
+		   [](auto result, auto order)
 		   {
-		     if(std::equal(std::begin(it.first),
-				   std::end(it.first),
-				   std::begin(acc.first)))
+		     if(std::equal(std::begin(order.first),
+				   std::end(order.first),
+				   std::begin(result.first)))
 		       {
-			 acc.second += it.second;
-			 acc.first.erase(0, it.first.size());
+			 result.second += order.second;
+			 result.first.erase(0, order.first.size());
 		       }
-		     return acc;
+		     return result;
 		   }).second;
 }
 
