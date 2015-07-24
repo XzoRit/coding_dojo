@@ -3,15 +3,23 @@
 #include <boost/bimap.hpp>
 #include <boost/bimap/vector_of.hpp>
 
-template<class From, class Map, class Order>
+template<class From, class Map, class Pred, class Order>
 auto translate(From toBeTranslated,
 	       Map TranslationMap,
-	       Order order)
+	       Pred isTranslationNeeded,
+	       Order doTranslation)
 {
   return std::accumulate(std::cbegin(TranslationMap),
 			 std::cend(TranslationMap),
 			 typename Map::value_type{toBeTranslated, {}},
-			 order);
+			 [=](auto result, auto order)
+			 {
+			   if(isTranslationNeeded(result, order))
+			     {
+			       return doTranslation(result, order);
+			     }
+			   return result;
+			 });
 }
 
 class TranslationMap
@@ -54,17 +62,22 @@ private:
 
 std::string arabaic_to_roman(int arabic)
 {
+  auto isTranslationNeeded = [](auto result, auto order)
+    {
+      return (result.first == order.first);
+    };
+
+  auto doTranslation =[](auto result, auto order)
+    {
+      result.second += order.second;
+      result.first -= order.first;
+      return result;
+    };
+
   return translate(arabic,
 		   TranslationMap{}.arabic_to_roman(),
-		   [](auto result, auto order)
-		   {
-		     if(result.first == order.first)
-		       {
-			 result.second += order.second;
-			 result.first -= order.first;
-		       }
-		     return result;
-		   }).second;
+		   isTranslationNeeded,
+		   doTranslation).second;
 }
 
 TEST_CASE("1 equals I")
@@ -119,19 +132,24 @@ TEST_CASE("9 equals IX")
 
 int roman_to_arabic(std::string roman)
 {
+  auto isTranslationNeeded = [](auto result, auto order)
+    {
+      return std::equal(std::begin(order.first),
+			std::end(order.first),
+			std::begin(result.first));
+    };
+
+  auto doTranslation = [](auto result, auto order)
+    {
+      result.second += order.second;
+      result.first.erase(0, order.first.size());
+      return result;
+    };
+
   return translate(roman,
 		   TranslationMap{}.roman_to_arabic(),
-		   [](auto result, auto order)
-		   {
-		     if(std::equal(std::begin(order.first),
-				   std::end(order.first),
-				   std::begin(result.first)))
-		       {
-			 result.second += order.second;
-			 result.first.erase(0, order.first.size());
-		       }
-		     return result;
-		   }).second;
+		   isTranslationNeeded,
+		   doTranslation).second;
 }
 
 
