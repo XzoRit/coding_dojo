@@ -32,7 +32,18 @@ public:
     map.push_back(Value(2, "II"));
     map.push_back(Value(1, "I"));
   }
-  
+
+  auto arabic_to_roman() const
+  {
+    return map.left;
+  }
+
+  auto roman_to_arabic() const
+  {
+    return map.right;
+  }
+
+private:
   using MapType = boost::bimap<
     boost::bimaps::vector_of<int>,
     boost::bimaps::vector_of<std::string>>;
@@ -44,10 +55,10 @@ public:
 std::string arabaic_to_roman(int arabic)
 {
   return translate(arabic,
-		   TranslationMap{}.map.left,
+		   TranslationMap{}.arabic_to_roman(),
 		   [](auto acc, auto it)
 		   {
-		     if(acc.first >= it.first)
+		     if(acc.first == it.first)
 		       {
 			 acc.second += it.second;
 			 acc.first -= it.first;
@@ -109,7 +120,7 @@ TEST_CASE("9 equals IX")
 int roman_to_arabic(std::string roman)
 {
   return translate(roman,
-		   TranslationMap{}.map.right,
+		   TranslationMap{}.roman_to_arabic(),
 		   [](auto acc, auto it)
 		   {
 		     if(std::equal(std::begin(it.first),
