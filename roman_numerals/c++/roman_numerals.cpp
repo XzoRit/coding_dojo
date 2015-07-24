@@ -64,7 +64,7 @@ std::string arabaic_to_roman(int arabic)
 {
   auto isTranslationNeeded = [](auto result, auto order)
     {
-      return (result.first == order.first);
+      return (result.first >= order.first);
     };
 
   auto doTranslation =[](auto result, auto order)
@@ -128,6 +128,11 @@ TEST_CASE("4 equals IV")
 TEST_CASE("9 equals IX")
 {
   CHECK(arabaic_to_roman(9) == "IX");
+}
+
+TEST_CASE("23 equals XXIII")
+{
+  CHECK(arabaic_to_roman(23) == "XXIII");
 }
 
 int roman_to_arabic(std::string roman)
@@ -201,4 +206,9 @@ TEST_CASE("IV equals 4")
 TEST_CASE("IX equals 9")
 {
   CHECK(roman_to_arabic("IX") == 9);
+}
+
+TEST_CASE("XXIII equals 23")
+{
+  CHECK(roman_to_arabic("XXIII") == 23);
 }
