@@ -1,83 +1,28 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
-#include <boost/bimap.hpp>
-#include <boost/bimap/vector_of.hpp>
-
-template<class From, class Map, class Pred, class Order>
-auto translate(From toBeTranslated,
-	       Map TranslationMap,
-	       Pred isTranslationNeeded,
-	       Order doTranslation)
-{
-  return std::accumulate(std::cbegin(TranslationMap),
-			 std::cend(TranslationMap),
-			 typename Map::value_type{toBeTranslated, {}},
-			 [=](auto result, auto order)
-			 {
-			   if(isTranslationNeeded(result, order))
-			     {
-			       return doTranslation(result, order);
-			     }
-			   return result;
-			 });
-}
-
-class TranslationMap
-{
-public:
-  TranslationMap()
-    : map{}
-  {
-    map.push_back(Value(20, "XX"));
-    map.push_back(Value(10, "X"));
-    map.push_back(Value(9, "IX"));
-    map.push_back(Value(8, "VIII"));
-    map.push_back(Value(7, "VII"));
-    map.push_back(Value(6, "VI"));
-    map.push_back(Value(5, "V"));
-    map.push_back(Value(4, "IV"));
-    map.push_back(Value(3, "III"));
-    map.push_back(Value(2, "II"));
-    map.push_back(Value(1, "I"));
-  }
-
-  auto arabic_to_roman() const
-  {
-    return map.left;
-  }
-
-  auto roman_to_arabic() const
-  {
-    return map.right;
-  }
-
-private:
-  using MapType = boost::bimap<
-    boost::bimaps::vector_of<int>,
-    boost::bimaps::vector_of<std::string>>;
-  using Value = MapType::value_type;
-  
-  MapType map;
-};
 
 std::string arabaic_to_roman(int arabic)
 {
-  auto isTranslationNeeded = [](auto result, auto order)
-    {
-      return (result.first >= order.first);
-    };
+  const std::vector<std::pair<int, std::string>> roman_chars
+  {
+    {10, "X"},
+    {9, "IX"},
+    {5, "V"},
+    {4, "IV"},
+    {1, "I"}
+  };
+  std::string roman;
 
-  auto doTranslation =[](auto result, auto order)
+  for(const auto it : roman_chars)
     {
-      result.second += order.second;
-      result.first -= order.first;
-      return result;
-    };
+      while(arabic >= it.first)
+	{
+	  roman += it.second;
+	  arabic -= it.first;
+	}
+    }
 
-  return translate(arabic,
-		   TranslationMap{}.arabic_to_roman(),
-		   isTranslationNeeded,
-		   doTranslation).second;
+  return roman;
 }
 
 TEST_CASE("1 equals I")
@@ -130,31 +75,28 @@ TEST_CASE("9 equals IX")
   CHECK(arabaic_to_roman(9) == "IX");
 }
 
-TEST_CASE("23 equals XXIII")
-{
-  CHECK(arabaic_to_roman(23) == "XXIII");
-}
-
 int roman_to_arabic(std::string roman)
 {
-  auto isTranslationNeeded = [](auto result, auto order)
-    {
-      return std::equal(std::begin(order.first),
-			std::end(order.first),
-			std::begin(result.first));
-    };
+  const std::vector<std::pair<std::string, int>> roman_chars
+  {
+    {"X", 10},
+    {"IX", 9},
+    {"V", 5},
+    {"IV", 4},
+    {"I", 1}
+  };
+  int arabic{};
 
-  auto doTranslation = [](auto result, auto order)
+  for(const auto it : roman_chars)
     {
-      result.second += order.second;
-      result.first.erase(0, order.first.size());
-      return result;
-    };
+      while(std::equal(std::begin(it.first), std::end(it.first), std::begin(roman)))
+	{
+	  arabic += it.second;
+	  roman.erase(0, it.first.size());
+	}
+    }
 
-  return translate(roman,
-		   TranslationMap{}.roman_to_arabic(),
-		   isTranslationNeeded,
-		   doTranslation).second;
+  return arabic;
 }
 
 
@@ -206,9 +148,4 @@ TEST_CASE("IV equals 4")
 TEST_CASE("IX equals 9")
 {
   CHECK(roman_to_arabic("IX") == 9);
-}
-
-TEST_CASE("XXIII equals 23")
-{
-  CHECK(roman_to_arabic("XXIII") == 23);
 }
