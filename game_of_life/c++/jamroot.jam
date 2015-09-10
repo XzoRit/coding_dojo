@@ -1,0 +1,9 @@
+exe game_of_life
+    : game_of_life.cpp
+    : <cxxflags>-std=c++14
+    :
+    : <variant>debug ;
+install install_game_of_life
+    : game_of_life
+    : <location>. ;
+    
