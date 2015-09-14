@@ -37,11 +37,9 @@ public:
   friend bool operator==(const Universe& lhs, const Universe& rhs);
   friend ostream& operator<<(ostream&, const Universe& universe);
 
-  static auto setup(vector<vector<bool>> grid)
+  static auto setup(const initializer_list<initializer_list<bool>>& grid)
   {
-    auto universe = Universe{};
-    universe.m_grid = move(grid);
-    return universe;
+    return Universe{grid};
   }
 
   static auto apply_rules(const Universe& universe)
@@ -103,6 +101,10 @@ public:
   
 private:
   Universe()
+  {}
+
+  Universe(const initializer_list<initializer_list<bool>>& grid)
+    : m_grid(cbegin(grid), cend(grid))
   {}
 
   vector<vector<bool>> m_grid;
