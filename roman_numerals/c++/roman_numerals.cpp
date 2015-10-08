@@ -6,7 +6,7 @@ namespace v2
   auto digits_of(int arabic)
   {
     auto result = std::vector<int>{0, 0, 0, 0};
-    if(arabic) result[3] = 1;
+    if(arabic) result[3] = arabic;
     return result;
   }
   
@@ -18,6 +18,11 @@ namespace v2
   TEST_CASE("digits of 1 returns {0, 0, 0, 1}")
   {
     CHECK((digits_of(1) == std::vector<int>{0, 0, 0, 1}));
+  }
+
+  TEST_CASE("digits of 2 returns {0, 0, 0, 2}")
+  {
+    CHECK((digits_of(2) == std::vector<int>{0, 0, 0, 2}));
   }
 }
 
