@@ -5,8 +5,9 @@ namespace v2
 {
   auto digits_of(int arabic)
   {
-    if(arabic) return std::vector<int>{0, 0, 0, 1};
-    return std::vector<int>{0, 0, 0, 0};
+    auto result = std::vector<int>{0, 0, 0, 0};
+    if(arabic) result[3] = 1;
+    return result;
   }
   
   TEST_CASE("digits of 0 returns {0, 0, 0, 0}")
