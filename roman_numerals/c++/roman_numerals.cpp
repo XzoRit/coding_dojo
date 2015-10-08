@@ -5,12 +5,18 @@ namespace v2
 {
   auto digits_of(int arabic)
   {
+    if(arabic) return std::vector<int>{0, 0, 0, 1};
     return std::vector<int>{0, 0, 0, 0};
   }
   
   TEST_CASE("digits of 0 returns {0, 0, 0, 0}")
   {
     CHECK((digits_of(0) == std::vector<int>{0, 0, 0, 0}));
+  }
+
+  TEST_CASE("digits of 1 returns {0, 0, 0, 1}")
+  {
+    CHECK((digits_of(1) == std::vector<int>{0, 0, 0, 1}));
   }
 }
 
