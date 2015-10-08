@@ -7,7 +7,10 @@ namespace v2
   {
     const auto nums_of_digits{4};
     auto result = std::vector<int>(nums_of_digits, 0);
-    const auto rem = arabic / 10;
+    auto rem = arabic / 100;
+    result[nums_of_digits-3] = rem;
+    arabic -= 100 * rem;
+    rem = arabic / 10;
     result[nums_of_digits-2] = rem;
     arabic -= 10 * rem;
     if(arabic) result[nums_of_digits-1] = arabic;
@@ -37,6 +40,11 @@ namespace v2
   TEST_CASE("digits of 37 returns {0, 0, 3, 7}")
   {
     CHECK((digits_of(37) == std::vector<int>{0, 0, 3, 7}));
+  }
+
+  TEST_CASE("digits of 739 returns {0, 7, 3, 9}")
+  {
+    CHECK((digits_of(739) == std::vector<int>{0, 7, 3, 9}));
   }
 }
 
