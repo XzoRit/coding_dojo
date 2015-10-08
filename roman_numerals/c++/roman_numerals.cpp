@@ -1,6 +1,19 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
+namespace v2
+{
+  auto digits_of(int arabic)
+  {
+    return std::vector<int>{0, 0, 0, 0};
+  }
+  
+  TEST_CASE("digits of 0 returns {0, 0, 0, 0}")
+  {
+    CHECK((digits_of(0) == std::vector<int>{0, 0, 0, 0}));
+  }
+}
+
 namespace v1
 {
   std::string arabaic_to_roman(int arabic)
