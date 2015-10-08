@@ -98,11 +98,12 @@ public:
       }
     return newUniverse;
   }
-  
-private:
-  Universe()
-  {}
 
+  
+  Universe& operator=(const Universe&) = default;
+private:
+  Universe() = delete;
+  
   Universe(const initializer_list<initializer_list<bool>>& grid)
     : m_grid(cbegin(grid), cend(grid))
   {}
