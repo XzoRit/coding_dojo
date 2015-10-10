@@ -3,10 +3,12 @@
 
 namespace v2
 {
+  using Digits = std::vector<int>;
+  
   auto digits_of(int arabic)
   {
     const auto num_of_digits{4};
-    auto digits = std::vector<int>(num_of_digits, 0);
+    auto digits = Digits(num_of_digits, 0);
     std::generate_n(std::rbegin(digits), num_of_digits, [arabic]() mutable
 		    {
 		      const auto digit = arabic % 10;
@@ -18,37 +20,37 @@ namespace v2
   
   TEST_CASE("digits of 0 returns {0, 0, 0, 0}")
   {
-    CHECK((digits_of(0) == std::vector<int>{0, 0, 0, 0}));
+    CHECK((digits_of(0) == Digits{0, 0, 0, 0}));
   }
 
   TEST_CASE("digits of 1 returns {0, 0, 0, 1}")
   {
-    CHECK((digits_of(1) == std::vector<int>{0, 0, 0, 1}));
+    CHECK((digits_of(1) == Digits{0, 0, 0, 1}));
   }
 
   TEST_CASE("digits of 2 returns {0, 0, 0, 2}")
   {
-    CHECK((digits_of(2) == std::vector<int>{0, 0, 0, 2}));
+    CHECK((digits_of(2) == Digits{0, 0, 0, 2}));
   }
 
   TEST_CASE("digits of 30 returns {0, 0, 3, 0}")
   {
-    CHECK((digits_of(30) == std::vector<int>{0, 0, 3, 0}));
+    CHECK((digits_of(30) == Digits{0, 0, 3, 0}));
   }
 
   TEST_CASE("digits of 37 returns {0, 0, 3, 7}")
   {
-    CHECK((digits_of(37) == std::vector<int>{0, 0, 3, 7}));
+    CHECK((digits_of(37) == Digits{0, 0, 3, 7}));
   }
 
   TEST_CASE("digits of 739 returns {0, 7, 3, 9}")
   {
-    CHECK((digits_of(739) == std::vector<int>{0, 7, 3, 9}));
+    CHECK((digits_of(739) == Digits{0, 7, 3, 9}));
   }
 
   TEST_CASE("digits of 7395 returns {7, 3, 9, 5}")
   {
-    CHECK((digits_of(7395) == std::vector<int>{7, 3, 9, 5}));
+    CHECK((digits_of(7395) == Digits{7, 3, 9, 5}));
   }
 }
 
