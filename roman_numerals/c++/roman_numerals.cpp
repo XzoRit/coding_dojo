@@ -52,6 +52,18 @@ namespace v2
   {
     CHECK((digits_of(7395) == Digits{7, 3, 9, 5}));
   }
+
+  using RomanSymbols = std::vector<std::string>;
+  
+  auto to_roman_symbols(Digits digits)
+  {
+    return RomanSymbols{"", "", "", ""};
+  }
+  
+  TEST_CASE("roman symbols of 0 is \"\"")
+  {
+    CHECK((to_roman_symbols({0, 0, 0, 0}) == RomanSymbols{"", "", "", ""}));
+  }
 }
 
 namespace v1
