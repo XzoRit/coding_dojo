@@ -8,11 +8,12 @@ namespace v2
     const auto num_of_digits{4};
     auto result = std::vector<int>(num_of_digits, 0);
     auto idx = num_of_digits - 1;
-    while(arabic)
-      {
-	result[idx--] = arabic % 10;
-	arabic /= 10;
-      }
+    std::generate_n(std::rbegin(result), num_of_digits, [arabic]() mutable
+		    {
+		      const auto digit = arabic % 10;
+		      arabic /= 10;
+		      return digit;
+		    });
     return result;
   }
   
@@ -44,6 +45,11 @@ namespace v2
   TEST_CASE("digits of 739 returns {0, 7, 3, 9}")
   {
     CHECK((digits_of(739) == std::vector<int>{0, 7, 3, 9}));
+  }
+
+  TEST_CASE("digits of 7395 returns {7, 3, 9, 5}")
+  {
+    CHECK((digits_of(7395) == std::vector<int>{7, 3, 9, 5}));
   }
 }
 
