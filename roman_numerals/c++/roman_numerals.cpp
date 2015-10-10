@@ -6,15 +6,14 @@ namespace v2
   auto digits_of(int arabic)
   {
     const auto num_of_digits{4};
-    auto result = std::vector<int>(num_of_digits, 0);
-    auto idx = num_of_digits - 1;
-    std::generate_n(std::rbegin(result), num_of_digits, [arabic]() mutable
+    auto digits = std::vector<int>(num_of_digits, 0);
+    std::generate_n(std::rbegin(digits), num_of_digits, [arabic]() mutable
 		    {
 		      const auto digit = arabic % 10;
 		      arabic /= 10;
 		      return digit;
 		    });
-    return result;
+    return digits;
   }
   
   TEST_CASE("digits of 0 returns {0, 0, 0, 0}")
