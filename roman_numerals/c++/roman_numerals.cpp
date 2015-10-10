@@ -5,15 +5,14 @@ namespace v2
 {
   auto digits_of(int arabic)
   {
-    const auto nums_of_digits{4};
-    auto result = std::vector<int>(nums_of_digits, 0);
-    auto rem = arabic / 100;
-    result[nums_of_digits-3] = rem;
-    arabic -= 100 * rem;
-    rem = arabic / 10;
-    result[nums_of_digits-2] = rem;
-    arabic -= 10 * rem;
-    if(arabic) result[nums_of_digits-1] = arabic;
+    const auto num_of_digits{4};
+    auto result = std::vector<int>(num_of_digits, 0);
+    auto idx = num_of_digits - 1;
+    while(arabic)
+      {
+	result[idx--] = arabic % 10;
+	arabic /= 10;
+      }
     return result;
   }
   
