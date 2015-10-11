@@ -108,6 +108,21 @@ namespace v2
   {
     CHECK((to_roman_symbols({0, 9, 9, 9}) == RomanSymbols{"", "CM", "XC", "IX"}));
   }
+
+  auto concat_roman_symbols(const RomanSymbols& symbols)
+  {
+    return std::accumulate(cbegin(symbols), cend(symbols), std::string{""});
+  }
+
+  TEST_CASE("concat symbols returns empty strings if symbols are empty")
+  {
+    CHECK((concat_roman_symbols(RomanSymbols{"", "", "", ""}) == std::string{""}));
+  }
+
+  TEST_CASE("concat symbols returns concats roman symbols")
+  {
+    CHECK((concat_roman_symbols(RomanSymbols{"MM", "CD", "XL", "VIII"}) == std::string{"MMCDXLVIII"}));
+  }
 }
 
 namespace v1
