@@ -123,6 +123,16 @@ namespace v2
   {
     CHECK((concat_roman_symbols(RomanSymbols{"MM", "CD", "XL", "VIII"}) == std::string{"MMCDXLVIII"}));
   }
+
+  auto arabic_to_roman(int arabic)
+  {
+    return concat_roman_symbols(to_roman_symbols(digits_of(arabic)));
+  }
+
+  TEST_CASE("1981 equals MCMLXXXI")
+  {
+    CHECK(arabic_to_roman(1981) == std::string{"MCMLXXXI"});
+  }
 }
 
 namespace v1
