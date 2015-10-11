@@ -57,12 +57,29 @@ namespace v2
   
   auto to_roman_symbols(Digits digits)
   {
-    return RomanSymbols{"", "", "", ""};
+    const auto thousands = RomanSymbols{"", "M"};
+    const auto hundreds = RomanSymbols{"", "C"};
+    const auto tens = RomanSymbols{"", "X"};
+    const auto ones = RomanSymbols{"", "I"};
+
+    auto symbols = RomanSymbols(4, "");
+
+    symbols[0] = thousands[digits[0]];
+    symbols[1] = hundreds[digits[1]];
+    symbols[2] = tens[digits[2]];
+    symbols[3] = ones[digits[3]];
+    
+    return symbols;
   }
   
   TEST_CASE("roman symbols of 0 is \"\"")
   {
     CHECK((to_roman_symbols({0, 0, 0, 0}) == RomanSymbols{"", "", "", ""}));
+  }
+
+  TEST_CASE("roman symbols of {1, 1, 1, 1} is {M, C, X, I}")
+  {
+    CHECK((to_roman_symbols({1, 1, 1, 1}) == RomanSymbols{"M", "C", "X", "I"}));
   }
 }
 
