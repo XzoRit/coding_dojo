@@ -57,10 +57,10 @@ namespace v2
   
   auto to_roman_symbols(Digits digits)
   {
-    const auto thousands = RomanSymbols{"", "M"};
-    const auto hundreds = RomanSymbols{"", "C"};
-    const auto tens = RomanSymbols{"", "X"};
-    const auto ones = RomanSymbols{"", "I"};
+    const auto thousands = RomanSymbols{"", "M", "MM", "MMM"};
+    const auto hundreds = RomanSymbols{"", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"};
+    const auto tens = RomanSymbols{"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
+    const auto ones = RomanSymbols{"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
 
     auto symbols = RomanSymbols(4, "");
 
@@ -80,6 +80,31 @@ namespace v2
   TEST_CASE("roman symbols of {1, 1, 1, 1} is {M, C, X, I}")
   {
     CHECK((to_roman_symbols({1, 1, 1, 1}) == RomanSymbols{"M", "C", "X", "I"}));
+  }
+
+  TEST_CASE("roman symbols of {2, 2, 2, 2} is {MM, CC, XX, II}")
+  {
+    CHECK((to_roman_symbols({2, 2, 2, 2}) == RomanSymbols{"MM", "CC", "XX", "II"}));
+  }
+
+  TEST_CASE("roman symbols of {0, 4, 4, 4} is {, CD, XL, IV}")
+  {
+    CHECK((to_roman_symbols({0, 4, 4, 4}) == RomanSymbols{"", "CD", "XL", "IV"}));
+  }
+
+  TEST_CASE("roman symbols of {0, 5, 5, 5} is {, D, L, V}")
+  {
+    CHECK((to_roman_symbols({0, 5, 5, 5}) == RomanSymbols{"", "D", "L", "V"}));
+  }
+
+  TEST_CASE("roman symbols of {0, 7, 7, 7} is {, DCC, LXX, VII}")
+  {
+    CHECK((to_roman_symbols({0, 7, 7, 7}) == RomanSymbols{"", "DCC", "LXX", "VII"}));
+  }
+
+  TEST_CASE("roman symbols of {0, 9, 9, 9} is {, CM, XC, IX}")
+  {
+    CHECK((to_roman_symbols({0, 9, 9, 9}) == RomanSymbols{"", "CM", "XC", "IX"}));
   }
 }
 
