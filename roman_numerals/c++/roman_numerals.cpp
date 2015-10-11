@@ -3,11 +3,11 @@
 
 namespace v2
 {
+  const auto num_of_digits{4};
   using Digits = std::vector<int>;
   
   auto digits_of(int arabic)
   {
-    const auto num_of_digits{4};
     auto digits = Digits(num_of_digits, 0);
     std::generate_n(std::rbegin(digits), num_of_digits, [arabic]() mutable
 		    {
@@ -62,12 +62,16 @@ namespace v2
     const auto tens = RomanSymbols{"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
     const auto ones = RomanSymbols{"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
 
-    auto symbols = RomanSymbols(4, "");
+    auto symbols = RomanSymbols(num_of_digits, "");
+    auto idx{0};
 
-    symbols[0] = thousands[digits[0]];
-    symbols[1] = hundreds[digits[1]];
-    symbols[2] = tens[digits[2]];
-    symbols[3] = ones[digits[3]];
+    symbols[idx] = thousands[digits[idx]];
+    ++idx;
+    symbols[idx] = hundreds[digits[idx]];
+    ++idx;
+    symbols[idx] = tens[digits[idx]];
+    ++idx;
+    symbols[idx] = ones[digits[idx]];
     
     return symbols;
   }
