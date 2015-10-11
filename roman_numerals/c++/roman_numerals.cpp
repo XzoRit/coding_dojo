@@ -62,18 +62,16 @@ namespace v2
     const auto tens = RomanSymbols{"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
     const auto ones = RomanSymbols{"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
 
-    auto symbols = RomanSymbols(num_of_digits, "");
-    auto idx{0};
-
-    symbols[idx] = thousands[digits[idx]];
-    ++idx;
-    symbols[idx] = hundreds[digits[idx]];
-    ++idx;
-    symbols[idx] = tens[digits[idx]];
-    ++idx;
-    symbols[idx] = ones[digits[idx]];
-    
-    return symbols;
+    const auto symbols = {thousands, hundreds, tens, ones};
+    auto results = RomanSymbols(num_of_digits, "");
+    std::transform(begin(digits), end(digits),
+		   begin(symbols),
+		   begin(results),
+		   [](auto digit, auto symMap)
+		   {
+		     return symMap[digit];
+		   });
+    return results;
   }
   
   TEST_CASE("roman symbols of 0 is \"\"")
