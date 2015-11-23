@@ -6,11 +6,16 @@ class ArabicToRoman {
 
   def convert(arabic: Int) = {
     var roman = ""
-    var count = 0
-    do {
+    var count = arabic
+    if(arabic >= 5) {
+      roman += "V"
+      count -= 5
+    }
+    while(count > 0)  {
       roman += "I"
-      count += 1
-    } while(count < arabic)
+      count -= 1
+    }
+
     roman
   }
 
@@ -30,6 +35,14 @@ class TestArabicToRoman extends FlatSpec with Matchers with BeforeAndAfter {
 
   "given a 3 convert" should "return III" in {
     arabicToRoman.convert(3) should be ("III")
+  }
+
+  "given a 5 convert" should "return V" in {
+    arabicToRoman.convert(5) should be ("V")
+  }
+
+  "given a 8 convert" should "return VIII" in {
+    arabicToRoman.convert(8) should be ("VIII")
   }
 
 }
