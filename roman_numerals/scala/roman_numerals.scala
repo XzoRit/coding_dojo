@@ -5,9 +5,13 @@ import org.scalatest._
 class ArabicToRoman {
 
   def convert(arabic: Int) = {
-    if(arabic == 3) "III"
-    else if(arabic == 2) "II"
-    else "I"
+    var roman = ""
+    var count = 0
+    do {
+      roman += "I"
+      count += 1
+    } while(count < arabic)
+    roman
   }
 
 }
