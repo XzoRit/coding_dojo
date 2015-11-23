@@ -28,4 +28,12 @@ class TestArabicToRoman extends FlatSpec with Matchers with BeforeAndAfter {
     arabicToRoman.convert(8) should be ("VIII")
   }
 
+  "given a 10 convert" should "return X" in {
+    arabicToRoman.convert(10) should be ("X")
+  }
+
+  "given a 30 convert" should "return XXX" in {
+    arabicToRoman.convert(30) should be ("XXX")
+  }
+
 }
