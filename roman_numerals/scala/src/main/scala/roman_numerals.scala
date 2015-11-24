@@ -5,20 +5,21 @@ class ArabicToRoman {
   def convert(arabic: Int) = {
     var roman = ""
     var count = arabic
-    while(count >= 10) {
-      roman += "X"
-      count -= 10
+    while(count >= symbolTable(2)._1) {
+      roman += symbolTable(2)._2
+      count -= symbolTable(2)._1
     }
-    if(count >= 5) {
-      roman += "V"
-      count -= 5
+    if(count >= symbolTable(1)._1) {
+      roman += symbolTable(1)._2
+      count -= symbolTable(1)._1
     }
-    while(count > 0)  {
-      roman += "I"
-      count -= 1
+    while(count >= symbolTable(0)._1)  {
+      roman += symbolTable(0)._2
+      count -= symbolTable(0)._1
     }
 
     roman
   }
 
+  val symbolTable = List((1 -> "I"), (5 -> "V"), (10 -> "X"))
 }
