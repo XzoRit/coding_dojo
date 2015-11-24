@@ -39,7 +39,7 @@ package functional {
   class ArabicToRoman {
 
     def digitsOf(num: Int) = {
-      List(0, 0, 0, 0)
+      num.toString map{_.asDigit} padTo(4, 0)
     }
 
   }

@@ -63,7 +63,11 @@ package functional {
     val arabicToRoman = new ArabicToRoman
 
     "digits of 0" should "return (0, 0, 0, 0)" in {
-      arabicToRoman.digitsOf(0) should be (List(0, 0, 0, 0))
+      arabicToRoman.digitsOf(0) should be (Vector(0, 0, 0, 0))
+    }
+
+    "digits of 1234" should "return (1, 2, 3, 4)" in {
+      arabicToRoman.digitsOf(1234) should be (Vector(1, 2, 3, 4))
     }
 
   }
