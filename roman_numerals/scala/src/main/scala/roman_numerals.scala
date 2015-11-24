@@ -1,31 +1,47 @@
 package xzr.coding_dojo.roman_numerals
 
-class ArabicToRoman {
+package imperativ {
 
-  def convert(arabic: Int) = {
-    var roman = ""
-    var count = arabic
-    symbolTable foreach { arabicRomanPair =>
-      while(count >= arabicRomanPair._1) {
-	roman += arabicRomanPair._2
-	count -= arabicRomanPair._1
+  class ArabicToRoman {
+
+    def convert(arabic: Int) = {
+      var roman = ""
+      var count = arabic
+      symbolTable foreach { arabicRomanPair =>
+	while(count >= arabicRomanPair._1) {
+	  roman += arabicRomanPair._2
+	  count -= arabicRomanPair._1
+	}
       }
+      roman
     }
-    roman
+
+    private val symbolTable = List(
+      (1000 -> "M"),
+      (900 -> "CM"),
+      (500 -> "D"),
+      (400 -> "CD"),
+      (100 -> "C"),
+      (90 -> "XC"),
+      (50 -> "L"),
+      (40 -> "XL"),
+      (10 -> "X"),
+      (9 -> "IX"),
+      (5 -> "V"),
+      (4 -> "IV"),
+      (1 -> "I"))
   }
 
-  private val symbolTable = List(
-    (1000 -> "M"),
-    (900 -> "CM"),
-    (500 -> "D"),
-    (400 -> "CD"),
-    (100 -> "C"),
-    (90 -> "XC"),
-    (50 -> "L"),
-    (40 -> "XL"),
-    (10 -> "X"),
-    (9 -> "IX"),
-    (5 -> "V"),
-    (4 -> "IV"),
-    (1 -> "I"))
+}
+
+package functional {
+
+  class ArabicToRoman {
+
+    def digitsOf(num: Int) = {
+      List(0, 0, 0, 0)
+    }
+
+  }
+
 }
