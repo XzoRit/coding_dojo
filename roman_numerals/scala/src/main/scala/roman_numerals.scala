@@ -14,7 +14,7 @@ class ArabicToRoman {
     roman
   }
 
-  val symbolTable = List(
+  private val symbolTable = List(
     (1000 -> "M"),
     (900 -> "CM"),
     (500 -> "D"),
