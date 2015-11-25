@@ -46,12 +46,6 @@ package functional {
       (digits, symbolTable).zipped map{(digit, symbols) => symbols(digit)}
     }
 
-    val ones = Vector("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
-    val tens = Vector("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
-    val hundreds = Vector("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
-    val thousands = Vector("", "M", "MM", "MMM")
-    val symbolTable = Vector(thousands, hundreds, tens, ones)
-
     def concatSymbols(symbols: IndexedSeq[String]) = {
       symbols.foldLeft(""){_ ++ _}
     }
@@ -60,6 +54,12 @@ package functional {
       concatSymbols(toRomanSymbols(digitsOf(arabic)))
     }
   
+    private val ones = Vector("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
+    private val tens = Vector("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
+    private val hundreds = Vector("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
+    private val thousands = Vector("", "M", "MM", "MMM")
+    private val symbolTable = Vector(thousands, hundreds, tens, ones)
+
   }
 
 }
