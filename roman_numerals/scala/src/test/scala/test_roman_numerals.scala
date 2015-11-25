@@ -70,6 +70,26 @@ package functional {
       arabicToRoman.digitsOf(1234) should be (Vector(1, 2, 3, 4))
     }
 
+    "mapping digits 0 0 0 0 to roman symbols" should "return (\"\", \"\", \"\", \"\")" in {
+      arabicToRoman.toRomanSymbols(Vector(0, 0, 0, 0)) should be (List("", "", "", ""))
+    }
+
+    "mapping digits 1 1 1 1 to roman symbols" should "return (\"M\", \"C\", \"X\", \"I\")" in {
+      arabicToRoman.toRomanSymbols(Vector(1, 1, 1, 1)) should be (List("M", "C", "X", "I"))
+    }
+
+    "mapping digits 3 3 3 3 to roman symbols" should "return (\"MMM\", \"CCC\", \"XXX\", \"III\")" in {
+      arabicToRoman.toRomanSymbols(Vector(3, 3, 3, 3)) should be (List("MMM", "CCC", "XXX", "III"))
+    }
+
+    "mapping digits 0 4 4 4 to roman symbols" should "return (\"\", \"CD\", \"XL\", \"IV\")" in {
+      arabicToRoman.toRomanSymbols(Vector(0, 4, 4, 4)) should be (List("", "CD", "XL", "IV"))
+    }
+
+    "mapping digits 9 9 9 9 to roman symbols" should "return (\"\", \"CM\", \"XC\", \"IX\")" in {
+      arabicToRoman.toRomanSymbols(Vector(0, 9, 9, 9)) should be (List("", "CM", "XC", "IX"))
+    }
+
   }
 
 }
