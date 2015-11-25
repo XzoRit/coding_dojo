@@ -42,11 +42,11 @@ package functional {
       num.toString map{_.asDigit} padTo(4, 0)
     }
 
-    def toRomanSymbols(digits: IndexedSeq[Int]) = {
+    def toRomanSymbols(digits: Traversable[Int]) = {
       (digits, symbolTable).zipped map{(digit, symbols) => symbols(digit)}
     }
 
-    def concatSymbols(symbols: IndexedSeq[String]) = {
+    def concatSymbols(symbols: Traversable[String]) = {
       symbols.foldLeft(""){_ ++ _}
     }
 
