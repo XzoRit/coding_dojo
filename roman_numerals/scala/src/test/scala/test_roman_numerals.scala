@@ -98,6 +98,10 @@ package functional {
       arabicToRoman.concatSymbols(Vector("M", "C", "X", "I")) should be ("MCXI")
     }
 
+    "converting 1974 to roman symbols" should "return MCMLXXIV" in {
+      arabicToRoman.convert(1974) should be ("MCMLXXIV")
+    }
+
   }
 
 }

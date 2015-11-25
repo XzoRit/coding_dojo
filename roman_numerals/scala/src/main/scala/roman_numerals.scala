@@ -42,7 +42,7 @@ package functional {
       num.toString map{_.asDigit} padTo(4, 0)
     }
 
-    def toRomanSymbols(digits: Vector[Int]) = {
+    def toRomanSymbols(digits: IndexedSeq[Int]) = {
       (digits, symbolTable).zipped map{(digit, symbols) => symbols(digit)}
     }
 
@@ -52,8 +52,12 @@ package functional {
     val thousands = List("", "M", "MM", "MMM")
     val symbolTable = List(thousands, hundreds, tens, ones)
 
-    def concatSymbols(symbols: Vector[String]) = {
+    def concatSymbols(symbols: IndexedSeq[String]) = {
       symbols.foldLeft(""){_ ++ _}
+    }
+
+    def convert(arabic: Int) = {
+      concatSymbols(toRomanSymbols(digitsOf(arabic)))
     }
   
   }
