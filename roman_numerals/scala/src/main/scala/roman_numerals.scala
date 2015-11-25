@@ -51,6 +51,11 @@ package functional {
     val hundreds = List("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
     val thousands = List("", "M", "MM", "MMM")
     val symbolTable = List(thousands, hundreds, tens, ones)
+
+    def concatSymbols(symbols: Vector[String]) = {
+      symbols.foldLeft(""){_ ++ _}
+    }
+  
   }
 
 }

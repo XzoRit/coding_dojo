@@ -90,6 +90,14 @@ package functional {
       arabicToRoman.toRomanSymbols(Vector(0, 9, 9, 9)) should be (List("", "CM", "XC", "IX"))
     }
 
+    "the concatination of \"\" \"\" \"\" \"\"" should "return \"\"" in {
+      arabicToRoman.concatSymbols(Vector("", "", "", "")) should be ("")
+    }
+
+    "the concatination of \"M\" \"C\" \"X\" \"I\"" should "return \"MCXI\"" in {
+      arabicToRoman.concatSymbols(Vector("M", "C", "X", "I")) should be ("MCXI")
+    }
+
   }
 
 }
