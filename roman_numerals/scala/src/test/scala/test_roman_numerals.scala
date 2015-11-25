@@ -71,23 +71,23 @@ package functional {
     }
 
     "mapping digits 0 0 0 0 to roman symbols" should "return (\"\", \"\", \"\", \"\")" in {
-      arabicToRoman.toRomanSymbols(Vector(0, 0, 0, 0)) should be (List("", "", "", ""))
+      arabicToRoman.toRomanSymbols(Vector(0, 0, 0, 0)) should be (Vector("", "", "", ""))
     }
 
     "mapping digits 1 1 1 1 to roman symbols" should "return (\"M\", \"C\", \"X\", \"I\")" in {
-      arabicToRoman.toRomanSymbols(Vector(1, 1, 1, 1)) should be (List("M", "C", "X", "I"))
+      arabicToRoman.toRomanSymbols(Vector(1, 1, 1, 1)) should be (Vector("M", "C", "X", "I"))
     }
 
     "mapping digits 3 3 3 3 to roman symbols" should "return (\"MMM\", \"CCC\", \"XXX\", \"III\")" in {
-      arabicToRoman.toRomanSymbols(Vector(3, 3, 3, 3)) should be (List("MMM", "CCC", "XXX", "III"))
+      arabicToRoman.toRomanSymbols(Vector(3, 3, 3, 3)) should be (Vector("MMM", "CCC", "XXX", "III"))
     }
 
     "mapping digits 0 4 4 4 to roman symbols" should "return (\"\", \"CD\", \"XL\", \"IV\")" in {
-      arabicToRoman.toRomanSymbols(Vector(0, 4, 4, 4)) should be (List("", "CD", "XL", "IV"))
+      arabicToRoman.toRomanSymbols(Vector(0, 4, 4, 4)) should be (Vector("", "CD", "XL", "IV"))
     }
 
     "mapping digits 9 9 9 9 to roman symbols" should "return (\"\", \"CM\", \"XC\", \"IX\")" in {
-      arabicToRoman.toRomanSymbols(Vector(0, 9, 9, 9)) should be (List("", "CM", "XC", "IX"))
+      arabicToRoman.toRomanSymbols(Vector(0, 9, 9, 9)) should be (Vector("", "CM", "XC", "IX"))
     }
 
     "the concatination of \"\" \"\" \"\" \"\"" should "return \"\"" in {
