@@ -23,3 +23,6 @@ leap_year/c++/build
 /roman_numerals/c++/bin/
 /roman_numerals/c++/roman_numerals.dSYM/
 /roman_numerals/scala/target/
+/roman_numerals/d/.dub/*
+/roman_numerals/d/roman_numerals
+/roman_numerals/d/dub.*.json
