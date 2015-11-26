@@ -1,0 +1,14 @@
+{
+    "name": "roman_numerals",
+    "description": "An implementation of the roman-numerals-code-kata",
+    "dependencies": {
+	"specd": ">=0.1.0"
+    },
+    "configurations": [
+	{
+            "name": "test",
+            "versions": ["specrunner"],
+            "targetType": "executable"
+	}
+    ]
+}
