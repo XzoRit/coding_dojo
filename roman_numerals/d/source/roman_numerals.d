@@ -58,6 +58,7 @@ struct ArabicToRoman
     import std.algorithm : map;
     import std.array : array, join;
     import std.range : zip;
+    import std.functional : pipe;
 
     static auto digits_of(immutable int num) pure @safe
     {      
@@ -79,7 +80,7 @@ struct ArabicToRoman
 
     static auto convert(int arabic) pure @safe
     {
-      return join_symbols(to_roman(digits_of(arabic)));
+      return pipe!(digits_of, to_roman, join_symbols)(arabic);
     }
 	 
     private static immutable(string[]) ones =
