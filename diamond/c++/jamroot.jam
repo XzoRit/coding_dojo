@@ -1,0 +1,9 @@
+exe diamond
+    : diamond.cpp
+    : <cxxflags>-std=c++14
+    :
+    : <variant>debug ;
+install install_diamond
+    : diamond
+    : <location>. ;
+    
