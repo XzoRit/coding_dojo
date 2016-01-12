@@ -26,3 +26,8 @@ leap_year/c++/build
 /roman_numerals/d/.dub/*
 /roman_numerals/d/roman_numerals
 /roman_numerals/d/dub.*.json
+/roman_numerals/scala/project/
+/diamond/c++/diamond
+/diamond/c++/bin/
+/diamond/c++/diamond.dSYM/
+/diamond/elixir/diamond/_build/
