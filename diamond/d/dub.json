@@ -1,0 +1,14 @@
+{
+    "name": "diamond",
+    "description": "An implementation of the diamond-code-kata",
+    "dependencies": {
+	"specd": ">=0.1.0"
+    },
+    "configurations": [
+	{
+            "name": "test",
+            "versions": ["specrunner"],
+            "targetType": "executable"
+	}
+    ]
+}
