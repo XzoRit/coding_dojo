@@ -1,12 +1,13 @@
 module xzr.diamond;
 
-import std.ascii               : uppercase;
-import std.array               : replicate;
-import std.algorithm.iteration : map;
-import std.range               : iota, retro;
-
 struct Diamond
 {
+  import std.ascii               : uppercase;
+  import std.array               : replicate;
+  import std.algorithm.iteration : map;
+  import std.range               : iota, retro, zip;
+  import std.conv                : to;
+
   static auto letters(char including)
   {
     return uppercase[0..(including - 'A' + 1)];
@@ -21,6 +22,21 @@ struct Diamond
   static auto spaces_before(int num)
   {
     return spaces_after(num).retro;
+  }
+
+  static auto lines(char including)
+  {
+    immutable num = including - 'A';
+    return zip(spaces_before(num),
+	       letters(including),
+	       spaces_after(num))
+      .map!(a => concat(a.expand));
+  }
+
+private:
+  static auto concat(string before, dchar letter, string after)
+  {
+    return before ~ to!string(letter) ~ after;
   }
 }
 
@@ -54,5 +70,14 @@ unittest
 	     { Diamond.spaces_before(1).array.must.equal([" ", ""]); },
 	     """return ["", " ", "  "] if given 2""":
 	     { Diamond.spaces_before(2).array.must.equal(["  ", " ", ""]); }
+	     ]);
+
+  describe("lines")
+    .should(["return [A] if given A":
+	     { Diamond.lines('A').array.must.equal(["A"]); },
+	     """return [ A, B ] if given B""":
+	     { Diamond.lines('B').array.must.equal([" A", "B "]); },
+	     """return [  A,  B , C  ] if given C""":
+	     { Diamond.lines('C').array.must.equal(["  A", " B ", "C  "]); }
 	     ]);
 }
