@@ -8,28 +8,27 @@ struct Diamond
   import std.range               : iota, retro, zip;
   import std.conv                : to;
 
-  static auto letters(char including)
+  static auto letters(int amount)
   {
-    return uppercase[0..(including - 'A' + 1)];
+    return uppercase[0..amount];
   }
 
-  static auto spaces_after(int num)
+  static auto spaces_after(int amount)
   {
-    return iota(0, num+1)
+    return iota(0, amount)
       .map!(a => replicate(" ", a));
   }
 
-  static auto spaces_before(int num)
+  static auto spaces_before(int amount)
   {
-    return spaces_after(num).retro;
+    return spaces_after(amount).retro;
   }
 
-  static auto lines(char including)
+  static auto lines(int amount)
   {
-    immutable num = including - 'A';
-    return zip(spaces_before(num),
-	       letters(including),
-	       spaces_after(num))
+    return zip(spaces_before(amount),
+	       letters(amount),
+	       spaces_after(amount))
       .map!(a => concat(a.expand));
   }
 
@@ -46,38 +45,38 @@ unittest
   import std.array : array;
 
   describe("letters")
-    .should(["return A if given A":
-	     { Diamond.letters('A').must.equal("A"); },
-	     "return AB if given B":
-	     { Diamond.letters('B').must.equal("AB"); },
-	     "return ABC if given C":
-	     { Diamond.letters('C').must.equal("ABC"); }
+    .should(["return A if given 1":
+	     { Diamond.letters(1).must.equal("A"); },
+	     "return AB if given 2":
+	     { Diamond.letters(2).must.equal("AB"); },
+	     "return ABC if given 3":
+	     { Diamond.letters(3).must.equal("ABC"); }
 	     ]);
 
   describe("spaces_after")
-    .should(["""return [""] if given 0""":
-	     { Diamond.spaces_after(0).array.must.equal([""]); },
-	     """return ["", " "] if given 1""":
-	     { Diamond.spaces_after(1).array.must.equal(["", " "]); },
-	     """return ["", " ", "  "] if given 2""":
-	     { Diamond.spaces_after(2).array.must.equal(["", " ", "  "]); }
+    .should(["""return [""] if given 1""":
+	     { Diamond.spaces_after(1).array.must.equal([""]); },
+	     """return ["", " "] if given 2""":
+	     { Diamond.spaces_after(2).array.must.equal(["", " "]); },
+	     """return ["", " ", "  "] if given 3""":
+	     { Diamond.spaces_after(3).array.must.equal(["", " ", "  "]); }
 	     ]);
 
   describe("spaces_before")
-    .should(["""return [""] if given 0""":
-	     { Diamond.spaces_before(0).array.must.equal([""]); },
-	     """return ["", " "] if given 1""":
-	     { Diamond.spaces_before(1).array.must.equal([" ", ""]); },
+    .should(["""return [""] if given 1""":
+	     { Diamond.spaces_before(1).array.must.equal([""]); },
+	     """return ["", " "] if given 2""":
+	     { Diamond.spaces_before(2).array.must.equal([" ", ""]); },
 	     """return ["", " ", "  "] if given 2""":
-	     { Diamond.spaces_before(2).array.must.equal(["  ", " ", ""]); }
+	     { Diamond.spaces_before(3).array.must.equal(["  ", " ", ""]); }
 	     ]);
 
   describe("lines")
-    .should(["return [A] if given A":
-	     { Diamond.lines('A').array.must.equal(["A"]); },
-	     """return [ A, B ] if given B""":
-	     { Diamond.lines('B').array.must.equal([" A", "B "]); },
-	     """return [  A,  B , C  ] if given C""":
-	     { Diamond.lines('C').array.must.equal(["  A", " B ", "C  "]); }
+    .should(["return [A] if given 1":
+	     { Diamond.lines(1).array.must.equal(["A"]); },
+	     """return [ A, B ] if given 2""":
+	     { Diamond.lines(2).array.must.equal([" A", "B "]); },
+	     """return [  A,  B , C  ] if given 3""":
+	     { Diamond.lines(3).array.must.equal(["  A", " B ", "C  "]); }
 	     ]);
-}
+  }
