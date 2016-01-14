@@ -40,6 +40,12 @@ struct Diamond
 	  .map!(a => drop(a, 1)))
       .map!(a => a[0] ~ to!string(a[1]));
   }
+
+  static auto mirror_horizontal(string[] lines)
+  {
+    foreach(line; drop(retro(lines), 1)) lines ~= line;
+    return lines;
+  }
 }
 
 unittest
@@ -91,4 +97,13 @@ unittest
 	     "return [  A  ,  B B , C   C] if given [  A,  B , C  ]":
 	     { Diamond.mirror_vertical(["  A", " B ", "C  "]).array.must.equal(["  A  ", " B B ", "C   C"]); }
 	     ]);
-  }
+
+  describe("mirror_horizontal")
+    .should(["return [A] if given [A]":
+	     { Diamond.mirror_horizontal(["A"]).array.must.equal(["A"]); },
+	     "return [ A, B, A] if given [ A, B ]":
+	     { Diamond.mirror_horizontal([" A", "B "]).array.must.equal([" A", "B ", " A"]); },
+	     "return [  A,  B , C  ,  B ,   A] if given [  A,  B , C  ]":
+	     { Diamond.mirror_horizontal(["  A", " B ", "C  "]).array.must.equal(["  A", " B ", "C  ", " B ", "  A"]); }
+	     ]);
+}
