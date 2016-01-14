@@ -36,7 +36,8 @@ struct Diamond
   {
     return
       zip(lines,
-	  map!(a => retro(a))(lines)
+	  lines
+	  .map!(a => retro(a))
 	  .map!(a => drop(a, 1)))
       .map!(a => a[0] ~ to!string(a[1]));
   }
@@ -45,6 +46,12 @@ struct Diamond
   {
     foreach(line; drop(retro(lines), 1)) lines ~= line;
     return lines;
+  }
+
+  static auto all_lines(int amount)
+  {
+    import std.array : array;
+    return mirror_horizontal(array(mirror_vertical(array(lines(amount)))));
   }
 }
 
@@ -105,5 +112,20 @@ unittest
 	     { Diamond.mirror_horizontal([" A", "B "]).array.must.equal([" A", "B ", " A"]); },
 	     "return [  A,  B , C  ,  B ,   A] if given [  A,  B , C  ]":
 	     { Diamond.mirror_horizontal(["  A", " B ", "C  "]).array.must.equal(["  A", " B ", "C  ", " B ", "  A"]); }
+	     ]);
+
+  describe("all_lines")
+    .should(["return [A] if given 1":
+	     { Diamond.all_lines(1).must.equal(["A"]); },
+	     "return [ A ,  B ,  A ] if given 2":
+	     { Diamond.all_lines(2).must.equal([" A ",
+						"B B",
+						" A "]); },
+	     "return [  A  ,  B B , C   C ,  B B ,   A  ] if given 3":
+	     { Diamond.all_lines(3).must.equal(["  A  ",
+						" B B ",
+						"C   C",
+						" B B ",
+						"  A  "]); }
 	     ]);
 }
