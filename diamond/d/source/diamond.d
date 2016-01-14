@@ -5,7 +5,7 @@ struct Diamond
   import std.ascii               : uppercase;
   import std.array               : replicate;
   import std.algorithm.iteration : map;
-  import std.range               : iota, retro, zip;
+  import std.range               : iota, retro, zip, drop;
   import std.conv                : to;
 
   static auto letters(int amount)
@@ -29,13 +29,16 @@ struct Diamond
     return zip(spaces_before(amount),
 	       letters(amount),
 	       spaces_after(amount))
-      .map!(a => concat(a.expand));
+      .map!(a => a[0] ~ to!string(a[1]) ~ a[2]);
   }
 
-private:
-  static auto concat(string before, dchar letter, string after)
+  static auto mirror_vertical(string[] lines)
   {
-    return before ~ to!string(letter) ~ after;
+    return
+      zip(lines,
+	  map!(a => retro(a))(lines)
+	  .map!(a => drop(a, 1)))
+      .map!(a => a[0] ~ to!string(a[1]));
   }
 }
 
@@ -74,9 +77,18 @@ unittest
   describe("lines")
     .should(["return [A] if given 1":
 	     { Diamond.lines(1).array.must.equal(["A"]); },
-	     """return [ A, B ] if given 2""":
+	     "return [ A, B ] if given 2":
 	     { Diamond.lines(2).array.must.equal([" A", "B "]); },
-	     """return [  A,  B , C  ] if given 3""":
+	     "return [  A,  B , C  ] if given 3":
 	     { Diamond.lines(3).array.must.equal(["  A", " B ", "C  "]); }
+	     ]);
+
+  describe("mirror_vertical")
+    .should(["return [A] if given [A]":
+	     { Diamond.mirror_vertical(["A"]).array.must.equal(["A"]); },
+	     "return [ A , B B] if given [ A, B ]":
+	     { Diamond.mirror_vertical([" A", "B "]).array.must.equal([" A ", "B B"]); }/*,
+	     "return [  A  ,  B B , C   C] if given [  A,  B , C  ]":
+	     { Diamond.mirror_vertical(["  A", " B ", "C  "]).array.must.equal(["  A  ", " B B ", "C   C"]); }*/
 	     ]);
   }
