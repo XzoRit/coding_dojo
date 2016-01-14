@@ -4,7 +4,7 @@ struct Diamond
 {
   import std.ascii               : uppercase;
   import std.array               : replicate;
-  import std.algorithm.iteration : map;
+  import std.algorithm.iteration : map, reduce;
   import std.range               : iota, retro, zip, drop;
   import std.conv                : to;
 
@@ -52,6 +52,12 @@ struct Diamond
   {
     import std.array : array;
     return mirror_horizontal(array(mirror_vertical(array(lines(amount)))));
+  }
+
+  static auto print(char c)
+  {
+    immutable amount = c - 'A' + 1;
+    return reduce!((a, b) => a ~ b ~ '\n')("", all_lines(amount));
   }
 }
 
@@ -128,4 +134,23 @@ unittest
 						" B B ",
 						"  A  "]); }
 	     ]);
+
+  describe("print")
+    .should(["return A-Diamond if given 'A'":
+	     { Diamond.print('A').must.equal("A\n"); },
+	     "return B-Diamond if given 'B'":
+	     { Diamond.print('B').must.equal(" A \n"
+					     "B B\n"
+					     " A \n"); },
+	     "return C-Diamond if given 'C'":
+	     { Diamond.print('C').must.equal("  A  \n"
+					     " B B \n"
+					     "C   C\n"
+					     " B B \n"
+					     "  A  \n"); }
+	     ]);
+
+  import std.stdio : writeln;
+  import std.ascii : uppercase;
+  foreach(c; uppercase) writeln(Diamond.print(c));
 }
