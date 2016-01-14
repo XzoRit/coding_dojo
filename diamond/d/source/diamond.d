@@ -87,8 +87,8 @@ unittest
     .should(["return [A] if given [A]":
 	     { Diamond.mirror_vertical(["A"]).array.must.equal(["A"]); },
 	     "return [ A , B B] if given [ A, B ]":
-	     { Diamond.mirror_vertical([" A", "B "]).array.must.equal([" A ", "B B"]); }/*,
+	     { Diamond.mirror_vertical([" A", "B "]).array.must.equal([" A ", "B B"]); },
 	     "return [  A  ,  B B , C   C] if given [  A,  B , C  ]":
-	     { Diamond.mirror_vertical(["  A", " B ", "C  "]).array.must.equal(["  A  ", " B B ", "C   C"]); }*/
+	     { Diamond.mirror_vertical(["  A", " B ", "C  "]).array.must.equal(["  A  ", " B B ", "C   C"]); }
 	     ]);
   }
