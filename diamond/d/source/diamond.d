@@ -32,26 +32,25 @@ struct Diamond
       .map!(a => a[0] ~ to!string(a[1]) ~ a[2]);
   }
 
-  static auto mirror_vertical(string[] lines)
+  static auto mirror_vertical(Range)(Range lines)
   {
     return
       zip(lines,
-	  lines
-	  .map!(a => retro(a))
-	  .map!(a => drop(a, 1)))
+	  lines.map!(a => retro(a).drop(1)))
       .map!(a => a[0] ~ to!string(a[1]));
   }
 
-  static auto mirror_horizontal(string[] lines)
+  static auto mirror_horizontal(Range)(Range lines)
   {
-    foreach(line; drop(retro(lines), 1)) lines ~= line;
-    return lines;
+    import std.array : array;
+    auto lines_as_array = array(lines);
+    foreach(line; retro(lines).drop(1)) lines_as_array ~= line;
+    return lines_as_array;
   }
 
   static auto all_lines(int amount)
   {
-    import std.array : array;
-    return mirror_horizontal(array(mirror_vertical(array(lines(amount)))));
+    return mirror_horizontal(mirror_vertical(lines(amount)));
   }
 
   static auto print(char c)
