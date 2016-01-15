@@ -31,3 +31,6 @@ leap_year/c++/build
 /diamond/c++/bin/
 /diamond/c++/diamond.dSYM/
 /diamond/elixir/diamond/_build/
+/diamond/d/.dub/*
+/diamond/d/diamond
+/diamond/d/dub.*.json
