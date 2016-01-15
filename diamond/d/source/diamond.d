@@ -7,6 +7,7 @@ struct Diamond
   import std.algorithm.iteration : map, reduce;
   import std.range               : iota, retro, zip, drop;
   import std.conv                : to;
+  import std.functional          : pipe;
 
   static auto letters(int amount)
   {
@@ -50,13 +51,18 @@ struct Diamond
 
   static auto all_lines(int amount)
   {
-    return mirror_horizontal(mirror_vertical(lines(amount)));
+    return pipe!(lines, mirror_vertical, mirror_horizontal)(amount);
   }
 
   static auto print(char c)
   {
-    immutable amount = c - 'A' + 1;
-    return reduce!((a, b) => a ~ b ~ '\n')("", all_lines(amount));
+    return reduce!((a, b) => a ~ b ~ '\n')("", all_lines(num_of_chars(c)));
+  }
+
+private:
+  static auto num_of_chars(char c)
+  {
+    return c - 'A' + 1;
   }
 }
 
