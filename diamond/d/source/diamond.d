@@ -72,67 +72,67 @@ unittest
   import std.array : array;
 
   describe("letters")
-    .should(["return A if given 1":
+    .should([`return "A" if given 1`:
 	     { Diamond.letters(1).must.equal("A"); },
-	     "return AB if given 2":
+	     `return "AB" if given 2`:
 	     { Diamond.letters(2).must.equal("AB"); },
-	     "return ABC if given 3":
+	     `return "ABC" if given 3`:
 	     { Diamond.letters(3).must.equal("ABC"); }
 	     ]);
 
   describe("spaces_after")
-    .should(["""return [""] if given 1""":
+    .should([`return [""] if given 1`:
 	     { Diamond.spaces_after(1).array.must.equal([""]); },
-	     """return ["", " "] if given 2""":
+	     `return ["", " "] if given 2`:
 	     { Diamond.spaces_after(2).array.must.equal(["", " "]); },
-	     """return ["", " ", "  "] if given 3""":
+	     `return ["", " ", "  "] if given 3`:
 	     { Diamond.spaces_after(3).array.must.equal(["", " ", "  "]); }
 	     ]);
 
   describe("spaces_before")
-    .should(["""return [""] if given 1""":
+    .should([`return [""] if given 1`:
 	     { Diamond.spaces_before(1).array.must.equal([""]); },
-	     """return ["", " "] if given 2""":
+	     `return ["", " "] if given 2`:
 	     { Diamond.spaces_before(2).array.must.equal([" ", ""]); },
-	     """return ["", " ", "  "] if given 2""":
+	     `return ["", " ", "  "] if given 2`:
 	     { Diamond.spaces_before(3).array.must.equal(["  ", " ", ""]); }
 	     ]);
 
   describe("lines")
-    .should(["return [A] if given 1":
+    .should([`return ["A"] if given 1`:
 	     { Diamond.lines(1).array.must.equal(["A"]); },
-	     "return [ A, B ] if given 2":
+	     `return [" A", "B "] if given 2`:
 	     { Diamond.lines(2).array.must.equal([" A", "B "]); },
-	     "return [  A,  B , C  ] if given 3":
+	     `return ["  A", " B ", "C  "] if given 3`:
 	     { Diamond.lines(3).array.must.equal(["  A", " B ", "C  "]); }
 	     ]);
 
   describe("mirror_vertical")
-    .should(["return [A] if given [A]":
+    .should([`return ["A"] if given ["A"]`:
 	     { Diamond.mirror_vertical(["A"]).array.must.equal(["A"]); },
-	     "return [ A , B B] if given [ A, B ]":
+	     `return [" A" , "B B"] if given [" A", "B "]`:
 	     { Diamond.mirror_vertical([" A", "B "]).array.must.equal([" A ", "B B"]); },
-	     "return [  A  ,  B B , C   C] if given [  A,  B , C  ]":
+	     `return ["  A  ", " B B ", "C   C"] if given ["  A", " B ", "C " ]`:
 	     { Diamond.mirror_vertical(["  A", " B ", "C  "]).array.must.equal(["  A  ", " B B ", "C   C"]); }
 	     ]);
 
   describe("mirror_horizontal")
-    .should(["return [A] if given [A]":
+    .should([`return ["A"] if given ["A"]`:
 	     { Diamond.mirror_horizontal(["A"]).array.must.equal(["A"]); },
-	     "return [ A, B, A] if given [ A, B ]":
+	     `return [" A", "B ", " A"] if given [" A", "B "]`:
 	     { Diamond.mirror_horizontal([" A", "B "]).array.must.equal([" A", "B ", " A"]); },
-	     "return [  A,  B , C  ,  B ,   A] if given [  A,  B , C  ]":
+	     `return ["  A", " B ", "C  ", " B ", "  A"] if given ["  A", " B ", "C  "]`:
 	     { Diamond.mirror_horizontal(["  A", " B ", "C  "]).array.must.equal(["  A", " B ", "C  ", " B ", "  A"]); }
 	     ]);
 
   describe("all_lines")
-    .should(["return [A] if given 1":
+    .should([`return ["A"] if given 1`:
 	     { Diamond.all_lines(1).must.equal(["A"]); },
-	     "return [ A ,  B ,  A ] if given 2":
+	     `return [" A ", " B ", " A "] if given 2`:
 	     { Diamond.all_lines(2).must.equal([" A ",
 						"B B",
 						" A "]); },
-	     "return [  A  ,  B B , C   C ,  B B ,   A  ] if given 3":
+	     `return ["  A " , " B B ", "C   C ", " B B ", "  A  "] if given 3`:
 	     { Diamond.all_lines(3).must.equal(["  A  ",
 						" B B ",
 						"C   C",
@@ -141,13 +141,13 @@ unittest
 	     ]);
 
   describe("print")
-    .should(["return A-Diamond if given 'A'":
+    .should([`return A-Diamond if given 'A'`:
 	     { Diamond.print('A').must.equal("A\n"); },
-	     "return B-Diamond if given 'B'":
+	     `return B-Diamond if given 'B'`:
 	     { Diamond.print('B').must.equal(" A \n"
 					     "B B\n"
 					     " A \n"); },
-	     "return C-Diamond if given 'C'":
+	     `return C-Diamond if given 'C'`:
 	     { Diamond.print('C').must.equal("  A  \n"
 					     " B B \n"
 					     "C   C\n"
