@@ -5,7 +5,7 @@ struct Diamond
   import std.ascii               : uppercase;
   import std.array               : replicate;
   import std.algorithm.iteration : map, reduce;
-  import std.range               : iota, retro, zip, drop;
+  import std.range               : iota, retro, zip, drop, chain;
   import std.conv                : to;
   import std.functional          : pipe;
 
@@ -43,10 +43,7 @@ struct Diamond
 
   static auto mirror_horizontal(Range)(Range lines)
   {
-    import std.array : array;
-    auto lines_as_array = array(lines);
-    foreach(line; retro(lines).drop(1)) lines_as_array ~= line;
-    return lines_as_array;
+    return chain(lines, retro(lines).drop(1));
   }
 
   static auto all_lines(int amount)
@@ -127,13 +124,13 @@ unittest
 
   describe("all_lines")
     .should([`return ["A"] if given 1`:
-	     { Diamond.all_lines(1).must.equal(["A"]); },
+	     { Diamond.all_lines(1).array().must.equal(["A"]); },
 	     `return [" A ", " B ", " A "] if given 2`:
-	     { Diamond.all_lines(2).must.equal([" A ",
+	     { Diamond.all_lines(2).array().must.equal([" A ",
 						"B B",
 						" A "]); },
 	     `return ["  A " , " B B ", "C   C ", " B B ", "  A  "] if given 3`:
-	     { Diamond.all_lines(3).must.equal(["  A  ",
+	     { Diamond.all_lines(3).array().must.equal(["  A  ",
 						" B B ",
 						"C   C",
 						" B B ",
