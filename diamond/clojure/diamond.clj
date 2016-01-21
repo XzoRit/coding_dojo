@@ -14,6 +14,16 @@
 (defn lines [amount]
   (map #(str %1 %2 %3) (spaces-before amount) (letters amount) (spaces-after amount)))
 
+(defn drop-last [line]
+  (subs line 0 (- (.length line) 1)))
+
+(defn mirror-vertical [lines]
+  (map str
+   lines
+   (->> lines
+       (map drop-last)
+       (map string/reverse))))
+
 (deftest letters-returns-the-first-x-letters-of-the-alphabet
   (is (= "A" (letters 1)))
   (is (= "AB" (letters 2)))
@@ -33,5 +43,13 @@
   (is (= '("A") (lines 1)))
   (is (= '(" A", "B ") (lines 2)))
   (is (= '("  A", " B ", "C  ") (lines 3))))
+
+(deftest lines-shall-be-mirrored-vertically
+  (is (= '("A") (mirror-vertical '("A"))))
+  (is (= '(" A ",
+           "B B") (mirror-vertical '(" A", "B "))))
+  (is (= '("  A  ",
+           " B B ",
+           "C   C") (mirror-vertical '("  A", " B ", "C  ")))))
 
 (run-tests 'xzr.diamond)
