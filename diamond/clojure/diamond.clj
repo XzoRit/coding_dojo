@@ -11,6 +11,9 @@
 (defn spaces-before [amount]
   (reverse (spaces-after amount)))
 
+(defn lines [amount]
+  (map #(str %1 %2 %3) (spaces-before amount) (letters amount) (spaces-after amount)))
+
 (deftest letters-returns-the-first-x-letters-of-the-alphabet
   (is (= "A" (letters 1)))
   (is (= "AB" (letters 2)))
@@ -25,5 +28,10 @@
   (is (= '("") (spaces-before 1)))
   (is (= '(" ", "") (spaces-before 2)))
   (is (= '("  ", " ", "") (spaces-before 3))))
-  
+
+(deftest lines-returns-upper-left-quadrant-of-diamond
+  (is (= '("A") (lines 1)))
+  (is (= '(" A", "B ") (lines 2)))
+  (is (= '("  A", " B ", "C  ") (lines 3))))
+
 (run-tests 'xzr.diamond)
