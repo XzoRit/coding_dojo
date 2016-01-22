@@ -27,6 +27,10 @@
 (defn mirror-horizontal [lines]
   (reduce #(concat %1 (list %2)) lines (reverse (drop-last lines))))
 
+(defn create [char-for-longest-line]
+  (let [amount (inc (- (int char-for-longest-line) (int \A)))]
+    (reduce #(str %1 %2 "\n") "" (mirror-horizontal (mirror-vertical (lines amount))))))
+
 (deftest letters-returns-the-first-x-letters-of-the-alphabet
   (is (= "A" (letters 1)))
   (is (= "AB" (letters 2)))
@@ -66,4 +70,17 @@
            " B ",
            "  A") (mirror-horizontal '("  A", " B ", "C  ")))))
 
+(deftest create-shall-return-string-with-given-character-as-the-longest-line
+  (is (= "A\n" (create \A)))
+  (is (= (str " A \n"
+              "B B\n"
+              " A \n") (create \B)))
+  (is (= (str "  A  \n"
+              " B B \n"
+              "C   C\n"
+              " B B \n"
+              "  A  \n") (create \C))))
+
 (run-tests 'xzr.diamond)
+
+(print (map create (seq "ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
