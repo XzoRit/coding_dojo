@@ -6,16 +6,22 @@
   (subs "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 0 amount))
 
 (defn spaces-after [amount]
-  (map #(string/join (repeat % " ")) (range 0 amount)))
+  (->> amount
+       (range 0)
+       (map #(repeat % " "))
+       (map #(string/join %))))
 
 (defn spaces-before [amount]
   (reverse (spaces-after amount)))
 
 (defn lines [amount]
-  (map #(str %1 %2 %3) (spaces-before amount) (letters amount) (spaces-after amount)))
+  (map #(str %1 %2 %3)
+       (spaces-before amount)
+       (letters amount)
+       (spaces-after amount)))
 
 (defn string-drop-last [line]
-  (subs line 0 (- (.length line) 1)))
+  (subs line 0 (dec (.length line))))
 
 (defn mirror-vertical [lines]
   (map str
@@ -29,7 +35,12 @@
 
 (defn create [char-for-longest-line]
   (let [amount (inc (- (int char-for-longest-line) (int \A)))]
-    (reduce #(str %1 %2 "\n") "" (mirror-horizontal (mirror-vertical (lines amount))))))
+    (reduce #(str %1 %2 "\n")
+            ""
+            (-> amount
+                lines
+                mirror-horizontal
+                mirror-vertical))))
 
 (deftest letters-returns-the-first-x-letters-of-the-alphabet
   (is (= "A" (letters 1)))
