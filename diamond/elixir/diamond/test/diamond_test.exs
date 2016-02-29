@@ -9,15 +9,15 @@ defmodule DiamondTest do
   end
 
 	test "spaces_after" do
-		assert spaces_after(0) == [""]
-		assert spaces_after(1) == ["", " "]
-		assert spaces_after(2) == ["", " ", "  "]
+		assert spaces_after(1) == [""]
+		assert spaces_after(2) == ["", " "]
+		assert spaces_after(3) == ["", " ", "  "]
 	end
 
 	test "spaces_before" do
-		assert spaces_before(0) == [""]
-		assert spaces_before(1) == [" ", ""]
-		assert spaces_before(2) == ["  ", " ", ""]
+		assert spaces_before(1) == [""]
+		assert spaces_before(2) == [" ", ""]
+		assert spaces_before(3) == ["  ", " ", ""]
 	end
 
 	test "lines" do

@@ -5,19 +5,19 @@ defmodule Diamond do
 		|> Enum.take_while &(&1 <= char)
 	end
 
-	def spaces_after(amount) do
-		0..amount
+	def spaces_after(chars_count) do
+		0..chars_count - 1
 		|> Enum.map &(String.duplicate " ", &1)
 	end
 
-	def spaces_before(amount) do
-		spaces_after(amount)
+	def spaces_before(chars_count) do
+		spaces_after(chars_count)
 		|> Enum.reverse
 	end
 
 	def lines(char) do
 		chars = letters char
-		spaces = Enum.count(chars) - 1
+		spaces = Enum.count(chars)
 		for {front, letter, back} <-
 		List.zip(
 			[
