@@ -269,6 +269,13 @@ namespace v2
 	 ostream_iterator<string>(o, "\n"));
     return o.str();
   }
+}
+
+#include <boost/assign.hpp>
+
+namespace v2
+{
+  using boost::assign::list_of;
 
   TEST_CASE("v2: letters")
   {
@@ -279,44 +286,45 @@ namespace v2
 
   TEST_CASE("v2: spaces_after")
   {
-    CHECK(Diamond::spaces_after(1) == (Diamond::Lines{""}));
-    CHECK(Diamond::spaces_after(2) == (Diamond::Lines{"", " "}));
-    CHECK(Diamond::spaces_after(3) == (Diamond::Lines{"", " ", "  "}));
+    CHECK(Diamond::spaces_after(1) == list_of(""));
+    CHECK(Diamond::spaces_after(2) == list_of("")(" "));
+    CHECK(Diamond::spaces_after(3) == list_of("")(" ")("  "));
   }
 
   TEST_CASE("v2: spaces_before")
   {
-    CHECK(Diamond::spaces_before(1) == (Diamond::Lines{""}));
-    CHECK(Diamond::spaces_before(2) == (Diamond::Lines{" ", ""}));
-    CHECK(Diamond::spaces_before(3) == (Diamond::Lines{"  ", " ", ""}));
+    Diamond::Lines expected;
+    CHECK(Diamond::spaces_before(1) == list_of(""));
+    CHECK(Diamond::spaces_before(2) == list_of(" ")(""));
+    CHECK(Diamond::spaces_before(3) == list_of("  ")(" ")(""));
   }
 
   TEST_CASE("v2: lines")
   {
-    CHECK(Diamond::lines(1) == (Diamond::Lines{"A"}));
-    CHECK(Diamond::lines(2) == (Diamond::Lines{" A", "B "}));
-    CHECK(Diamond::lines(3) == (Diamond::Lines{"  A", " B ", "C  "}));
+    CHECK(Diamond::lines(1) == list_of("A"));
+    CHECK(Diamond::lines(2) == list_of(" A")("B "));
+    CHECK(Diamond::lines(3) == list_of("  A")(" B ")("C  "));
   }
 
   TEST_CASE("v2: mirror_vertical")
   {
-    CHECK(Diamond::mirror_vertical(Diamond::lines(1)) == (Diamond::Lines{"A"}));
-    CHECK(Diamond::mirror_vertical(Diamond::lines(2)) == (Diamond::Lines{" A ", "B B"}));
-    CHECK(Diamond::mirror_vertical(Diamond::lines(3)) == (Diamond::Lines{"  A  ", " B B ", "C   C"}));
+    CHECK(Diamond::mirror_vertical(Diamond::lines(1)) == list_of("A"));
+    CHECK(Diamond::mirror_vertical(Diamond::lines(2)) == list_of(" A ")("B B"));
+    CHECK(Diamond::mirror_vertical(Diamond::lines(3)) == list_of("  A  ")(" B B ")("C   C"));
   }
 
   TEST_CASE("v2: mirror_horizontal")
   {
-    CHECK(Diamond::mirror_horizontal(Diamond::lines(1)) == (Diamond::Lines{"A"}));
-    CHECK(Diamond::mirror_horizontal(Diamond::lines(2)) == (Diamond::Lines{" A", "B ", " A"}));
-    CHECK(Diamond::mirror_horizontal(Diamond::lines(3)) == (Diamond::Lines{"  A", " B ", "C  ", " B ", "  A"}));
+    CHECK(Diamond::mirror_horizontal(Diamond::lines(1)) == list_of("A"));
+    CHECK(Diamond::mirror_horizontal(Diamond::lines(2)) == list_of(" A")("B ")(" A"));
+    CHECK(Diamond::mirror_horizontal(Diamond::lines(3)) == list_of("  A")(" B ")("C  ")(" B ")("  A"));
   }
 
   TEST_CASE("v2: all_lines")
   {
-    CHECK(Diamond::all_lines(1) == (Diamond::Lines{"A"}));
-    CHECK(Diamond::all_lines(2) == (Diamond::Lines{" A ", "B B", " A "}));
-    CHECK(Diamond::all_lines(3) == (Diamond::Lines{"  A  ", " B B ", "C   C", " B B ", "  A  "}));
+    CHECK(Diamond::all_lines(1) == list_of("A"));
+    CHECK(Diamond::all_lines(2) == list_of(" A ")("B B")(" A "));
+    CHECK(Diamond::all_lines(3) == list_of("  A  ")(" B B ")("C   C")(" B B ")("  A  "));
   }
 
   TEST_CASE("v2: char_to_num")
@@ -344,10 +352,10 @@ int main(int argc, char *argv[])
       using namespace std::literals::string_literals;
       
       for(const auto& c : "ABCDEFGHIJKLMNOPQRSTUVWXYZ"s)
-	{
-	  cout << v1::Diamond::print(c) << '\n';
-	  cout << v2::Diamond::print(c) << '\n';
-	}
+      	{
+      	  cout << v1::Diamond::print(c) << '\n';
+      	  cout << v2::Diamond::print(c) << '\n';
+      	}
     }
 
   return result;
