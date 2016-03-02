@@ -173,6 +173,7 @@ namespace v2
   using boost::reverse;
   using boost::copy;
   using boost::for_each;
+  using boost::make_iterator_range;
   
   class Diamond
   {
@@ -246,7 +247,7 @@ namespace v2
   Diamond::Lines Diamond::mirror_horizontal(Diamond::Lines lines)
   {
     lines.reserve(2 * lines.size() - 1);
-    copy(++lines.rbegin(), lines.rend(),
+    copy(make_iterator_range(++lines.rbegin(), lines.rend()),
 	 back_inserter(lines));
     return lines;
   }
