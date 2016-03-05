@@ -21,80 +21,80 @@ namespace v1
   {
   public:
     using Lines = vector<string>;
-    
-    static auto letters(int amount)
-    {
-      return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"s.substr(0, amount);
-    }
-  
-    static auto spaces_after(int amount)
-    {
-      auto spaces = Lines(amount);
-      boost::transform(boost::irange(0, amount),
-		       begin(spaces),
-		       [](const auto& num_of_spaces)
-		       { return string(num_of_spaces, ' '); });
-
-      return spaces;
-    }
-  
-    static auto spaces_before(int amount)
-    {
-      auto spaces = spaces_after(amount);
-      return boost::reverse(spaces);
-    }
-
-    static auto lines(int amount)
-    {
-      Lines lines(amount);
-      boost::transform(boost::combine(spaces_before(amount),
-				      letters(amount),
-				      spaces_after(amount)),
-		       begin(lines),
-		       [](const auto& space_letter_space)
-		       {
-			 string before, letter, after;
-			 boost::tie(before, letter, after) = space_letter_space;
-			 return before + letter + after;
-		       });
-      return lines;
-    }
-
-    static auto mirror_vertical(Lines lines)
-    {
-      for(auto& line : lines) line += string(crbegin(line) + 1, crend(line));
-      return lines;
-    }
-
-    static auto mirror_horizontal(Lines lines)
-    {
-      lines.reserve(2 * lines.size() - 1);
-      copy(++crbegin(lines), crend(lines),
-	   back_inserter(lines));
-      return lines;
-    }
-
-    static auto all_lines(int amount)
-    {
-      return mirror_horizontal(mirror_vertical(lines(amount)));
-    }
-
-    static auto char_to_num(char c)
-    {
-      return c - 'A' + 1;
-    }
-
-    static auto print(char c)
-    {
-      const auto lines = all_lines(char_to_num(c));
-      return boost::accumulate(lines, ""s,
-		      [](const auto& diamond, const auto& line)
-		      {
-			return diamond + line + '\n';
-		      });
-    }
+    static auto letters(int amount);
+    static auto spaces_after(int amount);
+    static auto spaces_before(int amount);
+    static auto lines(int amount);
+    static auto mirror_vertical(Lines lines);
+    static auto mirror_horizontal(Lines lines);
+    static auto all_lines(int amount);
+    static auto char_to_num(char c);
+    static auto print(char c);
   };
   
+  auto Diamond::letters(int amount)
+  {
+    return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"s.substr(0, amount);
+  }
+  auto Diamond::spaces_after(int amount)
+  {
+    auto spaces = Lines(amount);
+    boost::transform(boost::irange(0, amount),
+		     begin(spaces),
+		     [](const auto& num_of_spaces)
+		     { return string(num_of_spaces, ' '); });
+
+    return spaces;
+  }
+  auto Diamond::spaces_before(int amount)
+  {
+    auto spaces = spaces_after(amount);
+    return boost::reverse(spaces);
+  }
+  auto Diamond::lines(int amount)
+  {
+    Lines lines(amount);
+    boost::transform(boost::combine(spaces_before(amount),
+				    letters(amount),
+				    spaces_after(amount)),
+		     begin(lines),
+		     [](const auto& space_letter_space)
+		     {
+		       string before, letter, after;
+		       boost::tie(before, letter, after) = space_letter_space;
+		       return before + letter + after;
+		     });
+    return lines;
+  }
+  auto Diamond::mirror_vertical(Lines lines)
+  {
+    for(auto& line : lines) line += string(crbegin(line) + 1, crend(line));
+    return lines;
+  }
+  auto Diamond::mirror_horizontal(Lines lines)
+  {
+    lines.reserve(2 * lines.size() - 1);
+    copy(++crbegin(lines), crend(lines),
+	 back_inserter(lines));
+    return lines;
+  }
+  auto Diamond::all_lines(int amount)
+  {
+    return mirror_horizontal(mirror_vertical(lines(amount)));
+  }
+  auto Diamond::char_to_num(char c)
+  {
+    return c - 'A' + 1;
+  }
+  auto Diamond::print(char c)
+  {
+    const auto lines = all_lines(char_to_num(c));
+    return boost::accumulate(lines, ""s,
+			     [](const auto& diamond, const auto& line)
+			     {
+			       return diamond + line + '\n';
+			     });
+  }
   TEST_CASE("v1: letters")
   {
     CHECK(Diamond::letters(1) == "A");
