@@ -1,5 +1,5 @@
 exe diamond
-    : diamond.cpp
+    : diamond.cpp ./v1//diamond_v1 ./v2//diamond_v2
     : <cxxflags>-std=c++14
     :
     : <variant>debug ;
