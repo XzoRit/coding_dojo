@@ -1,6 +1,6 @@
 lib diamond_v2
     : diamond.cpp
-    : <cxxflags>-std=c++14
+    : <cxxflags>-std=c++03
     :
     : <variant>debug ;
 install install_diamond_v2
