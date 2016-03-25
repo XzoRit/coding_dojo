@@ -15,6 +15,7 @@ namespace v2
 {
   using std::string;
   using std::vector;
+  using std::back_inserter;
   using std::ostringstream;
   using std::ostream_iterator;
   
@@ -52,9 +53,10 @@ namespace v2
 
   Diamond::Lines Diamond::spaces_after(int amount)
   {
-    Lines spaces = Lines(amount);
+    Lines spaces;
+    spaces.reserve(amount);
     transform(irange(0, amount),
-	      spaces.begin(),
+	      back_inserter(spaces),
 	      &create_whitespaces);
     return spaces;
   }
@@ -67,18 +69,18 @@ namespace v2
 
   Diamond::Lines Diamond::lines(int amount)
   {
-    Lines lines(amount);
+    Lines lines;
+    lines.reserve(amount);
     transform(combine(spaces_before(amount),
 		      letters(amount),
 		      spaces_after(amount)),
-	      lines.begin(),
+	      back_inserter(lines),
 	      &create_line);
     return lines;
   }
 
   Diamond::Lines Diamond::mirror_vertical(Diamond::Lines lines)
   {
-    // todo use accumulate instead
     for_each(lines, &append_reversed);
     return lines;
   }
