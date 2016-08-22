@@ -113,7 +113,7 @@ std::string const numsAsString =
 #include <iterator>
 #include <limits>
 
-int main(int argc, char* const argv[])
+int main(int argc, char* argv[])
 {
   int result = Catch::Session().run(argc, argv);
   
