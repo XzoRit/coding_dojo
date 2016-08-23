@@ -1,0 +1,5 @@
+lib diamond_v3
+    : diamond.cpp
+    : <cxxflags>-std=c++14
+    :
+    : <variant>debug ;
