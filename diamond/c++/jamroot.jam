@@ -1,9 +1,11 @@
+import testing ;
 exe diamond
-    : diamond.cpp ./v1//diamond_v1/<link>static ./v2//diamond_v2/<link>static ./v3//diamond_v3/<link>static
+    : diamond.cpp ./v1//diamond_v1 ./v2//diamond_v2 ./v3//diamond_v3
     : <cxxflags>-std=c++14
     :
     : <variant>debug ;
 install install_diamond
     : diamond
     : <install-dependencies>on <install-type>EXE <install-type>LIB ;
-    
+unit-test diamond_test
+    : diamond ;
