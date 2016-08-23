@@ -2,6 +2,7 @@
 #include "v2/diamond.hpp"
 #include "v3/diamond.hpp"
 #define CATCH_CONFIG_RUNNER
+#define CATCH_CONFIG_COLOUR_NONE
 #include <catch.hpp>
 #include <iostream>
 #include <string>
