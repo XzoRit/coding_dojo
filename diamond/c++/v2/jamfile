@@ -3,6 +3,3 @@ lib diamond_v2
     : <cxxflags>-std=c++03
     :
     : <variant>debug ;
-install install_diamond_v2
-    : diamond_v2
-    : <location>.. ;

@@ -1,9 +1,9 @@
 exe diamond
-    : diamond.cpp ./v1//diamond_v1 ./v2//diamond_v2 ./v3//diamond_v3
+    : diamond.cpp ./v1//diamond_v1/<link>static ./v2//diamond_v2/<link>static ./v3//diamond_v3/<link>static
     : <cxxflags>-std=c++14
     :
     : <variant>debug ;
 install install_diamond
     : diamond
-    : <location>. ;
+    : <install-dependencies>on <install-type>EXE <install-type>LIB ;
     
