@@ -1,0 +1,23 @@
+import testing ;
+import feature : feature ;
+
+SOURCES = main ;
+
+feature enable-tests : no yes : optional propagated ;
+
+exe app_csv
+    : $(SOURCES).cpp
+    : <include>./doctest/doctest <include>./range-v3/include
+      <enable-tests>no:<define>DOCTEST_CONFIG_DISABLE
+    ;
+
+exe test_csv
+    : $(SOURCES).cpp
+    : <include>./doctest/doctest <include>./range-v3/include
+      <enable-tests>yes
+    ;
+
+unit-test exec_tests
+    : test_csv
+    : <testing.arg>"-dt-s"
+    ;
