@@ -2,6 +2,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest.h>
 #include <string>
+#include <vector>
 
 namespace xzr::csv
 {
@@ -20,6 +21,10 @@ const auto rows_from = [](const auto& csv_text)
 const auto cols_from = [](const auto& csv_row)
 {
     return impl::split_by(csv_row, ';');
+};
+const auto csv_from = [](const auto& txt)
+{
+    return rows_from(txt);
 };
 }
 
@@ -55,3 +60,37 @@ TEST_CASE("split row into colums")
     CHECK(cols[1] == "col 2");
     CHECK(cols[2] == "col 3");
 }
+
+TEST_CASE("csv to table")
+{
+    using xzr::csv::csv_from;
+
+    const auto csv =
+        "Name;Strasse;Ort;Alter\n"
+        "Peter Pan;Am Hang 5;12345 Einsam;42\n"
+        "Maria Schmitz;Kölner Straße 45;50123 Köln;43\n"
+        "Paul Meier;Münchener Weg 1;87654 München;65\n"s;
+
+    const auto expected = std::vector<std::string>
+    {
+        "Name;Strasse;Ort;Alter",
+        "Peter Pan;Am Hang 5;12345 Einsam;42",
+        "Maria Schmitz;Kölner Straße 45;50123 Köln;43",
+        "Paul Meier;Münchener Weg 1;87654 München;65"
+    };
+    const auto actual = std::vector<std::string> {csv_from(csv)};
+    CHECK(actual == expected);
+}
+
+/*
+Name;Strasse;Ort;Alter
+Peter Pan;Am Hang 5;12345 Einsam;42
+Maria Schmitz;Kölner Straße 45;50123 Köln;43
+Paul Meier;Münchener Weg 1;87654 München;65
+
+Name         |Strasse         |Ort          |Alter|
+-------------+----------------+-------------+-----+
+Peter Pan    |Am Hang 5       |12345 Einsam |42   |
+Maria Schmitz|Kölner Straße 45|50123 Köln   |43   |
+Paul Meier   |Münchener Weg 1 |87654 München|65   |
+*/
