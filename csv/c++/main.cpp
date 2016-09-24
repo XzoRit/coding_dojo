@@ -24,7 +24,14 @@ const auto cols_from = [](const auto& csv_row)
 };
 const auto csv_from = [](const auto& txt)
 {
-    return rows_from(txt);
+  using namespace std;
+  vector<vector<string>> v{};
+    const auto rows = rows_from(txt);
+    for(auto&& r : rows)
+      {
+	v.push_back(cols_from(r));
+      }
+  return v;
 };
 }
 
@@ -64,6 +71,8 @@ TEST_CASE("split row into colums")
 TEST_CASE("csv to table")
 {
     using xzr::csv::csv_from;
+    using std::vector;
+    using std::string;
 
     const auto csv =
         "Name;Strasse;Ort;Alter\n"
@@ -71,15 +80,15 @@ TEST_CASE("csv to table")
         "Maria Schmitz;Kölner Straße 45;50123 Köln;43\n"
         "Paul Meier;Münchener Weg 1;87654 München;65\n"s;
 
-    const auto expected = std::vector<std::string>
+    const auto expected = vector<vector<string>>
     {
-        "Name;Strasse;Ort;Alter",
-        "Peter Pan;Am Hang 5;12345 Einsam;42",
-        "Maria Schmitz;Kölner Straße 45;50123 Köln;43",
-        "Paul Meier;Münchener Weg 1;87654 München;65"
+      {"Name","Strasse","Ort","Alter"},
+      {"Peter Pan","Am Hang 5","12345 Einsam","42"},
+      {"Maria Schmitz","Kölner Straße 45","50123 Köln","43"},
+      {"Paul Meier","Münchener Weg 1","87654 München","65"}
     };
-    const auto actual = std::vector<std::string> {csv_from(csv)};
-    CHECK(actual == expected);
+    const auto actual = vector<vector<string>>{csv_from(csv)};
+    CHECK(expected == actual);
 }
 
 /*
