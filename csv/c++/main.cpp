@@ -64,37 +64,6 @@ const auto csv_from = [](const auto& txt)
 
 using namespace std::string_literals;
 
-TEST_CASE("split text by newline")
-{
-    using xzr::csv::rows_from;
-
-    const auto csv_text =
-        "first row\n"
-        "second row\n"
-        "third row"s;
-
-    const auto rows = rows_from(csv_text);
-
-    REQUIRE(rows.size() == 3);
-    CHECK(rows[0] == "first row");
-    CHECK(rows[1] == "second row");
-    CHECK(rows[2] == "third row");
-}
-
-TEST_CASE("split row into colums")
-{
-    using xzr::csv::cols_from;
-
-    const auto row = "col 1;col 2;col 3"s;
-
-    const auto cols = cols_from(row);
-
-    REQUIRE(cols.size() == 3);
-    CHECK(cols[0] == "col 1");
-    CHECK(cols[1] == "col 2");
-    CHECK(cols[2] == "col 3");
-}
-
 TEST_CASE("csv to table")
 {
     using xzr::csv::csv_from;
@@ -115,9 +84,9 @@ TEST_CASE("csv to table")
         {"Peter Pan","Am Hang 5","12345 Einsam","42"},
         {"Maria Schmitz","Koelner Strasse 45","50123 Koeln","43"},
         {"Paul Meier","Muenchener Weg 1","87654 Muenchen","65"},
-	{"Franz Kolp","Lange Strsse 15","45276 Holsten","18\n"}
+	{"Franz Kolp","Lange Strsse 15","45276 Holsten","18"}
     };
-    const auto actual = vector<vector<string>> {csv_from(csv)};
+    const auto actual = vector<vector<string>>{csv_from(csv)};
     CHECK(expected == actual);
 
     std::stringstream str;
