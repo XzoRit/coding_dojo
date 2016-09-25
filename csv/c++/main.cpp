@@ -16,7 +16,6 @@ const auto split_by = [](const auto& text, const auto& sep)
 {
     return split(text, sep);
 };
-}
 const auto rows_from = [](const auto& csv_text)
 {
     return impl::split_by(csv_text, '\n');
@@ -24,17 +23,6 @@ const auto rows_from = [](const auto& csv_text)
 const auto cols_from = [](const auto& csv_row)
 {
     return impl::split_by(csv_row, ';');
-};
-const auto csv_from = [](const auto& txt)
-{
-    using namespace std;
-    vector<vector<string>> v{};
-    const auto rows = rows_from(txt);
-    for(auto&& r : rows)
-    {
-        v.push_back(cols_from(r));
-    }
-    return v;
 };
 const auto by_colums = [](const auto& data)
 {
@@ -57,13 +45,14 @@ const auto max_size_of_each_col = [](const auto& data)
     vector<size_t> col_sizes;
     for(const auto& c : by_colums(data))
     {
-        const auto m = ranges::accumulate(
-                           c,
-                           size_t{0},
-                           [](const auto& a, const auto& b)
-        {
-            return max(a, b.size());
-        });
+        const auto m =
+	    ranges::accumulate(
+		c,
+		size_t{0},
+		[](const auto& a, const auto& b)
+		{
+		    return max(a, b.size());
+		});
         col_sizes.push_back(m);
     }
 
@@ -86,13 +75,51 @@ const auto print = [](auto& str, const auto& data) -> decltype(auto)
     return str;
 };
 }
+struct csv_type
+{
+    using data_type = std::vector<std::vector<std::string>>;
+    using cols_type = data_type;
+    using rows_type = data_type;
+    explicit csv_type(const data_type& data)
+	: m_data(data)
+	{}
+    const data_type data() const
+	{
+	    return m_data;
+	}
+    const rows_type rows() const
+	{
+	    return m_data;
+	}
+    const cols_type cols() const
+	{
+	    return impl::by_colums(m_data);
+	}
+private:
+    data_type m_data;
+};
+    std::ostream& operator<<(std::ostream& str, const csv_type& csv)
+    {
+	return impl::print(str, csv.data());
+    }
+auto csv_from(const std::string& txt) -> csv_type
+{
+    using namespace std;
+    vector<vector<string>> v{};
+    const auto rows = impl::rows_from(txt);
+    for(auto&& r : rows)
+    {
+        v.push_back(impl::cols_from(r));
+    }
+    return csv_type{v};
+};
+}
 
 using namespace std::string_literals;
 
 TEST_CASE("csv to table")
 {
     using xzr::csv::csv_from;
-    using xzr::csv::print;
     using std::vector;
     using std::string;
 
@@ -103,19 +130,8 @@ TEST_CASE("csv to table")
         "Paul Meier;Muenchener Weg 1;87654 Muenchen;65\n"
         "Franz Kolp;Lange Strsse 15;45276 Holsten;18\n"s;
 
-    const auto expected = vector<vector<string>>
-    {
-        {"Name","Strasse","Ort","Alter"},
-        {"Peter Pan","Am Hang 5","12345 Einsam","42"},
-        {"Maria Schmitz","Koelner Strasse 45","50123 Koeln","43"},
-        {"Paul Meier","Muenchener Weg 1","87654 Muenchen","65"},
-        {"Franz Kolp","Lange Strsse 15","45276 Holsten","18"}
-    };
-    const auto actual = vector<vector<string>> {csv_from(csv)};
-    CHECK(expected == actual);
-
     std::stringstream str;
-    print(str, actual);
+    str << csv_from(csv);
     CHECK(str.str() ==
           "Name         |Strasse           |Ort           |Alter|\n"
           "Peter Pan    |Am Hang 5         |12345 Einsam  |42   |\n"
