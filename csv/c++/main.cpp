@@ -1,5 +1,6 @@
 #include <range/v3/action/split.hpp>
 #include <range/v3/numeric/accumulate.hpp>
+#include <range/v3/view/tail.hpp>
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest.h>
 #include <string>
@@ -46,30 +47,45 @@ const auto max_size_of_each_col = [](const auto& data)
     for(const auto& c : by_colums(data))
     {
         const auto m =
-	    ranges::accumulate(
-		c,
-		size_t{0},
-		[](const auto& a, const auto& b)
-		{
-		    return max(a, b.size());
-		});
+            ranges::accumulate(
+                c,
+                size_t{0},
+                [](const auto& a, const auto& b)
+        {
+            return max(a, b.size());
+        });
         col_sizes.push_back(m);
     }
 
     return col_sizes;
 };
-const auto print = [](auto& str, const auto& data) -> decltype(auto)
+const auto format_row =
+    [](auto& str, const auto& row, const auto& col_sizes)
 {
     using namespace std;
-    const auto col_sizes = max_size_of_each_col(data);
-    for(auto&& r : data)
+
+    size_t max_idx{0};
+    for(auto&& c : row)
     {
-        size_t max_idx{0};
-        for(auto&& c : r)
-        {
-            str << c << string(col_sizes[max_idx] - c.size(), ' ') << '|';
-            ++max_idx;
-        }
+        str << c << string(col_sizes[max_idx] - c.size(), ' ') << '|';
+        ++max_idx;
+    }
+};
+const auto print =
+    [](auto& str, const auto& data) -> decltype(auto)
+{
+    using namespace std;
+
+    const auto col_sizes = max_size_of_each_col(data);
+
+    format_row(str, data[0], col_sizes);
+    str << '\n';
+    str << string(ranges::accumulate(col_sizes, 0) + col_sizes.size(), '-');
+    str << '\n';
+
+    for(auto&& r : ranges::view::tail(data))
+    {
+	format_row(str, r, col_sizes);
         str << '\n';
     }
     return str;
@@ -81,27 +97,27 @@ struct csv_type
     using cols_type = data_type;
     using rows_type = data_type;
     explicit csv_type(const data_type& data)
-	: m_data(data)
-	{}
+        : m_data(data)
+    {}
     const data_type data() const
-	{
-	    return m_data;
-	}
+    {
+        return m_data;
+    }
     const rows_type rows() const
-	{
-	    return m_data;
-	}
+    {
+        return m_data;
+    }
     const cols_type cols() const
-	{
-	    return impl::by_colums(m_data);
-	}
+    {
+        return impl::by_colums(m_data);
+    }
 private:
     data_type m_data;
 };
-    std::ostream& operator<<(std::ostream& str, const csv_type& csv)
-    {
-	return impl::print(str, csv.data());
-    }
+std::ostream& operator<<(std::ostream& str, const csv_type& csv)
+{
+    return impl::print(str, csv.data());
+}
 auto csv_from(const std::string& txt) -> csv_type
 {
     using namespace std;
@@ -134,6 +150,7 @@ TEST_CASE("csv to table")
     str << csv_from(csv);
     CHECK(str.str() ==
           "Name         |Strasse           |Ort           |Alter|\n"
+          "------------------------------------------------------\n"
           "Peter Pan    |Am Hang 5         |12345 Einsam  |42   |\n"
           "Maria Schmitz|Koelner Strasse 45|50123 Koeln   |43   |\n"
           "Paul Meier   |Muenchener Weg 1  |87654 Muenchen|65   |\n"
