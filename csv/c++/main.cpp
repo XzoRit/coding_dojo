@@ -71,6 +71,16 @@ const auto format_row =
         ++max_idx;
     }
 };
+const auto format_separator = [](const auto& col_sizes)
+{
+    using namespace std;
+    string separator;
+    for(auto size : col_sizes)
+    {
+	separator += string(size, '-') + '+';
+    }
+    return separator;
+};
 const auto print =
     [](auto& str, const auto& data) -> decltype(auto)
 {
@@ -80,7 +90,8 @@ const auto print =
 
     format_row(str, data[0], col_sizes);
     str << '\n';
-    str << string(ranges::accumulate(col_sizes, 0) + col_sizes.size(), '-');
+
+    str << format_separator(col_sizes);
     str << '\n';
 
     for(auto&& r : ranges::view::tail(data))
@@ -150,7 +161,7 @@ TEST_CASE("csv to table")
     str << csv_from(csv);
     CHECK(str.str() ==
           "Name         |Strasse           |Ort           |Alter|\n"
-          "------------------------------------------------------\n"
+          "-------------+------------------+--------------+-----+\n"
           "Peter Pan    |Am Hang 5         |12345 Einsam  |42   |\n"
           "Maria Schmitz|Koelner Strasse 45|50123 Koeln   |43   |\n"
           "Paul Meier   |Muenchener Weg 1  |87654 Muenchen|65   |\n"
