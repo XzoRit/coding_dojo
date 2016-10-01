@@ -12,18 +12,15 @@ namespace xzr::csv
 {
 namespace impl
 {
-using ranges::action::split;
-const auto split_by = [](const auto& text, const auto& sep)
-{
-    return split(text, sep);
-};
 const auto rows_from = [](const auto& csv_text)
 {
-    return impl::split_by(csv_text, '\n');
+    using ranges::action::split;
+    return split(csv_text, '\n');
 };
 const auto cols_from = [](const auto& csv_row)
 {
-    return impl::split_by(csv_row, ';');
+    using ranges::action::split;
+    return split(csv_row, ';');
 };
 const auto by_colums = [](const auto& data)
 {
@@ -40,20 +37,18 @@ const auto by_colums = [](const auto& data)
     }
     return cols;
 };
-const auto max_size_of_each_col = [](const auto& data)
+const auto max_size_per_col = [](const auto& data)
 {
     using namespace std;
     vector<size_t> col_sizes;
+    const auto by_max_size = [](const auto& a, const auto& b)
+    {
+	return max(a, b.size());
+    };
+    
     for(const auto& c : by_colums(data))
     {
-        const auto m =
-            ranges::accumulate(
-                c,
-                size_t{0},
-                [](const auto& a, const auto& b)
-        {
-            return max(a, b.size());
-        });
+        const auto m = ranges::accumulate(c, size_t{0}, by_max_size);
         col_sizes.push_back(m);
     }
 
@@ -77,16 +72,16 @@ const auto format_separator = [](const auto& col_sizes)
     string separator;
     for(auto size : col_sizes)
     {
-	separator += string(size, '-') + '+';
+        separator += string(size, '-') + '+';
     }
     return separator;
 };
-const auto print =
-    [](auto& str, const auto& data) -> decltype(auto)
+const auto print = [](auto& str, const auto& data)
 {
     using namespace std;
+    using ranges::view::tail;
 
-    const auto col_sizes = max_size_of_each_col(data);
+    const auto col_sizes = max_size_per_col(data);
 
     format_row(str, data[0], col_sizes);
     str << '\n';
@@ -94,51 +89,47 @@ const auto print =
     str << format_separator(col_sizes);
     str << '\n';
 
-    for(auto&& r : ranges::view::tail(data))
+    for(auto&& r : tail(data))
     {
-	format_row(str, r, col_sizes);
+        format_row(str, r, col_sizes);
         str << '\n';
     }
-    return str;
 };
 }
-struct csv_type
+struct type
 {
     using data_type = std::vector<std::vector<std::string>>;
     using cols_type = data_type;
     using rows_type = data_type;
-    explicit csv_type(const data_type& data)
+    explicit type(const data_type& data)
         : m_data(data)
     {}
-    const data_type data() const
+    const data_type& rows() const
     {
         return m_data;
     }
-    const rows_type rows() const
-    {
-        return m_data;
-    }
-    const cols_type cols() const
+    const cols_type& cols() const
     {
         return impl::by_colums(m_data);
     }
 private:
     data_type m_data;
 };
-std::ostream& operator<<(std::ostream& str, const csv_type& csv)
+std::ostream& operator<<(std::ostream& str, const type& csv)
 {
-    return impl::print(str, csv.data());
+    impl::print(str, csv.rows());
+    return str;
 }
-auto csv_from(const std::string& txt) -> csv_type
+const auto from = [](const std::string& txt)
 {
     using namespace std;
-    vector<vector<string>> v{};
+    vector<vector<string>> v;
     const auto rows = impl::rows_from(txt);
     for(auto&& r : rows)
     {
         v.push_back(impl::cols_from(r));
     }
-    return csv_type{v};
+    return type{v};
 };
 }
 
@@ -146,7 +137,7 @@ using namespace std::string_literals;
 
 TEST_CASE("csv to table")
 {
-    using xzr::csv::csv_from;
+    using namespace xzr;
     using std::vector;
     using std::string;
 
@@ -158,7 +149,7 @@ TEST_CASE("csv to table")
         "Franz Kolp;Lange Strsse 15;45276 Holsten;18\n"s;
 
     std::stringstream str;
-    str << csv_from(csv);
+    str << csv::from(csv);
     CHECK(str.str() ==
           "Name         |Strasse           |Ort           |Alter|\n"
           "-------------+------------------+--------------+-----+\n"
