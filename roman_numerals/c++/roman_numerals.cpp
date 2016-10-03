@@ -1,6 +1,43 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
+#include <algorithm>
+#include <numeric>
+#include <iterator>
+#include <experimental/optional>
 
+namespace v3
+{
+  std::experimental::optional<std::pair<std::string, int>> num_to_roman(int num)
+  {
+    if(num >= 10) return {{ "X", num - 10}};
+    if(num >=  9) return {{"IX", num -  9}};
+    if(num >=  5) return {{ "V", num -  5}};
+    if(num >=  4) return {{"IV", num -  4}};
+    if(num >=  1) return {{ "I", num -  1}};
+    return std::experimental::nullopt;
+  }
+
+  template<class F, class OutIter, class T>
+  OutIter unfold(F f, OutIter out, T&& init)
+  {
+    for(auto a = f(std::forward<T>(init)); a; a = f(std::move(a->second)))
+      {
+	out = std::move(std::begin(a->first), std::end(a->first), out);
+      }
+    return out;
+  }
+  
+  TEST_CASE("roman numerals with unfold")
+  {
+    using namespace std::string_literals;
+    auto roman = ""s;
+    static_cast<void>(unfold(
+			     num_to_roman,
+			     std::back_inserter(roman),
+			     34));
+    CHECK(roman == "XXXIV");
+  }
+}
 namespace v2
 {
   const auto num_of_digits{4};
