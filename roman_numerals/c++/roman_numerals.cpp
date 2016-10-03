@@ -7,6 +7,10 @@
 
 namespace v3
 {
+/*
+see this talk for the idea of unfold:
+https://www.youtube.com/watch?v=B6twozNPUoA&index=38&list=PLHTh1InhhwT7J5jl4vAhO1WvGHUUFgUQH
+*/
 std::experimental::optional<std::pair<std::string, int>> num_to_roman(int num)
 {
     if(num >= 10) return {{ "X", num - 10}};
