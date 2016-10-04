@@ -8,8 +8,8 @@
 namespace v3
 {
 /*
-see this talk for the idea of unfold:
-https://www.youtube.com/watch?v=B6twozNPUoA&index=38&list=PLHTh1InhhwT7J5jl4vAhO1WvGHUUFgUQH
+  see this talk for the idea of unfold:
+  https://www.youtube.com/watch?v=B6twozNPUoA&index=38&list=PLHTh1InhhwT7J5jl4vAhO1WvGHUUFgUQH
 */
 std::experimental::optional<std::pair<std::string, int>> num_to_roman(int num)
 {
@@ -39,6 +39,36 @@ TEST_CASE("roman numerals with unfold")
                           num_to_roman,
                           std::back_inserter(roman),
                           34));
+    CHECK(roman == "XXXIV");
+}
+
+TEST_CASE("roman numerals with accumulate (foled)")
+{
+    using namespace std::string_literals;
+    const std::vector<std::pair<int, std::string>> roman_chars
+    {
+        {10, "X"},
+        {9, "IX"},
+        {5, "V"},
+        {4, "IV"},
+        {1, "I"}
+    };
+
+    const auto num_to_roman = [](auto a, const auto& b)
+    {
+        while(a.second >= b.first)
+        {
+            a.first += b.second;
+            a.second -= b.first;
+        }
+        return a;
+    };
+
+    const auto roman = std::accumulate(
+                           std::begin(roman_chars),
+                           std::end(roman_chars),
+                           std::make_pair(""s, 34),
+                           num_to_roman).first;
     CHECK(roman == "XXXIV");
 }
 }
