@@ -224,7 +224,7 @@ unittest
 	     {
 	       (ArabicRoman.convert(1961)).must.equal("MCMLXI");
 	     },
-	     "return MMMLCCCDXXXVIII on [MMM, DCCC, LXXX, VIII]":
+	     "return MMMDCCCLXXXVIII on [MMM, DCCC, LXXX, VIII]":
 	     {
 	       (ArabicRoman.convert(3888)).must.equal("MMMDCCCLXXXVIII");
 	     }
