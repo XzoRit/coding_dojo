@@ -11,16 +11,6 @@ namespace v3
   see this talk for the idea of unfold:
   https://www.youtube.com/watch?v=B6twozNPUoA&index=38&list=PLHTh1InhhwT7J5jl4vAhO1WvGHUUFgUQH
 */
-std::experimental::optional<std::pair<std::string, int>> num_to_roman(int num)
-{
-    if(num >= 10) return {{ "X", num - 10}};
-    if(num >=  9) return {{"IX", num -  9}};
-    if(num >=  5) return {{ "V", num -  5}};
-    if(num >=  4) return {{"IV", num -  4}};
-    if(num >=  1) return {{ "I", num -  1}};
-    return std::experimental::nullopt;
-}
-
 template<class F, class OutIter, class T>
 OutIter unfold(F f, OutIter out, T&& init)
 {
@@ -31,7 +21,17 @@ OutIter unfold(F f, OutIter out, T&& init)
     return out;
 }
 
-TEST_CASE("roman numerals with unfold")
+std::experimental::optional<std::pair<std::string, int>> num_to_roman(int num)
+{
+    if(num >= 10) return {{ "X", num - 10}};
+    if(num >=  9) return {{"IX", num -  9}};
+    if(num >=  5) return {{ "V", num -  5}};
+    if(num >=  4) return {{"IV", num -  4}};
+    if(num >=  1) return {{ "I", num -  1}};
+    return std::experimental::nullopt;
+}
+
+TEST_CASE("arabic to roman with unfold")
 {
     using namespace std::string_literals;
     auto roman = ""s;
@@ -42,7 +42,31 @@ TEST_CASE("roman numerals with unfold")
     CHECK(roman == "XXXIV");
 }
 
-TEST_CASE("roman numerals with accumulate (foled)")
+std::experimental::optional<std::pair<std::vector<int>, std::string>> roman_to_num(std::string roman)
+{
+    if(roman.substr(0, 1) ==  "X") return {{ {10}, roman.substr(1) }};
+    if(roman.substr(0, 2) == "IX") return {{ { 9}, roman.substr(2) }};
+    if(roman.substr(0, 1) ==  "V") return {{ { 5}, roman.substr(1) }};
+    if(roman.substr(0, 2) == "IV") return {{ { 4}, roman.substr(2) }};
+    if(roman.substr(0, 1) ==  "I") return {{ { 1}, roman.substr(1) }};
+    return std::experimental::nullopt;
+}
+
+TEST_CASE("roman to arabic with unfold")
+{
+    using namespace std::string_literals;
+
+    std::vector<int> arabics{};
+    static_cast<void>(unfold(
+                          roman_to_num,
+                          std::back_inserter(arabics),
+                          "XXXIV"s));
+    const auto arabic =
+        std::accumulate(std::begin(arabics), std::end(arabics), 0);
+    CHECK(arabic == 34);
+}
+
+TEST_CASE("roman numerals with accumulate (fold)")
 {
     using namespace std::string_literals;
     const std::vector<std::pair<int, std::string>> roman_chars
