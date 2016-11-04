@@ -70,3 +70,15 @@ TEST_CASE("score of 2,2")
 {
   CHECK(score(2, 2) == "Thirty-All");
 }
+
+TEST_CASE("mixed scores")
+{
+  CHECK(score(1, 2) == "Fifteen-Thirty");
+  CHECK(score(2, 1) == "Thirty-Fifteen");
+
+  CHECK(score(1, 3) == "Fifteen-Fourty");
+  CHECK(score(3, 1) == "Fourty-Fifteen");
+
+  CHECK(score(2, 3) == "Thirty-Fourty");
+  CHECK(score(3, 2) == "Fourty-Thirty");
+}
