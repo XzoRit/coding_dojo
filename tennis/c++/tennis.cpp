@@ -1,7 +1,15 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest.h>
+#include <string>
 
-TEST_CASE("")
+using namespace std;
+
+string score(int, int)
 {
-  CHECK(false);
+  return {"Love-All"};
+}
+
+TEST_CASE("score of 0,0")
+{
+  CHECK(score(0, 0) == "Love-All");
 }
