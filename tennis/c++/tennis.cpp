@@ -7,7 +7,9 @@ using namespace std::string_literals;
 
 string score(int a, int b)
 {
-  if(a) return "Fifteen-Love";
+  vector<string> numbers =
+    {"Love", "Fifteen", "Thirty", "Fourty"};
+  if(a) return numbers[a] + "-Love";
   if(b) return "Love-Fifteen";
   return "Love-All";
 }
@@ -25,4 +27,14 @@ TEST_CASE("score of 0,1")
 TEST_CASE("score of 1,0")
 {
   CHECK(score(1, 0) == "Fifteen-Love");
+}
+
+TEST_CASE("score of 2,0")
+{
+  CHECK(score(2, 0) == "Thirty-Love");
+}
+
+TEST_CASE("score of 3,0")
+{
+  CHECK(score(3, 0) == "Fourty-Love");
 }
