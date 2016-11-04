@@ -8,12 +8,11 @@ using namespace std::string_literals;
 string score(int left, int right)
 {
   const auto sep{'-'};
-  const vector<string> numbers =
-    {"Love", "Fifteen", "Thirty", "Fourty"};
+  const auto numbers = vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
   
-  if(left) return numbers[left] + sep + numbers[0];
-  if(right) return numbers[0] + sep + numbers[right];
-  return numbers[0] + sep + "All";
+  if(left ) return numbers[left] + sep + numbers[    0];
+  if(right) return numbers[   0] + sep + numbers[right];
+  else      return numbers[   0] + sep +          "All";
 }
 
 TEST_CASE("score of 0,0")
