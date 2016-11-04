@@ -5,17 +5,22 @@
 using namespace std;
 using namespace std::string_literals;
 
-string score(int left, int right)
+bool no_one_scored_yet(int score_left, int score_right)
 {
-  if(!(left || right)) return "Love-All";
+  return !(score_left || score_right);
+}
+
+string score(int score_left, int score_right)
+{
+  if(no_one_scored_yet(score_left, score_right)) return "Love-All";
   
   const auto sep{'-'};
   const auto numbers = vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
   
-  auto score_left = numbers[left];
-  auto score_right = numbers[right];
+  auto  left_str = numbers[score_left ];
+  auto right_str = numbers[score_right];
   
-  return score_left + sep + score_right;
+  return left_str + sep + right_str;
 }
 
 TEST_CASE("score of 0,0")
