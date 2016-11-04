@@ -5,13 +5,14 @@
 using namespace std;
 using namespace std::string_literals;
 
-string score(int a, int b)
+string score(int left, int right)
 {
   const auto sep{'-'};
-  vector<string> numbers =
+  const vector<string> numbers =
     {"Love", "Fifteen", "Thirty", "Fourty"};
-  if(a) return numbers[a] + sep + numbers[0];
-  if(b) return numbers[0] + sep + numbers[b];
+  
+  if(left) return numbers[left] + sep + numbers[0];
+  if(right) return numbers[0] + sep + numbers[right];
   return numbers[0] + sep + "All";
 }
 
