@@ -1,0 +1,17 @@
+project
+    : default-build debug
+    : build-dir ./build
+    : requirements <cxxflags>-std=c++1z
+      <warnings>all
+      <warnings-as-errors>on
+    ;
+
+import testing ;
+
+run tennis.cpp
+    :
+    :
+    : <include>../../../c++/doctest/doctest
+    : test_tennis
+    ;
+    
