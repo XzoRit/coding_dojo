@@ -9,9 +9,9 @@ string score(int a, int b)
 {
   vector<string> numbers =
     {"Love", "Fifteen", "Thirty", "Fourty"};
-  if(a) return numbers[a] + "-Love";
-  if(b) return "Love-" + numbers[b];
-  return "Love-All";
+  if(a) return numbers[a] + "-" + numbers[0];
+  if(b) return numbers[0] + "-" + numbers[b];
+  return numbers[0] + "-All";
 }
 
 TEST_CASE("score of 0,0")
