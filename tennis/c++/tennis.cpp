@@ -1,29 +1,31 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest.h>
 #include <string>
+#include <array>
 
 using namespace std;
 using namespace std::string_literals;
 
-bool both_same_score(int score_left, int score_right)
+constexpr auto both_same_score(int score_left, int score_right)
 {
   return score_left == score_right;
 }
 
-string score(int score_left, int score_right)
+auto score(int score_left, int score_right)
 {
-  const auto sep{'-'};
-  const auto score_to_string = vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
+  constexpr auto sep{'-'};
+  constexpr auto score_to_string =
+    array<const char*, 4>{{"Love", "Fifteen", "Thirty", "Fourty"}};
   
   if(both_same_score(score_left, score_right))
     {
-      return score_to_string[score_left] + sep + "All";
+      return string{score_to_string[score_left]} + sep + "All";
     }
   
-  auto  left_str = score_to_string[score_left ];
-  auto right_str = score_to_string[score_right];
+  const auto  left_str = score_to_string[score_left ];
+  const auto right_str = score_to_string[score_right];
   
-  return left_str + sep + right_str;
+  return string{left_str} + sep + right_str;
 }
 
 TEST_CASE("score of 0,0")
