@@ -7,12 +7,15 @@ using namespace std::string_literals;
 
 string score(int left, int right)
 {
+  if(!(left || right)) return "Love-All";
+  
   const auto sep{'-'};
   const auto numbers = vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
   
-  if(left ) return numbers[left] + sep + numbers[    0];
-  if(right) return numbers[   0] + sep + numbers[right];
-  else      return numbers[   0] + sep +          "All";
+  auto score_left = numbers[left];
+  auto score_right = numbers[right];
+  
+  return score_left + sep + score_right;
 }
 
 TEST_CASE("score of 0,0")
