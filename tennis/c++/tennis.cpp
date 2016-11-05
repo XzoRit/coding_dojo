@@ -13,11 +13,15 @@ string score(int score_left, int score_right)
     vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
   const auto deuce_border{3};
 
-  if(score_left >= 4 && score_right >= deuce_border)
+  if((score_left >= 4 && score_right >= deuce_border)
+     ||
+     (score_right >= 4 && score_left >= deuce_border)
+     )
     {
       const auto score_diff = score_left - score_right;
       if(score_diff > 0) return "Advantage for player1";
-      else return "Deuce";
+      if(score_diff < 0) return "Advantage for player2";
+      return "Deuce";
     }
   if(score_left == score_right)
     {
@@ -111,4 +115,11 @@ TEST_CASE("advantage player1")
   CHECK(score(4, 3) == "Advantage for player1");
   CHECK(score(5, 4) == "Advantage for player1");
   CHECK(score(6, 5) == "Advantage for player1");
+}
+
+TEST_CASE("advantage player2")
+{
+  CHECK(score(3, 4) == "Advantage for player2");
+  CHECK(score(4, 5) == "Advantage for player2");
+  CHECK(score(5, 6) == "Advantage for player2");
 }
