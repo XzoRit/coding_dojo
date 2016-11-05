@@ -18,7 +18,8 @@ string score(int score_left, int score_right)
       const auto score_diff = score_left - score_right;
       if(score_diff == 1) return "Advantage for player1";
       if(score_diff == 2) return "Win for player1";
-      if(score_diff < 0) return "Advantage for player2";
+      if(score_diff == -1) return "Advantage for player2";
+      if(score_diff == -2) return "Win for player2";
       return "Deuce";
     }
   
@@ -127,4 +128,11 @@ TEST_CASE("win for player1 after deuce")
   CHECK(score(5, 3) == "Win for player1");
   CHECK(score(6, 4) == "Win for player1");
   CHECK(score(7, 5) == "Win for player1");
+}
+
+TEST_CASE("win for player2 after deuce")
+{
+  CHECK(score(3, 5) == "Win for player2");
+  CHECK(score(4, 6) == "Win for player2");
+  CHECK(score(5, 7) == "Win for player2");
 }
