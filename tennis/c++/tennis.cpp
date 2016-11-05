@@ -6,32 +6,44 @@
 using namespace std;
 using namespace std::string_literals;
 
+constexpr auto is_deuce_game(int score_left, int score_right)
+{
+  constexpr auto deuce_border{3};
+
+  return
+    score_left  >= deuce_border
+    &&
+    score_right >= deuce_border;
+}
+
+constexpr auto deuce_game_score(int score_left, int score_right)
+{
+  const auto score_diff = score_left - score_right;
+  if(score_diff ==  1) return "Advantage for player1";
+  if(score_diff == -1) return "Advantage for player2";
+  if(score_diff ==  2) return "Win for player1";
+  if(score_diff == -2) return "Win for player2";
+  return "Deuce";
+}
+
 string score(int score_left, int score_right)
 {
-  const auto sep{'-'};
-  const auto score_to_string =
-    vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
-  const auto deuce_border{3};
-
-  if(score_left >= deuce_border && score_right >= deuce_border)
+  if(is_deuce_game(score_left, score_right))
     {
-      const auto score_diff = score_left - score_right;
-      if(score_diff == 1) return "Advantage for player1";
-      if(score_diff == 2) return "Win for player1";
-      if(score_diff == -1) return "Advantage for player2";
-      if(score_diff == -2) return "Win for player2";
-      return "Deuce";
+      return deuce_game_score(score_left, score_right);
     }
   
+  if(score_left  == 4) return "Win for player1";
+  if(score_right == 4) return "Win for player2";
+
+  const auto sep{'-'};
+  const auto score_to_string = vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
+
   if(score_left == score_right)
     {
       return score_to_string[score_left] + sep + "All";
     }
   
-  if(score_left == 4) return "Win for player1";
-
-  if(score_right == 4) return "Win for player2";
-
   return score_to_string[score_left] + sep + score_to_string[score_right];
 }
 
