@@ -12,16 +12,16 @@ string score(int score_left, int score_right)
   const auto score_to_string =
     vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
 
+  if(score_left == score_right)
+    {
+      if(score_left >= 3) return "Deuce";
+      return score_to_string[score_left] + sep + "All";
+    }
+  
   if(score_left == 4) return "Win for player1";
 
   if(score_right == 4) return "Win for player2";
 
-  if(score_left == score_right)
-    {
-      if(score_left == 3) return "Deuce";
-      return score_to_string[score_left] + sep + "All";
-    }
-  
   return score_to_string[score_left] + sep + score_to_string[score_right];
 }
 
@@ -92,7 +92,9 @@ TEST_CASE("score of 0,4")
   CHECK(score(0, 4) == "Win for player2");
 }
 
-TEST_CASE("deuce at score of 3,3")
+TEST_CASE("deuce")
 {
   CHECK(score(3, 3) == "Deuce");
+  CHECK(score(4, 4) == "Deuce");
+  CHECK(score(5, 5) == "Deuce");
 }
