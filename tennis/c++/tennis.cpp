@@ -2,8 +2,10 @@
 #include <doctest.h>
 #include <string>
 #include <vector>
+#include <experimental/optional>
 
 using namespace std;
+using namespace std::experimental;
 using namespace std::string_literals;
 
 const auto winning_score = 4;
@@ -29,6 +31,13 @@ const auto deuce_game_score = [](auto score_left, auto score_right)
   return "Deuce";
 };
 
+const auto one_player_won = [](auto score_left, auto score_right) -> optional<string>
+{
+  if(score_left  == winning_score) return "player1"s;
+  if(score_right == winning_score) return "player2"s;
+  return nullopt;
+};
+
 const auto score = [](auto score_left, auto score_right) -> string
 {
   if(is_deuce_game(score_left, score_right))
@@ -36,9 +45,11 @@ const auto score = [](auto score_left, auto score_right) -> string
       return deuce_game_score(score_left, score_right);
     }
 
-  if(score_left  == winning_score) return "Win for player1";
-  if(score_right == winning_score) return "Win for player2";
-
+  if(const optional<string> wining_player = one_player_won(score_left, score_right))
+    {
+      return  "Win for " + (*wining_player);
+    }
+  
   if(score_left == score_right)
     {
       return score_to_string[score_left] + sep + "All";
