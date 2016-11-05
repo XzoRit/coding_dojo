@@ -6,10 +6,13 @@
 using namespace std;
 using namespace std::string_literals;
 
+const auto winning_score = 4;
+const auto deuce_border = 3;
+const auto score_to_string = vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
+const auto sep = '-';
+
 const auto is_deuce_game = [](auto score_left, auto score_right)
 {
-  const auto deuce_border = 3;
-
   return
     score_left  >= deuce_border
     &&
@@ -32,12 +35,9 @@ const auto score = [](auto score_left, auto score_right) -> string
     {
       return deuce_game_score(score_left, score_right);
     }
-  
-  if(score_left  == 4) return "Win for player1";
-  if(score_right == 4) return "Win for player2";
 
-  const auto sep = '-';
-  const auto score_to_string = vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
+  if(score_left  == winning_score) return "Win for player1";
+  if(score_right == winning_score) return "Win for player2";
 
   if(score_left == score_right)
     {
