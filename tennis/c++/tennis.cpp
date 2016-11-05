@@ -13,19 +13,16 @@ string score(int score_left, int score_right)
     vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
   const auto deuce_border{3};
 
-  if((score_left >= 4 && score_right >= deuce_border)
-     ||
-     (score_right >= 4 && score_left >= deuce_border)
-     )
+  if(score_left >= deuce_border && score_right >= deuce_border)
     {
       const auto score_diff = score_left - score_right;
       if(score_diff > 0) return "Advantage for player1";
       if(score_diff < 0) return "Advantage for player2";
       return "Deuce";
     }
+  
   if(score_left == score_right)
     {
-      if(score_left >= deuce_border) return "Deuce";
       return score_to_string[score_left] + sep + "All";
     }
   
