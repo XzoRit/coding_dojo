@@ -6,27 +6,19 @@
 using namespace std;
 using namespace std::string_literals;
 
-constexpr auto both_same_score(int score_left, int score_right)
-{
-  return score_left == score_right;
-}
-
 string score(int score_left, int score_right)
 {
   const auto sep{'-'};
   const auto score_to_string =
     vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
 
-  if(score_left == 4)
+  if(score_left == 4) return "Win for player1";
+
+  if(score_right == 4) return "Win for player2";
+
+  if(score_left == score_right)
     {
-      return "Win for player1";
-    }
-  if(score_right == 4)
-    {
-      return "Win for player2";
-    }
-  if(both_same_score(score_left, score_right))
-    {
+      if(score_left == 3) return "Deuce";
       return score_to_string[score_left] + sep + "All";
     }
   
@@ -98,4 +90,9 @@ TEST_CASE("score of 4,0")
 TEST_CASE("score of 0,4")
 {
   CHECK(score(0, 4) == "Win for player2");
+}
+
+TEST_CASE("deuce at score of 3,3")
+{
+  CHECK(score(3, 3) == "Deuce");
 }
