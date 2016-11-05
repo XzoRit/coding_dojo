@@ -1,7 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest.h>
 #include <string>
-#include <array>
+#include <vector>
 
 using namespace std;
 using namespace std::string_literals;
@@ -11,21 +11,26 @@ constexpr auto both_same_score(int score_left, int score_right)
   return score_left == score_right;
 }
 
-auto score(int score_left, int score_right)
+string score(int score_left, int score_right)
 {
-  constexpr auto sep{'-'};
-  constexpr auto score_to_string =
-    array<const char*, 4>{{"Love", "Fifteen", "Thirty", "Fourty"}};
-  
+  const auto sep{'-'};
+  const auto score_to_string =
+    vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
+
+  if(score_left == 4)
+    {
+      return "Win for player1";
+    }
+  if(score_right == 4)
+    {
+      return "Win for player2";
+    }
   if(both_same_score(score_left, score_right))
     {
-      return string{score_to_string[score_left]} + sep + "All";
+      return score_to_string[score_left] + sep + "All";
     }
   
-  const auto  left_str = score_to_string[score_left ];
-  const auto right_str = score_to_string[score_right];
-  
-  return string{left_str} + sep + right_str;
+  return score_to_string[score_left] + sep + score_to_string[score_right];
 }
 
 TEST_CASE("score of 0,0")
@@ -83,4 +88,14 @@ TEST_CASE("mixed scores")
 
   CHECK(score(2, 3) == "Thirty-Fourty");
   CHECK(score(3, 2) == "Fourty-Thirty");
+}
+
+TEST_CASE("score of 4,0")
+{
+  CHECK(score(4, 0) == "Win for player1");
+}
+
+TEST_CASE("score of 0,4")
+{
+  CHECK(score(0, 4) == "Win for player2");
 }
