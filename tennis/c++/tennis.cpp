@@ -16,7 +16,8 @@ string score(int score_left, int score_right)
   if(score_left >= deuce_border && score_right >= deuce_border)
     {
       const auto score_diff = score_left - score_right;
-      if(score_diff > 0) return "Advantage for player1";
+      if(score_diff == 1) return "Advantage for player1";
+      if(score_diff == 2) return "Win for player1";
       if(score_diff < 0) return "Advantage for player2";
       return "Deuce";
     }
@@ -119,4 +120,11 @@ TEST_CASE("advantage player2")
   CHECK(score(3, 4) == "Advantage for player2");
   CHECK(score(4, 5) == "Advantage for player2");
   CHECK(score(5, 6) == "Advantage for player2");
+}
+
+TEST_CASE("win for player1 after deuce")
+{
+  CHECK(score(5, 3) == "Win for player1");
+  CHECK(score(6, 4) == "Win for player1");
+  CHECK(score(7, 5) == "Win for player1");
 }
