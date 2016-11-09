@@ -24,11 +24,11 @@ const auto is_deuce_game = [](auto score_left, auto score_right)
 const auto deuce_game_score = [](auto score_left, auto score_right)
 {
   const auto score_diff = score_left - score_right;
-  if(score_diff ==  1) return "Advantage for player1";
-  if(score_diff == -1) return "Advantage for player2";
-  if(score_diff ==  2) return "Win for player1";
-  if(score_diff == -2) return "Win for player2";
-  return "Deuce";
+  if(score_diff ==  1) return "Advantage for player1"s;
+  if(score_diff == -1) return "Advantage for player2"s;
+  if(score_diff ==  2) return "Win for player1"s;
+  if(score_diff == -2) return "Win for player2"s;
+  return "Deuce"s;
 };
 
 const auto one_player_won = [](auto score_left, auto score_right) -> optional<string>
@@ -38,7 +38,7 @@ const auto one_player_won = [](auto score_left, auto score_right) -> optional<st
   return nullopt;
 };
 
-const auto score = [](auto score_left, auto score_right) -> string
+const auto score = [](auto score_left, auto score_right)
 {
   if(is_deuce_game(score_left, score_right))
     {
@@ -47,7 +47,7 @@ const auto score = [](auto score_left, auto score_right) -> string
 
   if(const optional<string> wining_player = one_player_won(score_left, score_right))
     {
-      return  "Win for " + (*wining_player);
+      return  "Win for "s + (*wining_player);
     }
   
   if(score_left == score_right)
