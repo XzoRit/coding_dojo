@@ -12,6 +12,12 @@ const auto winning_score = 4;
 const auto deuce_border = 3;
 const auto score_to_string = vector<string>{"Love", "Fifteen", "Thirty", "Fourty"};
 const auto sep = '-';
+const auto both = "All"s;
+const auto winner = "Win for "s;
+const auto advantage = "Advantage for "s;
+const auto deuce = "Deuce"s;
+const auto player1 = "player1"s;
+const auto player2 = "player2"s;
 
 const auto is_deuce_game = [](auto score_left, auto score_right)
 {
@@ -24,17 +30,17 @@ const auto is_deuce_game = [](auto score_left, auto score_right)
 const auto deuce_game_score = [](auto score_left, auto score_right)
 {
   const auto score_diff = score_left - score_right;
-  if(score_diff ==  1) return "Advantage for player1"s;
-  if(score_diff == -1) return "Advantage for player2"s;
-  if(score_diff ==  2) return "Win for player1"s;
-  if(score_diff == -2) return "Win for player2"s;
-  return "Deuce"s;
+  if(score_diff ==  1) return advantage + player1;
+  if(score_diff == -1) return advantage + player2;
+  if(score_diff ==  2) return winner + player1;
+  if(score_diff == -2) return winner + player2;
+  return deuce;
 };
 
 const auto one_player_won = [](auto score_left, auto score_right) -> optional<string>
 {
-  if(score_left  == winning_score) return "player1"s;
-  if(score_right == winning_score) return "player2"s;
+  if(score_left  == winning_score) return player1;
+  if(score_right == winning_score) return player2;
   return nullopt;
 };
 
@@ -47,12 +53,12 @@ const auto score = [](auto score_left, auto score_right)
 
   if(const optional<string> wining_player = one_player_won(score_left, score_right))
     {
-      return  "Win for "s + (*wining_player);
+      return  winner + (*wining_player);
     }
   
   if(score_left == score_right)
     {
-      return score_to_string[score_left] + sep + "All";
+      return score_to_string[score_left] + sep + both;
     }
   
   return score_to_string[score_left] + sep + score_to_string[score_right];
