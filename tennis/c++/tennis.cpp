@@ -25,7 +25,7 @@ const auto deuce_game_scores = map<int, string>
     {-2, winner    + player2},
     { 1, advantage + player1},
     {-1, advantage + player2},
-    { 0, deuce}
+    { 0, deuce              }
 };
 
 const auto is_deuce_game = [](auto score_left, auto score_right)
@@ -34,11 +34,6 @@ const auto is_deuce_game = [](auto score_left, auto score_right)
         score_left  >= deuce_border
         &&
         score_right >= deuce_border;
-};
-
-const auto deuce_game_score = [](auto score_left, auto score_right)
-{
-    return deuce_game_scores.at(score_left - score_right);
 };
 
 const auto has_one_player_won = [](auto score_left, auto score_right) -> optional<string>
@@ -52,7 +47,7 @@ const auto score = [](auto score_left, auto score_right)
 {
     if(is_deuce_game(score_left, score_right))
     {
-        return deuce_game_score(score_left, score_right);
+        return deuce_game_scores.at(score_left - score_right);
     }
 
     if(const optional<string> wining_player = has_one_player_won(score_left, score_right))
