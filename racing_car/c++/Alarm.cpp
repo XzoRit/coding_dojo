@@ -3,24 +3,24 @@
 #include "ISensor.h"
 
 Alarm::Alarm(UniqueSensor s)
-    : m_sensor(std::move(s))
-    , m_lowPressureTreshold(17)
-    , m_highPressureTreshold(21)
-    , m_alarmOn(false)
+  : m_sensor(std::move(s))
+  , m_lowPressureTreshold(17)
+  , m_highPressureTreshold(21)
+  , m_alarmOn(false)
 {}
 
 Alarm::Alarm()
-    : Alarm(std::make_unique<Sensor>())
+  : Alarm(std::make_unique<Sensor>())
 {}
 
 double Alarm::lowThreshold() const
 {
-    return m_lowPressureTreshold;
+  return m_lowPressureTreshold;
 }
 
 double Alarm::highThreshold() const
 {
-    return m_highPressureTreshold;
+  return m_highPressureTreshold;
 }
 
 void Alarm::check()
