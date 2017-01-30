@@ -1,0 +1,21 @@
+project
+    : default-build debug
+    : build-dir ./build
+    : requirements <cxxflags>-std=c++1z
+      <warnings>all
+      <warnings-as-errors>on
+    ;
+
+exe main
+    : [ glob *.cpp ]
+    :
+    : <include>../doctest/doctest
+    ;
+
+import testing ;
+
+unit-test exec_main_test
+    : main
+    ;
+
+always exec_main_test ;
