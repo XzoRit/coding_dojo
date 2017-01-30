@@ -9,7 +9,7 @@ project
 exe main
     : [ glob *.cpp ]
     :
-    : <include>../doctest/doctest
+    : <include>../../../c++/doctest/doctest
     ;
 
 import testing ;
