@@ -1,0 +1,2 @@
+* Racing Car Kata
+The original sources for this refactoring kata come from [[https://github.com/emilybache/Racing-Car-Katas][here]].
