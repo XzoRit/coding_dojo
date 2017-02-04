@@ -78,6 +78,9 @@ TEST_CASE("alarm depends on sensor values")
     }
     a.check();
     CHECK(a.isAlarmOn());
+    sensor->value(okValue);
+    a.check();
+    CHECK(a.isAlarmOn());
   }
 }
 
