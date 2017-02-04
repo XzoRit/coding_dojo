@@ -7,7 +7,7 @@ public:
   static std::string escapeHtml(std::string const& input);
 };
 
-inline static std::string StringEscapeUtils::escapeHtml(
+inline std::string StringEscapeUtils::escapeHtml(
   std::string const& input)
 {
   std::string output = input;
