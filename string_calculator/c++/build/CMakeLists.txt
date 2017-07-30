@@ -3,7 +3,7 @@ cmake_policy(SET CMP0021 OLD)
 
 project(string_calculator)
 
-include_directories(".." "/opt/local/include")
+include_directories(".." "/opt/local/include" "../../../../c++/boost")
 
 set (${PROJECT_NAME}_headers "../lib/convert.hpp" "../lib/str_utils.hpp")
 set (${PROJECT_NAME}_sources "../test/main.cpp")
@@ -28,4 +28,4 @@ set_property(TARGET ${PROJECT_NAME}_cpp03 APPEND PROPERTY INCLUDE_DIRECTORIES ".
 set_property(TARGET ${PROJECT_NAME}_boost APPEND PROPERTY INCLUDE_DIRECTORIES "../boost")
 set_property(TARGET ${PROJECT_NAME}_cpp11 APPEND PROPERTY INCLUDE_DIRECTORIES "../cpp11")
 
-set_property(TARGET ${PROJECT_NAME}_cpp11 APPEND PROPERTY COMPILE_FLAGS "-std=c++0x")
+set_property(TARGET ${PROJECT_NAME}_cpp11 APPEND PROPERTY COMPILE_FLAGS "-std=c++11")
