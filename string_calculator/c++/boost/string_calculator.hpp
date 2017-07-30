@@ -17,8 +17,8 @@
 
 #include <vector>
 #include <string>
-#include <sstream> // boost stream?
-#include <stdexcept> // boost exception?
+#include <sstream>
+#include <stdexcept>
 #include <iterator>
 
 #include <boost/spirit/include/qi_parse.hpp>
