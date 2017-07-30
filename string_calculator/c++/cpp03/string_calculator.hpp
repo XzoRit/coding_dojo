@@ -20,7 +20,8 @@ std::pair<std::string, std::string> extractSep(std::string const& parse)
     static std::string::size_type const SizeOfSepSection = 4;
 
     if(parse.size() >= SizeOfSepSection && parse[0] == '/')
-        return std::make_pair(std::string(parse.begin() + SizeOfSepSection, parse.end()), std::string(1, parse[2]));
+        return std::make_pair(std::string(parse.begin() + SizeOfSepSection,
+                                          parse.end()), std::string(1, parse[2]));
     else
         return std::make_pair(parse, ",\n");
 }
@@ -32,13 +33,15 @@ int add(std::string const& nums)
     std::pair<std::string, std::string> const numsAndSep = extractSep(nums);
 
     std::vector<std::string> sepNumsAsString;
-    StrUtil::split(numsAndSep.first, numsAndSep.second, std::back_inserter(sepNumsAsString));
+    StrUtil::split(numsAndSep.first, numsAndSep.second,
+                   std::back_inserter(sepNumsAsString));
 
     std::vector<int> ints(sepNumsAsString.size(), 0);
     std::transform(sepNumsAsString.begin(), sepNumsAsString.end(),
                    ints.begin(), &Convert::String::to<int>);
 
-    std::vector<int>::iterator p = std::partition(ints.begin(), ints.end(), std::bind2nd(std::less<int>(), 0));
+    std::vector<int>::iterator p = std::partition(ints.begin(), ints.end(),
+                                   std::bind2nd(std::less<int>(), 0));
 
     if(p == ints.begin())
     {
@@ -47,9 +50,6 @@ int add(std::string const& nums)
     else
     {
         std::vector<int> negNums;
-        // use std::vector::insert instead of copy
-        // this should be faster
-        // negNums.inster(negNums.begin(), ints.begin(), p);
         std::copy(ints.begin(), p, std::back_inserter(negNums));
 
         std::ostringstream exceptTxt;
