@@ -7,7 +7,7 @@ StringCalculator := Object clone do(
             numbers split(",", "\n")
         )
     )
-    
+
     add := method(numbers,
         if(numbers isEmpty,
             0,

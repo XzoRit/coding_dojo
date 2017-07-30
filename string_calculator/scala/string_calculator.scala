@@ -54,7 +54,7 @@ class TestStringCalculator extends FlatSpec with Matchers with BeforeAndAfter {
   "if seperator specification is present add" should "use the string as seperator" in {
     calculator.add("//-T-\n1-T-22-T-333") should be (356)
   }
-  
+
   "add with negative numbers" should "throw an exception with negative numbers listed" in {
     the [IllegalArgumentException] thrownBy calculator.add("1,-22,-333") should have message ("Negative numbers not allowed: -22 -333 ")
   }
