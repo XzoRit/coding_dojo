@@ -1,6 +1,6 @@
 [submodule "csv/c++/doctest"]
-	path = csv/c++/doctest
+	path = doctest
 	url = https://github.com/onqtam/doctest
 [submodule "csv/c++/range-v3"]
-	path = csv/c++/range-v3
+	path = range-v3
 	url = https://github.com/ericniebler/range-v3
