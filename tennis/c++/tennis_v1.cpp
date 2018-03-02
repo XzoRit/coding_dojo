@@ -1,10 +1,11 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <optional>
 
+namespace
+{
 using namespace std;
 using namespace std::string_literals;
 
@@ -41,7 +42,9 @@ const auto has_one_player_won = [](auto score_left, auto score_right) -> optiona
     if(score_right == winning_score) return player2;
     return nullopt;
 };
-
+}
+namespace v1
+{
 const auto score = [](auto score_left, auto score_right)
 {
     if(is_deuce_game(score_left, score_right))
@@ -162,4 +165,5 @@ TEST_CASE("win for player2 after deuce")
     CHECK(score(3, 5) == "Win for player2");
     CHECK(score(4, 6) == "Win for player2");
     CHECK(score(5, 7) == "Win for player2");
+}
 }

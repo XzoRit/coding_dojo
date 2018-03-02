@@ -8,7 +8,9 @@ project
 
 import testing ;
 
-run tennis.cpp
+run test_main.cpp
+    tennis_v1.cpp
+    tennis_v2.cpp
     :
     :
     : <include>../../doctest/doctest
