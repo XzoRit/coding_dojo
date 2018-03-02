@@ -8,77 +8,84 @@ namespace
 }
 namespace v2
 {
-    using namespace std;
-    using namespace std::string_literals;
+using namespace std;
+using namespace std::string_literals;
 
-    enum class point
-    {
-        Love,
-        Fifteen,
-        Thirty
-    };
+enum class point
+{
+    Love,
+    Fifteen,
+    Thirty
+};
 
-    point operator++(point p)
-    {
-        if(p == point::Love) return point::Fifteen;
-        if(p == point::Fifteen) return point::Thirty;
-        return p;
-    }
+point operator++(point p)
+{
+    if(p == point::Love) return point::Fifteen;
+    if(p == point::Fifteen) return point::Thirty;
+    return p;
+}
 
-    struct player
-    {
-        string name;
-        point points;
-    };
+struct player
+{
+    string name;
+    point points;
+};
 
-    struct game
-    {
-        player player_1;
-        player player_2;
-    };
+bool operator==(const player& p1, const player& p2)
+{
+    return (p1.name == p2.name);
+}
 
-    struct player_scored
-    {
-        player scored_player;
-    };
+struct game
+{
+    player player_1;
+    player player_2;
+};
 
-    const auto inc_score_of = [](const auto& p)
-    {
-        return player{p.name, ++p.points};
-    };
+struct player_scored
+{
+    player scored_player;
+};
 
-    const auto update = [](const auto& g, const auto&)
-    {
+const auto inc_score_of = [](const auto& p)
+{
+    return player{p.name, ++p.points};
+};
+
+const auto update = [](const auto& g, const auto& act)
+{
+    if(act.scored_player == g.player_1)
         return game{inc_score_of(g.player_1), g.player_2};
-    };
+    else return game{g.player_1, inc_score_of(g.player_2)};
+};
 
-    ostream& operator<<(ostream& str, const point& p)
-    {
-        if(p == point::Love) str << "0";
-        else if(p == point::Fifteen) str << "15";
-        else if(p == point::Thirty) str << "30";
-        return str;
-    }
+ostream& operator<<(ostream& str, const point& p)
+{
+    if(p == point::Love) str << "0";
+    else if(p == point::Fifteen) str << "15";
+    else if(p == point::Thirty) str << "30";
+    return str;
+}
 
-    ostream& operator<<(ostream& str, const player& p)
-    {
-        str << p.name << ": " << p.points;
-        return str;
-    }
+ostream& operator<<(ostream& str, const player& p)
+{
+    str << p.name << ": " << p.points;
+    return str;
+}
 
-    ostream& operator<<(ostream& str, const game& g)
-    {
-        str << g.player_1 << " vs. " << g.player_2;
-        str << '\n';
-        return str;
-    }
+ostream& operator<<(ostream& str, const game& g)
+{
+    str << g.player_1 << " vs. " << g.player_2;
+    str << '\n';
+    return str;
+}
 
-    const auto draw = [](const auto& game)
-    {
-        stringstream str;
-        str << game;
-        return str.str();
-    };
+const auto draw = [](const auto& game)
+{
+    stringstream str;
+    str << game;
+    return str.str();
+};
 
 TEST_CASE("game")
 {
@@ -88,8 +95,17 @@ TEST_CASE("game")
     const auto a = draw(g);
     REQUIRE(a == "player_1: 0 vs. player_2: 0\n"s);
 
-    const auto new_g = update(g, player_scored{player_1});
-    const auto b = draw(new_g);
-    REQUIRE(b == "player_1: 15 vs. player_2: 0\n"s);
+    SUBCASE("player_1 scores")
+    {
+        const auto new_g = update(g, player_scored{player_1});
+        const auto b = draw(new_g);
+        REQUIRE(b == "player_1: 15 vs. player_2: 0\n"s);
+    }
+    SUBCASE("player_2 scores")
+    {
+        const auto new_g = update(g, player_scored{player_2});
+        const auto b = draw(new_g);
+        REQUIRE(b == "player_1: 0 vs. player_2: 15\n"s);
+    }
 }
 }
