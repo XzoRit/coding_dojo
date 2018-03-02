@@ -1,7 +1,7 @@
 project
     : default-build debug
     : build-dir ./build
-    : requirements <cxxflags>-std=c++1z
+    : requirements <cxxflags>-std=c++17
       <warnings>all
       <warnings-as-errors>on
     ;
@@ -11,7 +11,7 @@ import testing ;
 run tennis.cpp
     :
     :
-    : <include>../../../c++/doctest/doctest
+    : <include>../../doctest/doctest
     : test_tennis
     ;
     

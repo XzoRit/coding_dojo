@@ -3,10 +3,9 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <experimental/optional>
+#include <optional>
 
 using namespace std;
-using namespace std::experimental;
 using namespace std::string_literals;
 
 const auto winning_score = 4;
