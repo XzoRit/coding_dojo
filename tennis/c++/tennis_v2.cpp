@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <variant>
+#include <optional>
 
 namespace
 {
@@ -39,12 +40,25 @@ bool operator==(const player& p1, const player& p2)
     return (p1.name == p2.name);
 }
 
+struct model
+{
+    player player_1;
+    player player_2;
+    point points_1;
+    point points_2;
+    bool deuce;
+    optional<player> advantage;
+    optional<player> winning;
+};
+
 struct game
 {
     struct simple
     {
         player player_1;
         player player_2;
+        point points_1;
+        point points_2;
     };
     struct winner
     {
@@ -94,6 +108,7 @@ struct do_action
         return game{};
     }
     action act;
+    model current;
 };
 
 const auto update = [](const auto& g, const auto& act)
