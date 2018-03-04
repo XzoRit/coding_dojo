@@ -40,6 +40,11 @@ bool operator==(const player& p1, const player& p2)
     return (p1.name == p2.name);
 }
 
+player inc_score_of(const player& p)
+{
+    return player{p.name, ++p.points};
+}
+
 struct game
 {
     struct simple
@@ -56,13 +61,6 @@ struct game
     variant<simple, winner> state;
 };
 
-struct player_scored
-{
-    player scored_player;
-};
-
-using action = player_scored;
-
 struct player_1_scored
 {};
 
@@ -70,42 +68,6 @@ struct player_2_scored
 {};
 
 using score_action = variant<player_1_scored, player_2_scored>;
-
-const auto inc_score_of = [](const auto& p)
-{
-    return player{p.name, ++p.points};
-};
-
-struct do_action
-{
-    game operator()(const game::simple& g) const
-    {
-        game new_game{};
-        if(act.scored_player == g.player_1
-                &&
-                g.player_1.points == point::Forty)
-        {
-            new_game.state =
-                game::winner{act.scored_player};
-        }
-        else if(act.scored_player == g.player_1)
-        {
-            new_game.state =
-                game::simple{inc_score_of(g.player_1), g.player_2};
-        }
-        else
-        {
-            new_game.state =
-                game::simple{g.player_1, inc_score_of(g.player_2)};
-        }
-        return new_game;
-    }
-    game operator()(const game::winner&) const
-    {
-        return game{};
-    }
-    action act;
-};
 
 struct update_player_1_scored
 {
@@ -166,12 +128,7 @@ struct apply_score_action
     const game& current;
 };
 
-auto update(const game& g, const action& act)
-{
-    return visit(do_action{act}, g.state);
-}
-
-auto update(const game& g, const score_action& act)
+game update(const game& g, const score_action& act)
 {
     return visit(apply_score_action{g}, act);
 }
@@ -214,12 +171,12 @@ ostream& operator<<(ostream& str, const game& g)
     return str;
 }
 
-const auto draw = [](const auto& game)
+string draw(const game& g)
 {
     stringstream str;
-    str << game;
+    str << g;
     return str.str();
-};
+}
 
 TEST_CASE("game")
 {
