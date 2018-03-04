@@ -113,8 +113,16 @@ struct update_player_1_scored
     game operator()(const game::simple& g) const
     {
         game new_game{};
-        new_game.state =
-            game::simple{inc_score_of(g.player_1), g.player_2};
+        if(g.player_1.points == point::Forty)
+        {
+            new_game.state =
+                game::winner{g.player_1};
+        }
+        else
+        {
+            new_game.state =
+                game::simple{inc_score_of(g.player_1), g.player_2};
+        }
         return new_game;
     }
     game operator()(const game::winner&) const
@@ -201,30 +209,24 @@ TEST_CASE("game")
     const auto a = draw(g);
     REQUIRE(a == "player_1: 0 vs. player_2: 0\n"s);
 
-    SUBCASE("player_1 scores once model")
-    {
-        const auto g_1 = update(g, score_action{player_1_scored{}});
-        const auto b = draw(g_1);
-        CHECK(b == "player_1: 15 vs. player_2: 0\n"s);
-    }
     SUBCASE("player_1 scores once")
     {
-        const auto g_1 = update(g, player_scored{player_1});
+        const auto g_1 = update(g, score_action{player_1_scored{}});
         const auto b = draw(g_1);
         REQUIRE(b == "player_1: 15 vs. player_2: 0\n"s);
         SUBCASE("player_1 twice")
         {
-            const auto g_2 = update(g_1, player_scored{player_1});
+            const auto g_2 = update(g_1, score_action{player_1_scored{}});
             const auto b = draw(g_2);
             REQUIRE(b == "player_1: 30 vs. player_2: 0\n"s);
             SUBCASE("player_1 thrice")
             {
-                const auto g_3 = update(g_2, player_scored{player_1});
+                const auto g_3 = update(g_2, score_action{player_1_scored{}});
                 const auto b = draw(g_3);
                 REQUIRE(b == "player_1: 40 vs. player_2: 0\n"s);
                 SUBCASE("player_1 won")
                 {
-                    const auto g_4 = update(g_3, player_scored{player_1});
+                    const auto g_4 = update(g_3, score_action{player_1_scored{}});
                     const auto b = draw(g_4);
                     REQUIRE(b == "player_1: won\n"s);
                 }
