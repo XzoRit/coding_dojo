@@ -233,22 +233,22 @@ TEST_CASE("game")
 
     SUBCASE("player_1 scores once")
     {
-        const auto g_1 = update(g, score_action{player_1_scored{}});
+        const auto g_1 = update(g, player_1_scored{});
         const auto b = draw(g_1);
         REQUIRE(b == "player_1: 15 vs. player_2: 0\n"s);
         SUBCASE("player_1 twice")
         {
-            const auto g_2 = update(g_1, score_action{player_1_scored{}});
+            const auto g_2 = update(g_1, player_1_scored{});
             const auto b = draw(g_2);
             REQUIRE(b == "player_1: 30 vs. player_2: 0\n"s);
             SUBCASE("player_1 thrice")
             {
-                const auto g_3 = update(g_2, score_action{player_1_scored{}});
+                const auto g_3 = update(g_2, player_1_scored{});
                 const auto b = draw(g_3);
                 REQUIRE(b == "player_1: 40 vs. player_2: 0\n"s);
                 SUBCASE("player_1 won")
                 {
-                    const auto g_4 = update(g_3, score_action{player_1_scored{}});
+                    const auto g_4 = update(g_3, player_1_scored{});
                     const auto b = draw(g_4);
                     REQUIRE(b == "player_1: won\n"s);
                 }
@@ -257,22 +257,22 @@ TEST_CASE("game")
     }
     SUBCASE("player_2 scores once")
     {
-        const auto g_1 = update(g, score_action{player_2_scored{}});
+        const auto g_1 = update(g, player_2_scored{});
         const auto b = draw(g_1);
         REQUIRE(b == "player_1: 0 vs. player_2: 15\n"s);
         SUBCASE("player_2 twice")
         {
-            const auto g_2 = update(g_1, score_action{player_2_scored{}});
+            const auto g_2 = update(g_1, player_2_scored{});
             const auto b = draw(g_2);
             REQUIRE(b == "player_1: 0 vs. player_2: 30\n"s);
             SUBCASE("player_2 thrice")
             {
-                const auto g_3 = update(g_2, score_action{player_2_scored{}});
+                const auto g_3 = update(g_2, player_2_scored{});
                 const auto b = draw(g_3);
                 REQUIRE(b == "player_1: 0 vs. player_2: 40\n"s);
                 SUBCASE("player_2 won")
                 {
-                    const auto g_4 = update(g_3, score_action{player_2_scored{}});
+                    const auto g_4 = update(g_3, player_2_scored{});
                     const auto b = draw(g_4);
                     REQUIRE(b == "player_2: won\n"s);
                 }
