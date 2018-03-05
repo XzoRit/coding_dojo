@@ -40,6 +40,11 @@ bool operator==(const player& p1, const player& p2)
     return (p1.name == p2.name);
 }
 
+bool operator!=(const player& p1, const player& p2)
+{
+    return !(p1.name == p2.name);
+}
+
 player inc_score_of(const player& p)
 {
     return player{p.name, ++p.points};
@@ -51,12 +56,10 @@ struct game
     {
         player player_1;
         player player_2;
-        point points_1;
-        point points_2;
     };
     struct winner
     {
-        player won_by;
+        string won_by;
     };
     variant<simple, winner> state;
 };
@@ -69,45 +72,30 @@ struct player_2_scored
 
 using score_action = variant<player_1_scored, player_2_scored>;
 
-struct update_player_1_scored
+optional<player> has_winner(const game::simple& g)
 {
-    game operator()(const game::simple& g) const
-    {
-        game new_game{};
-        if(g.player_1.points == point::Forty)
-        {
-            new_game.state =
-                game::winner{g.player_1};
-        }
-        else
-        {
-            new_game.state =
-                game::simple{inc_score_of(g.player_1), g.player_2};
-        }
-        return new_game;
-    }
-    game operator()(const game::winner&) const
-    {
-        return game{};
-    }
-};
+    if(g.player_1.points == point::Forty) return g.player_1;
+    if(g.player_2.points == point::Forty) return g.player_2;
+    else return nullopt;
+}
 
-struct update_player_2_scored
+game::simple inc_score_of(const game::simple& g, player_1_scored)
+{
+    return {inc_score_of(g.player_1), g.player_2};
+}
+
+game::simple inc_score_of(const game::simple& g, player_2_scored)
+{
+    return {g.player_1, inc_score_of(g.player_2)};
+}
+
+template<class act>
+struct update_game_state
 {
     game operator()(const game::simple& g) const
     {
-        game new_game{};
-        if(g.player_2.points == point::Forty)
-        {
-            new_game.state =
-                game::winner{g.player_2};
-        }
-        else
-        {
-            new_game.state =
-                game::simple{g.player_1, inc_score_of(g.player_2)};
-        }
-        return new_game;
+        if(const auto win = has_winner(g)) return game{game::winner{(*win).name}};
+        else return game{inc_score_of(g, act{})};
     }
     game operator()(const game::winner&) const
     {
@@ -117,13 +105,10 @@ struct update_player_2_scored
 
 struct apply_score_action
 {
-    game operator()(player_1_scored) const
+    template<class act>
+    game operator()(act) const
     {
-        return visit(update_player_1_scored{}, current.state);
-    }
-    game operator()(player_2_scored) const
-    {
-        return visit(update_player_2_scored{}, current.state);
+        return visit(update_game_state<act>{}, current.state);
     }
     const game& current;
 };
@@ -152,22 +137,18 @@ ostream& operator<<(ostream& str, const game::simple& g)
 {
     str << g.player_1 << " vs. " << g.player_2;
     str << '\n';
-
     return str;
 }
 
 ostream& operator<<(ostream& str, const game::winner& g)
 {
-    str << g.won_by.name << ": won\n";
-
+    str << g.won_by << ": won\n";
     return str;
 }
 
 ostream& operator<<(ostream& str, const game& g)
 {
-    visit([&](const auto & a) mutable
-    { str << a; }
-    , g.state);
+    visit([&](const auto & a) mutable { str << a; }, g.state);
     return str;
 }
 

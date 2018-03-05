@@ -1,9 +1,15 @@
+import boost ;
+
+boost.use-project ;
+
 project
     : default-build debug
     : build-dir ./build
-    : requirements <cxxflags>-std=c++17
+    : requirements
+      <cxxflags>-std=c++17
       <warnings>all
       <warnings-as-errors>on
+      <use>/boost//headers
     ;
 
 import testing ;
