@@ -159,63 +159,78 @@ string draw(const game& g)
     return str.str();
 }
 
-TEST_CASE("game")
+TEST_CASE("simple game")
 {
     const player player_1{"player_1", point::Love};
     const player player_2{"player_2", point::Love};
-    game g{};
-    g.state = game::simple{player_1, player_2};
+    game g{game::simple{player_1, player_2}};
 
-    const auto a = draw(g);
+    auto a = draw(g);
     REQUIRE(a == "player_1: 0 vs. player_2: 0\n"s);
 
     SUBCASE("player_1 scores once")
     {
-        const auto g_1 = update(g, player_1_scored{});
-        const auto b = draw(g_1);
-        REQUIRE(b == "player_1: 15 vs. player_2: 0\n"s);
-        SUBCASE("player_1 twice")
+        g = update(g, player_1_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_1: 15 vs. player_2: 0\n"s);
+        SUBCASE("scores twice")
         {
-            const auto g_2 = update(g_1, player_1_scored{});
-            const auto b = draw(g_2);
-            REQUIRE(b == "player_1: 30 vs. player_2: 0\n"s);
-            SUBCASE("player_1 thrice")
+            g = update(g, player_1_scored{});
+            a = draw(g);
+            REQUIRE(a == "player_1: 30 vs. player_2: 0\n"s);
+            SUBCASE("scores thrice")
             {
-                const auto g_3 = update(g_2, player_1_scored{});
-                const auto b = draw(g_3);
-                REQUIRE(b == "player_1: 40 vs. player_2: 0\n"s);
+                g = update(g, player_1_scored{});
+                a = draw(g);
+                REQUIRE(a == "player_1: 40 vs. player_2: 0\n"s);
                 SUBCASE("player_1 won")
                 {
-                    const auto g_4 = update(g_3, player_1_scored{});
-                    const auto b = draw(g_4);
-                    REQUIRE(b == "player_1: won\n"s);
+                    g = update(g, player_1_scored{});
+                    a = draw(g);
+                    REQUIRE(a == "player_1: won\n"s);
                 }
             }
         }
     }
     SUBCASE("player_2 scores once")
     {
-        const auto g_1 = update(g, player_2_scored{});
-        const auto b = draw(g_1);
-        REQUIRE(b == "player_1: 0 vs. player_2: 15\n"s);
-        SUBCASE("player_2 twice")
+        g = update(g, player_2_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_1: 0 vs. player_2: 15\n"s);
+        SUBCASE("scores twice")
         {
-            const auto g_2 = update(g_1, player_2_scored{});
-            const auto b = draw(g_2);
-            REQUIRE(b == "player_1: 0 vs. player_2: 30\n"s);
-            SUBCASE("player_2 thrice")
+            g = update(g, player_2_scored{});
+            a = draw(g);
+            REQUIRE(a == "player_1: 0 vs. player_2: 30\n"s);
+            SUBCASE("scores thrice")
             {
-                const auto g_3 = update(g_2, player_2_scored{});
-                const auto b = draw(g_3);
-                REQUIRE(b == "player_1: 0 vs. player_2: 40\n"s);
+                g = update(g, player_2_scored{});
+                a = draw(g);
+                REQUIRE(a == "player_1: 0 vs. player_2: 40\n"s);
                 SUBCASE("player_2 won")
                 {
-                    const auto g_4 = update(g_3, player_2_scored{});
-                    const auto b = draw(g_4);
-                    REQUIRE(b == "player_2: won\n"s);
+                    g = update(g, player_2_scored{});
+                    a = draw(g);
+                    REQUIRE(a == "player_2: won\n"s);
                 }
             }
         }
     }
+}
+
+TEST_CASE("deuce game")
+{
+    const player player_1{"player_1", point::Love};
+    const player player_2{"player_2", point::Love};
+    game g{game::simple{player_1, player_2}};
+
+    for(int i{}; i < 3; ++i)
+    {
+        g = update(g, player_1_scored{});
+        g = update(g, player_2_scored{});
+    }
+
+    auto a = draw(g);
+    REQUIRE(a == "deuce"s);
 }
 }
