@@ -173,48 +173,42 @@ TEST_CASE("simple game")
         g = update(g, player_1_scored{});
         a = draw(g);
         REQUIRE(a == "player_1: 15 vs. player_2: 0\n"s);
-        SUBCASE("scores twice")
-        {
-            g = update(g, player_1_scored{});
-            a = draw(g);
-            REQUIRE(a == "player_1: 30 vs. player_2: 0\n"s);
-            SUBCASE("scores thrice")
-            {
-                g = update(g, player_1_scored{});
-                a = draw(g);
-                REQUIRE(a == "player_1: 40 vs. player_2: 0\n"s);
-                SUBCASE("player_1 won")
-                {
-                    g = update(g, player_1_scored{});
-                    a = draw(g);
-                    REQUIRE(a == "player_1: won\n"s);
-                }
-            }
-        }
+
+        INFO("scores twice");
+        g = update(g, player_1_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_1: 30 vs. player_2: 0\n"s);
+
+        INFO("scores thrice");
+        g = update(g, player_1_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_1: 40 vs. player_2: 0\n"s);
+
+        INFO("player_1 won");
+        g = update(g, player_1_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_1: won\n"s);
     }
     SUBCASE("player_2 scores once")
     {
         g = update(g, player_2_scored{});
         a = draw(g);
         REQUIRE(a == "player_1: 0 vs. player_2: 15\n"s);
-        SUBCASE("scores twice")
-        {
-            g = update(g, player_2_scored{});
-            a = draw(g);
-            REQUIRE(a == "player_1: 0 vs. player_2: 30\n"s);
-            SUBCASE("scores thrice")
-            {
-                g = update(g, player_2_scored{});
-                a = draw(g);
-                REQUIRE(a == "player_1: 0 vs. player_2: 40\n"s);
-                SUBCASE("player_2 won")
-                {
-                    g = update(g, player_2_scored{});
-                    a = draw(g);
-                    REQUIRE(a == "player_2: won\n"s);
-                }
-            }
-        }
+
+        INFO("scores twice");
+        g = update(g, player_2_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_1: 0 vs. player_2: 30\n"s);
+
+        INFO("scores thrice");
+        g = update(g, player_2_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_1: 0 vs. player_2: 40\n"s);
+
+        INFO("player_2 won");
+        g = update(g, player_2_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_2: won\n"s);
     }
 }
 
