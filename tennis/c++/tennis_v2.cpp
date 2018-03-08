@@ -57,11 +57,19 @@ struct game
         player player_1;
         player player_2;
     };
+    struct forty
+    {
+        player player_1;
+        player player_2;
+    };
+    struct deuce
+    {
+    };
     struct winner
     {
         string won_by;
     };
-    variant<simple, winner> state;
+    variant<simple, forty, deuce, winner> state;
 };
 
 struct player_1_scored
@@ -71,6 +79,50 @@ struct player_2_scored
 {};
 
 using score_action = variant<player_1_scored, player_2_scored>;
+
+bool scorer_gets_forty_points(const game::simple& g, player_1_scored)
+{
+    return g.player_1.points == point::Thirty;
+}
+
+bool scorer_gets_forty_points(const game::simple& g, player_2_scored)
+{
+    return g.player_2.points == point::Thirty;
+}
+
+game::forty create_forty_game(const game::simple& g, player_1_scored)
+{
+    return {inc_score_of(g.player_1), g.player_2};
+}
+
+game::forty create_forty_game(const game::simple& g, player_2_scored)
+{
+    return {g.player_1, inc_score_of(g.player_2)};
+}
+
+game::winner create_winner_game(const game::forty& g, player_1_scored)
+{
+    return {g.player_1.name};
+}
+
+game::winner create_winner_game(const game::forty& g, player_2_scored)
+{
+    return {g.player_2.name};
+}
+
+bool is_deuce(const game::forty& g, player_1_scored)
+{
+    return
+        g.player_1.points == point::Thirty &&
+        g.player_2.points == point::Forty;
+}
+
+bool is_deuce(const game::forty& g, player_2_scored)
+{
+    return
+        g.player_1.points == point::Forty &&
+        g.player_2.points == point::Thirty;
+}
 
 optional<player> has_winner(const game::simple& g)
 {
@@ -89,13 +141,31 @@ game::simple inc_score_of(const game::simple& g, player_2_scored)
     return {g.player_1, inc_score_of(g.player_2)};
 }
 
-template<class act>
+template<class scoring_player>
 struct update_game_state
 {
     game operator()(const game::simple& g) const
     {
-        if(const auto win = has_winner(g)) return game{game::winner{(*win).name}};
-        else return game{inc_score_of(g, act{})};
+        if(scorer_gets_forty_points(g, scoring_player{}))
+            return game{create_forty_game(g, scoring_player{})};
+
+        if(const auto win = has_winner(g))
+            return game{game::winner{(*win).name}};
+
+        else
+            return game{inc_score_of(g, scoring_player{})};
+    }
+    game operator()(const game::forty& g) const
+    {
+        if(is_deuce(g, scoring_player{}))
+            return game{game::deuce{}};
+
+        else
+            return game{create_winner_game(g, scoring_player{})};
+    }
+    game operator()(const game::deuce&) const
+    {
+        return game{};
     }
     game operator()(const game::winner&) const
     {
@@ -105,17 +175,17 @@ struct update_game_state
 
 struct apply_score_action
 {
-    template<class act>
-    game operator()(act) const
+    template<class scoring_player>
+    game operator()(scoring_player) const
     {
-        return visit(update_game_state<act>{}, current.state);
+        return visit(update_game_state<scoring_player> {}, current.state);
     }
     const game& current;
 };
 
-game update(const game& g, const score_action& act)
+game update(const game& g, const score_action& player_scored)
 {
-    return visit(apply_score_action{g}, act);
+    return visit(apply_score_action{g}, player_scored);
 }
 
 ostream& operator<<(ostream& str, const point& p)
@@ -137,6 +207,19 @@ ostream& operator<<(ostream& str, const game::simple& g)
 {
     str << g.player_1 << " vs. " << g.player_2;
     str << '\n';
+    return str;
+}
+
+ostream& operator<<(ostream& str, const game::forty& g)
+{
+    str << g.player_1 << " vs. " << g.player_2;
+    str << '\n';
+    return str;
+}
+
+ostream& operator<<(ostream& str, game::deuce)
+{
+    str << "deuce\n";
     return str;
 }
 
@@ -225,6 +308,6 @@ TEST_CASE("deuce game")
     }
 
     auto a = draw(g);
-    REQUIRE(a == "deuce"s);
+    REQUIRE(a == "deuce\n"s);
 }
 }
