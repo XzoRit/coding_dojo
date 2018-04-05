@@ -65,11 +65,15 @@ struct game
     struct deuce
     {
     };
+    struct advantage
+    {
+        player leading;
+    };
     struct winner
     {
         string won_by;
     };
-    variant<simple, forty, deuce, winner> state;
+    variant<simple, forty, deuce, advantage, winner> state;
 };
 
 struct player_1_scored
@@ -110,6 +114,16 @@ game::winner create_winner_game(const game::forty& g, player_2_scored)
     return {g.player_2.name};
 }
 
+game::advantage create_advantage_game(const game::deuce& g, player_1_scored)
+{
+    return game::advantage{};
+}
+
+game::advantage create_advantage_game(const game::deuce& g, player_2_scored)
+{
+    return game::advantage{};
+}
+
 bool is_deuce(const game::forty& g, player_1_scored)
 {
     return
@@ -148,10 +162,6 @@ struct update_game_state
     {
         if(scorer_gets_forty_points(g, scoring_player{}))
             return game{create_forty_game(g, scoring_player{})};
-
-        if(const auto win = has_winner(g))
-            return game{game::winner{(*win).name}};
-
         else
             return game{inc_score_of(g, scoring_player{})};
     }
@@ -159,13 +169,16 @@ struct update_game_state
     {
         if(is_deuce(g, scoring_player{}))
             return game{game::deuce{}};
-
         else
             return game{create_winner_game(g, scoring_player{})};
     }
-    game operator()(const game::deuce&) const
+    game operator()(const game::deuce& g) const
     {
-        return game{};
+        return game{create_advantage_game(g, scoring_player{})};
+    }
+    game operator()(const game::advantage& g) const
+    {
+        return game{g};
     }
     game operator()(const game::winner&) const
     {
@@ -220,6 +233,12 @@ ostream& operator<<(ostream& str, const game::forty& g)
 ostream& operator<<(ostream& str, game::deuce)
 {
     str << "deuce\n";
+    return str;
+}
+
+ostream& operator<<(ostream& str, const game::advantage& g)
+{
+    str << "advantage " << g.leading.name << "\n";
     return str;
 }
 
@@ -295,7 +314,7 @@ TEST_CASE("simple game")
     }
 }
 
-TEST_CASE("deuce game")
+TEST_CASE("deuce/advantage/win game")
 {
     const player player_1{"player_1", point::Love};
     const player player_2{"player_2", point::Love};
@@ -307,7 +326,13 @@ TEST_CASE("deuce game")
         g = update(g, player_2_scored{});
     }
 
+    INFO("deuce");
     auto a = draw(g);
     REQUIRE(a == "deuce\n"s);
+
+    INFO("advantage player_1");
+    g = update(g, player_1_scored{});
+    a = draw(g);
+    REQUIRE(a == "advantage player_1\n"s);
 }
 }
