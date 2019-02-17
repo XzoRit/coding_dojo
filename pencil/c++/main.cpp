@@ -25,7 +25,7 @@ namespace xzr::pencil
             explicit durability(int d)
                 : value_{d}
                 {}
-            explicit operator bool()
+            explicit operator bool() const
                 {
                     return value_ > 0;
                 }
@@ -39,11 +39,27 @@ namespace xzr::pencil
                 }
             int value_{0};
         };
+        struct length
+        {
+            explicit length(int l)
+                : value_{l}
+                {}
+            explicit operator bool() const
+                {
+                    return value_ > 0;
+                }
+            void shorten()
+                {
+                    if(value_) --value_;
+                }
+            int value_;
+        };
         struct pen
         {
-            pen(durability d)
+            pen(durability d, length l)
                 : initial_durability_{d}
                 , durability_{d}
+                , length_{l}
                 {}
             std::string write(const std::string& txt)
                 {
@@ -58,10 +74,12 @@ namespace xzr::pencil
                 }
             void sharpen()
                 {
-                    durability_ = initial_durability_;
+                    if(length_) durability_ = initial_durability_;
+                    length_.shorten();
                 }
             const durability initial_durability_;
             durability durability_;
+            length length_;
         };
         void write(const std::string& txt, pen& pen, paper& sheet)
         {
@@ -71,14 +89,15 @@ namespace xzr::pencil
 }
 namespace
 {
+    using xzr::pencil::durability;
+    using xzr::pencil::length;
     using xzr::pencil::paper;
     using xzr::pencil::pen;
-    using xzr::pencil::durability;
 
     TEST_CASE("writing to causes a pencil point to go dull")
     {
         paper sheet{};
-        pen pencil{durability{8}};
+        pen pencil{durability{8}, length{1}};
 
         write("abc", pencil, sheet);
         CHECK(sheet.text() == "abc");
@@ -98,6 +117,12 @@ namespace
                         paper new_sheet{};
                         write("abcdefghi", pencil, new_sheet);
                         CHECK(new_sheet.text() == "abcdefgh ");
+                        SUBCASE("length exceeded")
+                        {
+                            pencil.sharpen();
+                            write("abc", pencil, new_sheet);
+                            CHECK(new_sheet.text() == "abcdefgh    ");
+                        }
                     }
                 }
                 SUBCASE("upper case")

@@ -9,12 +9,14 @@ exe app_pencil
     : $(SOURCES).cpp
     : <include>../../doctest/doctest <include>../../range-v3/include
       <enable-tests>no:<define>DOCTEST_CONFIG_DISABLE
+      <cxxflags>-std=c++1z
     ;
 
 exe test_pencil
     : $(SOURCES).cpp
     : <include>../../doctest/doctest <include>../../range-v3/include
       <enable-tests>yes
+      <cxxflags>-std=c++1z
     ;
 
 unit-test exec_tests
