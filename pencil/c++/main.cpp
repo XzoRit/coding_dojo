@@ -9,6 +9,7 @@ namespace xzr::pencil
     {
         struct paper
         {
+            using value_type = std::string::value_type;
             using iterator = std::string::iterator;
             iterator begin()
                 {
@@ -18,10 +19,12 @@ namespace xzr::pencil
                 {
                     return txt_.end();
                 }
-            void write(const std::string& txt)
+            template<class Char>
+            void push_back(Char c)
                 {
-                    txt_ += txt;
+                    txt_.push_back(c);
                 }
+
             const std::string& text() const
                 {
                     return txt_;
@@ -71,16 +74,15 @@ namespace xzr::pencil
                 , length_{l}
                 , eraser_durability_{e}
                 {}
-            std::string write(const std::string& txt)
+            template<class Iter>
+            void write_to(const std::string& txt, Iter it)
                 {
-                    std::string s{};
                     for(auto c : txt)
                     {
-                        if(durability_) s += c;
-                        else s += ' ';
+                        if(durability_) (*it++) = c;
+                        else (*it++) = ' ';
                         durability_.degrade(c);
                     }
-                    return s;
                 }
             void sharpen()
                 {
@@ -88,7 +90,7 @@ namespace xzr::pencil
                     length_.shorten();
                 }
             template<class Range>
-            void erase(Range range)
+            void erase_from(Range range)
                 {
                     for(auto& a : range)
                     {
@@ -104,12 +106,12 @@ namespace xzr::pencil
         };
         void write(const std::string& txt, pen& pen, paper& sheet)
         {
-            sheet.write(pen.write(txt));
+            pen.write_to(txt, std::back_inserter(sheet));
         }
         void erase(const std::string& txt, pen& pen, paper& sheet)
         {
-            const auto& range{boost::make_iterator_range(sheet.begin(), sheet.end())};
-            pen.erase(boost::find_last(range, txt));
+            const auto& sheet_range{boost::make_iterator_range(sheet.begin(), sheet.end())};
+            pen.erase_from(boost::find_last(sheet_range, txt));
         }
     }
 }
