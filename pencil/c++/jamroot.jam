@@ -7,14 +7,18 @@ feature enable-tests : no yes : optional propagated ;
 
 exe app_pencil
     : $(SOURCES).cpp
-    : <include>../../doctest/doctest <include>../../range-v3/include
+    : <include>../../doctest/doctest
+      <include>../../range-v3/include
+      <include>../../../boost
       <enable-tests>no:<define>DOCTEST_CONFIG_DISABLE
       <cxxflags>-std=c++1z
     ;
 
 exe test_pencil
     : $(SOURCES).cpp
-    : <include>../../doctest/doctest <include>../../range-v3/include
+    : <include>../../doctest/doctest
+      <include>../../range-v3/include
+      <include>../../../boost
       <enable-tests>yes
       <cxxflags>-std=c++1z
     ;
