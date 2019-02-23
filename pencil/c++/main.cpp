@@ -66,13 +66,29 @@ namespace xzr::pencil
                 }
             int value_;
         };
+        struct eraser
+        {
+            eraser()
+                : durability_{0}
+                {}
+            explicit eraser(durability d)
+                : durability_{d}
+                {}
+            void erase(char& c)
+                {
+                    const auto tmp{c};
+                    if(durability_) c = ' ';
+                    durability_.degrade(tmp);
+                }
+            durability durability_;
+        };
         struct pen
         {
-            pen(durability d, length l, durability e)
+            pen(durability d, length l, eraser e)
                 : initial_durability_{d}
                 , durability_{d}
                 , length_{l}
-                , eraser_durability_{e}
+                , eraser_{e}
                 {}
             template<class OutIter>
             void write_to(const std::string& txt, OutIter it)
@@ -109,15 +125,13 @@ namespace xzr::pencil
                 {
                     for(auto& a : range)
                     {
-                        const auto b{a};
-                        if(eraser_durability_) a = ' ';
-                        eraser_durability_.degrade(b);
+                        eraser_.erase(a);
                     }
                 }
             const durability initial_durability_;
             durability durability_;
             length length_;
-            durability eraser_durability_;
+            eraser eraser_;
         };
         void write(const std::string& txt, pen& pen, paper& sheet)
         {
@@ -140,6 +154,7 @@ namespace xzr::pencil
 namespace
 {
     using xzr::pencil::durability;
+    using xzr::pencil::eraser;
     using xzr::pencil::length;
     using xzr::pencil::paper;
     using xzr::pencil::pen;
@@ -147,7 +162,7 @@ namespace
     TEST_CASE("writing to causes a pencil point to go dull")
     {
         paper sheet{};
-        pen pencil{durability{8}, length{1}, durability{4}};
+        pen pencil{durability{8}, length{1}, eraser{durability{4}}};
 
         write("abc", pencil, sheet);
         CHECK(sheet.text() == "abc");
@@ -192,17 +207,14 @@ namespace
     TEST_CASE("eraser")
     {
         paper sheet{};
-        pen pencil{durability{100}, length{1}, durability{4}};
+        pen pencil{durability{100}, length{1}, eraser{durability{4}}};
         write("abcabc", pencil, sheet);
         const auto& erased_range{erase("ab", pencil, sheet)};
         CHECK(sheet.text() == "abc  c");
         SUBCASE("durability")
         {
-            SUBCASE("whitespace")
-            {
-                erase("  ", pencil, sheet);
-                CHECK(sheet.text() == "abc  c");
-            }
+            erase("  ", pencil, sheet);
+            CHECK(sheet.text() == "abc  c");
             SUBCASE("lower case")
             {
                 erase("ab", pencil, sheet);
