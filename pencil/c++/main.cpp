@@ -74,12 +74,27 @@ namespace xzr::pencil
                 , length_{l}
                 , eraser_durability_{e}
                 {}
-            template<class Iter>
-            void write_to(const std::string& txt, Iter it)
+            template<class OutIter>
+            void write_to(const std::string& txt, OutIter it)
                 {
                     for(auto c : txt)
                     {
                         if(durability_) (*it++) = c;
+                        else (*it++) = ' ';
+                        durability_.degrade(c);
+                    }
+                }
+            template<class OutRange>
+            void insert_to(const std::string& txt, OutRange out_range)
+                {
+                    auto it{std::begin(out_range)};
+                    for(auto c : txt)
+                    {
+                        if(durability_)
+                        {
+                            if((*it) == ' ') (*it++) = c;
+                            else (*it++) = '@';
+                        }
                         else (*it++) = ' ';
                         durability_.degrade(c);
                     }
@@ -108,10 +123,17 @@ namespace xzr::pencil
         {
             pen.write_to(txt, std::back_inserter(sheet));
         }
-        void erase(const std::string& txt, pen& pen, paper& sheet)
+        auto erase(const std::string& txt, pen& pen, paper& sheet)
         {
             const auto& sheet_range{boost::make_iterator_range(sheet.begin(), sheet.end())};
-            pen.erase_from(boost::find_last(sheet_range, txt));
+            const auto& erase_range{boost::find_last(sheet_range, txt)};
+            pen.erase_from(erase_range);
+            return erase_range;
+        }
+        template<class Range>
+        void insert(const std::string& txt, const Range& insert_range, pen& pen)
+        {
+            pen.insert_to(txt, insert_range);
         }
     }
 }
@@ -165,29 +187,42 @@ namespace
                 }
             }
         }
-        SUBCASE("eraser")
+    }
+
+    TEST_CASE("eraser")
+    {
+        paper sheet{};
+        pen pencil{durability{100}, length{1}, durability{4}};
+        write("abcabc", pencil, sheet);
+        const auto& erased_range{erase("ab", pencil, sheet)};
+        CHECK(sheet.text() == "abc  c");
+        SUBCASE("durability")
         {
-            write("abc", pencil, sheet);
-            erase("ab", pencil, sheet);
-            CHECK(sheet.text() == "abc  c");
-            SUBCASE("durability")
+            SUBCASE("whitespace")
             {
-                SUBCASE("whitespace")
+                erase("  ", pencil, sheet);
+                CHECK(sheet.text() == "abc  c");
+            }
+            SUBCASE("lower case")
+            {
+                erase("ab", pencil, sheet);
+                CHECK(sheet.text() == "  c  c");
+                SUBCASE("dull")
                 {
-                    erase("  ", pencil, sheet);
-                    CHECK(sheet.text() == "abc  c");
-                }
-                SUBCASE("lower case")
-                {
-                    erase("ab", pencil, sheet);
+                    erase("c", pencil, sheet);
                     CHECK(sheet.text() == "  c  c");
-                    SUBCASE("dull")
-                    {
-                        erase("c", pencil, sheet);
-                        CHECK(sheet.text() == "  c  c");
-                    }
                 }
             }
+        }
+        SUBCASE("insert")
+        {
+            insert("de", erased_range, pencil);
+            CHECK(sheet.text() == "abcdec");
+        }
+        SUBCASE("insert too much")
+        {
+            insert("def", erased_range, pencil);
+            CHECK(sheet.text() == "abcde@");
         }
     }
 }
