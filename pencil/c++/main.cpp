@@ -133,22 +133,6 @@ namespace xzr::pencil
             length length_;
             eraser eraser_;
         };
-        void write(const std::string& txt, pen& pen, paper& sheet)
-        {
-            pen.write_to(txt, std::back_inserter(sheet));
-        }
-        auto erase(const std::string& txt, pen& pen, paper& sheet)
-        {
-            const auto& sheet_range{boost::make_iterator_range(sheet.begin(), sheet.end())};
-            const auto& erase_range{boost::find_last(sheet_range, txt)};
-            pen.erase_from(erase_range);
-            return erase_range;
-        }
-        template<class Range>
-        void insert(const std::string& txt, const Range& insert_range, pen& pen)
-        {
-            pen.insert_to(txt, insert_range);
-        }
         struct scratch_pad
         {
             scratch_pad(paper pap, pen p)
@@ -161,16 +145,19 @@ namespace xzr::pencil
                 }
             void write(const std::string& txt)
                 {
-                    v1::write(txt, pen_, paper_);
+                    pen_.write_to(txt, std::back_inserter(paper_));
                 }
             auto erase(const std::string& txt)
                 {
-                    return v1::erase(txt, pen_, paper_);
+                    const auto& paper_range{boost::make_iterator_range(paper_.begin(), paper_.end())};
+                    const auto& erase_range{boost::find_last(paper_range, txt)};
+                    pen_.erase_from(erase_range);
+                    return erase_range;
                 }
             template<class Range>
             void insert(const std::string& txt, const Range& insert_range)
                 {
-                    v1::insert(txt, insert_range, pen_);
+                    pen_.insert_to(txt, insert_range);
                 }
             void sharpen_pen()
                 {
