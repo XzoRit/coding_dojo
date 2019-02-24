@@ -149,6 +149,36 @@ namespace xzr::pencil
         {
             pen.insert_to(txt, insert_range);
         }
+        struct scratch_pad
+        {
+            scratch_pad(paper pap, pen p)
+                : paper_{std::move(pap)}
+                , pen_{std::move(p)}
+                {}
+            std::string text() const
+                {
+                    return paper_.text();
+                }
+            void write(const std::string& txt)
+                {
+                    v1::write(txt, pen_, paper_);
+                }
+            auto erase(const std::string& txt)
+                {
+                    return v1::erase(txt, pen_, paper_);
+                }
+            template<class Range>
+            void insert(const std::string& txt, const Range& insert_range)
+                {
+                    v1::insert(txt, insert_range, pen_);
+                }
+            void sharpen_pen()
+                {
+                    pen_.sharpen();
+                }
+            paper paper_;
+            pen pen_;
+        };
     }
 }
 namespace
@@ -158,47 +188,45 @@ namespace
     using xzr::pencil::length;
     using xzr::pencil::paper;
     using xzr::pencil::pen;
+    using xzr::pencil::scratch_pad;
 
     TEST_CASE("writing to causes a pencil point to go dull")
     {
-        paper sheet{};
-        pen pencil{durability{8}, length{1}, eraser{durability{4}}};
-
-        write("abc", pencil, sheet);
-        CHECK(sheet.text() == "abc");
+        scratch_pad pad{paper{}, pen{durability{8}, length{1}, eraser{durability{4}}}};
+        pad.write("abc");
+        CHECK(pad.text() == "abc");
         SUBCASE("append")
         {
-            write("def", pencil, sheet);
-            CHECK(sheet.text() == "abcdef");
+            pad.write("def");
+            CHECK(pad.text() == "abcdef");
             SUBCASE("dull")
             {
                 SUBCASE("lower case")
                 {
-                    write("ghi", pencil, sheet);
-                    CHECK(sheet.text() == "abcdefgh ");
+                    pad.write("ghi");
+                    CHECK(pad.text() == "abcdefgh ");
                     SUBCASE("sharpen")
                     {
-                        pencil.sharpen();
-                        paper new_sheet{};
-                        write("abcdefghi", pencil, new_sheet);
-                        CHECK(new_sheet.text() == "abcdefgh ");
+                        pad.sharpen_pen();
+                        pad.write("abcdefghi");
+                        CHECK(pad.text() == "abcdefgh abcdefgh ");
                         SUBCASE("length exceeded")
                         {
-                            pencil.sharpen();
-                            write("abc", pencil, new_sheet);
-                            CHECK(new_sheet.text() == "abcdefgh    ");
+                            pad.sharpen_pen();
+                            pad.write("abc");
+                            CHECK(pad.text() == "abcdefgh abcdefgh    ");
                         }
                     }
                 }
                 SUBCASE("upper case")
                 {
-                    write("GHI", pencil, sheet);
-                    CHECK(sheet.text() == "abcdefG  ");
+                    pad.write("GHI");
+                    CHECK(pad.text() == "abcdefG  ");
                 }
                 SUBCASE("whitespace")
                 {
-                    write("   gh", pencil, sheet);
-                    CHECK(sheet.text() == "abcdef   gh");
+                    pad.write("   gh");
+                    CHECK(pad.text() == "abcdef   gh");
                 }
             }
         }
@@ -206,35 +234,34 @@ namespace
 
     TEST_CASE("eraser")
     {
-        paper sheet{};
-        pen pencil{durability{100}, length{1}, eraser{durability{4}}};
-        write("abcabc", pencil, sheet);
-        const auto& erased_range{erase("ab", pencil, sheet)};
-        CHECK(sheet.text() == "abc  c");
+        scratch_pad pad{paper{}, pen{durability{100}, length{1}, eraser{durability{4}}}};
+        pad.write("abcabc");
+        const auto& erased_range{pad.erase("ab")};
+        CHECK(pad.text() == "abc  c");
         SUBCASE("durability")
         {
-            erase("  ", pencil, sheet);
-            CHECK(sheet.text() == "abc  c");
+            pad.erase("  ");
+            CHECK(pad.text() == "abc  c");
             SUBCASE("lower case")
             {
-                erase("ab", pencil, sheet);
-                CHECK(sheet.text() == "  c  c");
+                pad.erase("ab");
+                CHECK(pad.text() == "  c  c");
                 SUBCASE("dull")
                 {
-                    erase("c", pencil, sheet);
-                    CHECK(sheet.text() == "  c  c");
+                    pad.erase("c");
+                    CHECK(pad.text() == "  c  c");
                 }
             }
         }
         SUBCASE("insert")
         {
-            insert("de", erased_range, pencil);
-            CHECK(sheet.text() == "abcdec");
+            pad.insert("de", erased_range);
+            CHECK(pad.text() == "abcdec");
         }
         SUBCASE("insert too much")
         {
-            insert("def", erased_range, pencil);
-            CHECK(sheet.text() == "abcde@");
+            pad.insert("def", erased_range);
+            CHECK(pad.text() == "abcde@");
         }
     }
 }
