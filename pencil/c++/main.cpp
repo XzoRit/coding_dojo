@@ -39,13 +39,15 @@ namespace xzr::pencil
                     {
                          return value_ > 0;
                     }
-               void degrade(unsigned char c)
+               durability degrade(unsigned char c)
                     {
+                         const auto old{*this};
                          if(value_ && !std::isspace(c))
                          {
                               if(std::isupper(c)) value_ -= 2;
                               else value_ -= 1;
                          }
+                         return old;
                     }
                int value_{0};
           };
@@ -83,9 +85,7 @@ namespace xzr::pencil
                     {}
                void erase(char& c)
                     {
-                         const auto tmp{c};
-                         if(durability_) c = ' ';
-                         durability_.degrade(tmp);
+                        if(durability_.degrade(c)) c = ' ';
                     }
                durability durability_{0};
           };
@@ -102,9 +102,8 @@ namespace xzr::pencil
                     {
                          for(auto c : txt)
                          {
-                              if(durability_) (*it++) = c;
+                              if(durability_.degrade(c)) (*it++) = c;
                               else (*it++) = std::isspace(c) ? c : ' ';
-                              durability_.degrade(c);
                          }
                     }
                template<class OutRange>
@@ -113,14 +112,13 @@ namespace xzr::pencil
                          auto it{std::begin(out_range)};
                          for(auto c : txt)
                          {
-                              if(durability_)
+                              if(durability_.degrade(c))
                               {
                                    if((*it) == ' ') (*it++) = c;
                                    else (*it++) = '@';
                               }
                               else (*it++) = ' ';
-                              durability_.degrade(c);
-                         }
+                          }
                     }
                void sharpen()
                     {
