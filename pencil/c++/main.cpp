@@ -19,12 +19,10 @@ namespace xzr::pencil
                 {
                     return txt_.end();
                 }
-            template<class Char>
-            void push_back(Char c)
+            void push_back(value_type c)
                 {
                     txt_.push_back(c);
                 }
-
             const std::string& text() const
                 {
                     return txt_;
@@ -51,6 +49,11 @@ namespace xzr::pencil
                 }
             int value_{0};
         };
+        int shorten(int current)
+        {
+            if(current) --current;
+            return current;;
+        }
         struct length
         {
             explicit length(int l)
@@ -60,9 +63,15 @@ namespace xzr::pencil
                 {
                     return value_ > 0;
                 }
-            void shorten()
+            length operator--() const
                 {
-                    if(value_) --value_;
+                    return length{shorten(value_)};
+                }
+            length operator--(int)
+                {
+                    const auto l{*this};
+                    value_ = shorten(value_);
+                    return l;
                 }
             int value_;
         };
@@ -117,8 +126,7 @@ namespace xzr::pencil
                 }
             void sharpen()
                 {
-                    if(length_) durability_ = initial_durability_;
-                    length_.shorten();
+                    if(length_--) durability_ = initial_durability_;
                 }
             template<class Range>
             void erase_from(Range range)
