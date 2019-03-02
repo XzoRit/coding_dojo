@@ -96,7 +96,7 @@ namespace xzr::pencil
                     for(auto c : txt)
                     {
                         if(durability_) (*it++) = c;
-                        else (*it++) = ' ';
+                        else (*it++) = std::isspace(c) ? c : ' ';
                         durability_.degrade(c);
                     }
                 }
