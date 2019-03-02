@@ -177,45 +177,86 @@ namespace
     using xzr::pencil::pen;
     using xzr::pencil::scratch_pad;
 
-    TEST_CASE("writing to causes a pencil point to go dull")
+    TEST_CASE(
+        "As a writer "
+        "I want to be able use a pencil to write text on a sheet of paper "
+        "so that I can better remember my thoughts")
     {
-        scratch_pad pad{paper{}, pen{durability{8}, length{1}, eraser{durability{4}}}};
-        pad.write("abc");
-        CHECK(pad.text() == "abc");
-        SUBCASE("append")
-        {
-            pad.write("def");
-            CHECK(pad.text() == "abcdef");
-            SUBCASE("dull")
+        scratch_pad pad
             {
-                SUBCASE("lower case")
+                paper{},
+                pen
                 {
-                    pad.write("ghi");
-                    CHECK(pad.text() == "abcdefgh ");
-                    SUBCASE("sharpen")
+                    durability{8},
+                    length{1},
+                    eraser
                     {
-                        pad.sharpen_pen();
-                        pad.write("abcdefghi");
-                        CHECK(pad.text() == "abcdefgh abcdefgh ");
-                        SUBCASE("length exceeded")
-                        {
-                            pad.sharpen_pen();
-                            pad.write("abc");
-                            CHECK(pad.text() == "abcdefgh abcdefgh    ");
-                        }
+                        durability{4}
                     }
                 }
-                SUBCASE("upper case")
+            };
+
+        pad.write("abc");
+        CHECK(pad.text() == "abc");
+
+        pad.write("def");
+        CHECK(pad.text() == "abcdef");
+    }
+
+    TEST_CASE(
+        "As a pencil manufacturer "
+        "I want writing to cause a pencil point to go dull "
+        "so that I can sell more pencils")
+    {
+        scratch_pad pad
+            {
+                paper{},
+                pen
                 {
-                    pad.write("GHI");
-                    CHECK(pad.text() == "abcdefG  ");
+                    durability{2},
+                    length{1},
+                    eraser
+                    {
+                        durability{4}
+                    }
                 }
-                SUBCASE("whitespace")
+            };
+        SUBCASE(
+            "lowercase letters should degrade the pencil point by a value of one")
+        {
+            pad.write("abc");
+            CHECK(pad.text() == "ab ");
+            SUBCASE(
+                "As a writer "
+                "I want to be able to sharpen my pencil "
+                "so that I can continue to write with it after it goes dull")
+            {
+                pad.sharpen_pen();
+                pad.write("abc");
+                CHECK(pad.text() == "ab ab ");
+                SUBCASE(
+                    "When a pencil's length is zero, "
+                    "then sharpening it "
+                    "no longer restores its point durabliity")
                 {
-                    pad.write("   gh");
-                    CHECK(pad.text() == "abcdef   gh");
+                    pad.sharpen_pen();
+                    pad.write("abc");
+                    CHECK(pad.text() == "ab ab    ");
                 }
             }
+        }
+        SUBCASE(
+            "capital letters should degrade the point by two")
+        {
+            pad.write("ABC");
+            CHECK(pad.text() == "A  ");
+        }
+        SUBCASE(
+            "Writing spaces and newlines expends no graphite; "
+            "therefore these characters should not affect the pencil point")
+        {
+            pad.write("  \nab\n");
+            CHECK(pad.text() == "  \nab\n");
         }
     }
 
