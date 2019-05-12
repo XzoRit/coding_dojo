@@ -1,0 +1,11 @@
+exe args
+    : main.cpp
+    : <library>/lib_args//lib_args
+    ;
+
+import testing
+    ;
+
+unit-test exec_args
+    : args
+    ;

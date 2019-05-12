@@ -1,0 +1,29 @@
+project lib_args
+    : usage-requirements <include>..
+    ;
+
+lib lib_args
+    : args.cpp
+    : <include>..
+    :
+    :
+    ;
+
+import boost
+    ;
+
+boost.use-project
+    ;
+
+import testing
+    ;
+
+run main.test.cpp
+    args.test.cpp
+    : --color_output=false
+    :
+    : <library>lib_args
+      <library>/boost//unit_test_framework
+    : test_lib_args
+    :
+    ;
