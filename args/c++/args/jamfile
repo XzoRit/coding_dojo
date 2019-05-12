@@ -1,11 +1,21 @@
-exe args
-    : main.cpp
-    : <library>/lib_args//lib_args
+project args
+    : requirements <library>/lib_args//lib
+    ;
+
+constant sources
+    : [ glob *.cpp ]
+    ;
+
+exe exe
+    : $(sources)
     ;
 
 import testing
     ;
 
-unit-test exec_args
-    : args
+unit-test run
+    : exe
+    ;
+
+always run
     ;

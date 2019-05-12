@@ -2,11 +2,17 @@ project lib_args
     : usage-requirements <include>..
     ;
 
-lib lib_args
-    : args.cpp
+constant test_sources
+    : [ glob *.test.cpp ]
+    ;
+
+constant sources
+    : [ glob *.cpp : $(test_sources) ]
+    ;
+
+lib lib
+    : $(sources)
     : <include>..
-    :
-    :
     ;
 
 import boost
@@ -18,12 +24,10 @@ boost.use-project
 import testing
     ;
 
-run main.test.cpp
-    args.test.cpp
+run $(test_sources)
     : --color_output=false
     :
-    : <library>lib_args
+    : <library>lib
       <library>/boost//unit_test_framework
-    : test_lib_args
-    :
+    : test
     ;
