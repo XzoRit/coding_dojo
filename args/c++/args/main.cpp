@@ -3,7 +3,7 @@
 
 int main()
 {
-    std::cout << "Hello args\n";
+  std::cout << "Hello args\n";
 
-    return xzr::args::add(0, 0);
+  return xzr::args::add(0, 0);
 }
