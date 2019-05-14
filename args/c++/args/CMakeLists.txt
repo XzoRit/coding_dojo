@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
 project(
   args_executeable
@@ -6,9 +6,10 @@ project(
   DESCRIPTION "executable args application")
 
 add_executable(
+  args_exe)
+target_sources(
   args_exe
-  main.cpp)
-
+  PRIVATE "main.cpp")
 target_link_libraries(
   args_exe
   PRIVATE libargs::lib)
