@@ -13,3 +13,7 @@ target_sources(
 target_link_libraries(
   args_exe
   PRIVATE libargs::lib)
+
+add_test(
+  NAME args::exe
+  COMMAND args_exe)

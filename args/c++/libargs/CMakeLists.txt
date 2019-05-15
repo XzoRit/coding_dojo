@@ -22,3 +22,16 @@ target_link_libraries(
 
 add_library(
   libargs::lib ALIAS libargs_lib)
+
+add_executable(
+  libargs_test)
+target_sources(
+  libargs_test
+  PRIVATE "main_test.cpp")
+target_link_libraries(
+  libargs_test
+  PRIVATE libargs::lib)
+
+add_test(
+  NAME libargs::test
+  COMMAND libargs_test)
