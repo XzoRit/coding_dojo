@@ -1,3 +1,6 @@
+project args_project
+    ;
+
 build-project args
     ;
 

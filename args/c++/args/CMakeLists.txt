@@ -9,11 +9,14 @@ add_executable(
   args_exe)
 target_sources(
   args_exe
-  PRIVATE "main.cpp")
+  PRIVATE
+  "main.cpp")
 target_link_libraries(
   args_exe
-  PRIVATE libargs::lib)
+  PRIVATE
+  libargs::lib
+  Boost::program_options)
 
 add_test(
   NAME args::exe
-  COMMAND args_exe)
+  COMMAND args_exe "--help")

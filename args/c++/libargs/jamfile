@@ -2,6 +2,12 @@ project lib_args
     : usage-requirements <include>..
     ;
 
+import boost
+    ;
+
+boost.use-project
+    ;
+
 constant test_sources
     : [ glob *.test.cpp ]
     ;
