@@ -39,4 +39,4 @@ target_link_libraries(
 
 add_test(
   NAME libargs::test
-  COMMAND libargs_test)
+  COMMAND libargs_test "--color_output=false")
