@@ -8,5 +8,4 @@ enable_testing()
 
 add_subdirectory(args)
 add_subdirectory(libargs)
-
-# add_subdirectory(external)
+add_subdirectory(external)

@@ -27,10 +27,15 @@ add_executable(
   libargs_test)
 target_sources(
   libargs_test
-  PRIVATE "main_test.cpp")
+  PRIVATE
+  "args.test.cpp"
+  "main.test.cpp")
 target_link_libraries(
   libargs_test
-  PRIVATE libargs::lib)
+  PRIVATE
+  libargs::lib
+  Boost::unit_test_framework
+)
 
 add_test(
   NAME libargs::test
