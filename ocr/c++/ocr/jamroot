@@ -1,0 +1,12 @@
+project ocr_project
+    ;
+
+build-project ocr
+    ;
+
+build-project libocr
+    ;
+
+use-project /lib_ocr
+    : libocr
+    ;
