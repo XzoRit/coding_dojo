@@ -176,7 +176,6 @@ namespace ocr
 inline namespace v1
 {
 using ocr_str_t = impl::ocr_str_t;
-using num_t = impl::num_t;
 constexpr auto parse(const ocr_str_t& ocr_str)
 {
   return impl::digits_to_int(ocr_str);

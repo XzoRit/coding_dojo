@@ -1,6 +1,5 @@
 #include <boost/test/unit_test.hpp>
 #include <libocr/ocr.hpp>
-#include <variant>
 
 /*
  0123456789012345678901234567
