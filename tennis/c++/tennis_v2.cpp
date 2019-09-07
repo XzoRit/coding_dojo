@@ -52,6 +52,8 @@ player inc_score_of(const player& p)
 
 struct game
 {
+    struct player_1 {};
+    struct player_2 {};
     struct simple
     {
         player player_1;
@@ -67,7 +69,7 @@ struct game
     };
     struct advantage
     {
-        player leading;
+        variant<player_1, player_2> leading;
     };
     struct winner
     {
@@ -76,11 +78,8 @@ struct game
     variant<simple, forty, deuce, advantage, winner> state;
 };
 
-struct player_1_scored
-{};
-
-struct player_2_scored
-{};
+struct player_1_scored {};
+struct player_2_scored {};
 
 using score_action = variant<player_1_scored, player_2_scored>;
 
@@ -116,12 +115,12 @@ game::winner create_winner_game(const game::forty& g, player_2_scored)
 
 game::advantage create_advantage_game(const game::deuce& g, player_1_scored)
 {
-    return game::advantage{};
+    return game::advantage{game::player_1{}};
 }
 
 game::advantage create_advantage_game(const game::deuce& g, player_2_scored)
 {
-    return game::advantage{};
+    return game::advantage{game::player_2{}};
 }
 
 bool is_deuce(const game::forty& g, player_1_scored)
@@ -236,9 +235,21 @@ ostream& operator<<(ostream& str, game::deuce)
     return str;
 }
 
+struct player_to_string
+{
+    string operator()(const game::player_1&)
+        {
+            return "player_1"s;
+        }
+    string operator()(const game::player_2&)
+        {
+            return "player_2"s;
+        }
+};
+
 ostream& operator<<(ostream& str, const game::advantage& g)
 {
-    str << "advantage " << g.leading.name << "\n";
+    str << "advantage " << visit(player_to_string{}, g.leading) << "\n";
     return str;
 }
 
