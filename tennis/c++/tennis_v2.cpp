@@ -75,7 +75,8 @@ struct game
     {
         string won_by;
     };
-    variant<simple, forty, deuce, advantage, winner> state;
+    using state_type = variant<simple, forty, deuce, advantage, winner>;
+    state_type state;
 };
 
 struct player_1_scored {};
@@ -122,6 +123,35 @@ game::advantage create_advantage_game(const game::deuce& g, player_2_scored)
 {
     return game::advantage{game::player_2{}};
 }
+
+template<class player_scored>
+struct create_deuce_or_winner_game;
+
+template<>
+struct create_deuce_or_winner_game<player_1_scored>
+{
+    game::state_type operator()(const game::player_1& p)
+    {
+        return game::winner{"player_1"};
+    }
+    game::state_type operator()(const game::player_2&)
+    {
+        return game::deuce{};
+    }
+};
+
+template<>
+struct create_deuce_or_winner_game<player_2_scored>
+{
+    game::state_type operator()(const game::player_1&)
+    {
+        return game::deuce{};
+    }
+    game::state_type operator()(const game::player_2& p)
+    {
+        return game::winner{"player_2"};
+    }
+};
 
 bool is_deuce(const game::forty& g, player_1_scored)
 {
@@ -177,7 +207,7 @@ struct update_game_state
     }
     game operator()(const game::advantage& g) const
     {
-        return game{g};
+        return game{visit(create_deuce_or_winner_game<scoring_player>{}, g.leading)};
     }
     game operator()(const game::winner&) const
     {
@@ -345,5 +375,36 @@ TEST_CASE("deuce/advantage/win game")
     g = update(g, player_1_scored{});
     a = draw(g);
     REQUIRE(a == "advantage player_1\n"s);
+
+    INFO("deuce");
+    g = update(g, player_2_scored{});
+    a = draw(g);
+    REQUIRE(a == "deuce\n"s);
+
+    SUBCASE("player_1 will win")
+    {
+        INFO("advantage player_1");
+        g = update(g, player_1_scored{});
+        a = draw(g);
+        REQUIRE(a == "advantage player_1\n"s);
+
+        INFO("winner player_1");
+        g = update(g, player_1_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_1: won\n"s);
+    }
+
+    SUBCASE("player_2 will win")
+    {
+        INFO("advantage player_2");
+        g = update(g, player_2_scored{});
+        a = draw(g);
+        REQUIRE(a == "advantage player_2\n"s);
+
+        INFO("winner player_2");
+        g = update(g, player_2_scored{});
+        a = draw(g);
+        REQUIRE(a == "player_2: won\n"s);
+    }
 }
 }
