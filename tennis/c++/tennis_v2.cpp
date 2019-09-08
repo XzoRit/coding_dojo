@@ -56,6 +56,12 @@ player inc_score_of(const player& p)
     return player{p.name, ++p.points};
 }
 
+template<class player_type>
+struct typed_player
+{
+    point points;
+};
+
 struct game
 {
     struct player_1 {};
@@ -64,11 +70,13 @@ struct game
     {
         player player_1;
         player player_2;
+        typed_player<game::player_1> points_player_1{point::Love};
+        typed_player<game::player_2> points_player_2{point::Love};
     };
     struct forty
     {
-        player player_1;
-        player player_2;
+        variant<game::player_1, game::player_2> leading_player;
+        point points_other_players;
     };
     struct deuce
     {
@@ -92,22 +100,22 @@ using score_action = variant<player_1_scored, player_2_scored>;
 
 bool scorer_gets_forty_points(const game::simple& g, player_1_scored)
 {
-    return g.player_1.points == point::Thirty;
+    return g.points_player_1.points == point::Thirty;
 }
 
 bool scorer_gets_forty_points(const game::simple& g, player_2_scored)
 {
-    return g.player_2.points == point::Thirty;
+    return g.points_player_2.points == point::Thirty;
 }
 
 game::forty create_forty_game(const game::simple& g, player_1_scored)
 {
-    return {inc_score_of(g.player_1), g.player_2};
+    return {game::player_1{}, g.points_player_2.points};
 }
 
 game::forty create_forty_game(const game::simple& g, player_2_scored)
 {
-    return {g.player_1, inc_score_of(g.player_2)};
+    return {game::player_2{}, g.points_player_1.points};
 }
 
 game::winner create_winner_game(const game::forty& g, player_1_scored)
@@ -161,16 +169,12 @@ struct create_deuce_or_winner_game<player_2_scored>
 
 bool is_deuce(const game::forty& g, player_1_scored)
 {
-    return
-        g.player_1.points == point::Thirty &&
-        g.player_2.points == point::Forty;
+    return std::get_if<game::player_2>(&g.leading_player);
 }
 
 bool is_deuce(const game::forty& g, player_2_scored)
 {
-    return
-        g.player_1.points == point::Forty &&
-        g.player_2.points == point::Thirty;
+    return std::get_if<game::player_1>(&g.leading_player);
 }
 
 optional<player> has_winner(const game::simple& g)
@@ -182,12 +186,12 @@ optional<player> has_winner(const game::simple& g)
 
 game::simple inc_score_of(const game::simple& g, player_1_scored)
 {
-    return {inc_score_of(g.player_1), g.player_2};
+    return {inc_score_of(g.player_1), g.player_2, {++g.points_player_1.points}, g.points_player_2};
 }
 
 game::simple inc_score_of(const game::simple& g, player_2_scored)
 {
-    return {g.player_1, inc_score_of(g.player_2)};
+    return {g.player_1, inc_score_of(g.player_2), g.points_player_1, {++g.points_player_2.points}};
 }
 
 template<class scoring_player>
@@ -272,14 +276,28 @@ struct player_type_to_string
 
 ostream& operator<<(ostream& str, const game::simple& g)
 {
-    str << g.player_1 << " vs. " << g.player_2;
-    str << '\n';
+    str << player_type_to_string{}(game::player_1{}) << ": "
+        << g.points_player_1.points << ' '
+        << "vs. "
+        << player_type_to_string{}(game::player_2{}) << ": "
+        << g.points_player_2.points << '\n';
     return str;
 }
 
 ostream& operator<<(ostream& str, const game::forty& g)
 {
-    str << g.player_1 << " vs. " << g.player_2;
+    if(std::get_if<game::player_1>(&g.leading_player))
+    {
+        str << visit(player_type_to_string{}, g.leading_player) << ": " << point::Forty << ' '
+            << "vs. "
+            << player_type_to_string{}(game::player_2{}) << ": " << g.points_other_players;
+    }
+    else
+    {
+        str << player_type_to_string{}(game::player_1{}) << ": " << g.points_other_players << ' '
+            << "vs. "
+            << visit(player_type_to_string{}, g.leading_player) << ": " << point::Forty;
+    }
     str << '\n';
     return str;
 }
