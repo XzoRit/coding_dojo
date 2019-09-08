@@ -45,6 +45,7 @@ struct game
 {
     struct player_1 {};
     struct player_2 {};
+    using player_1_or_player_2 = variant<player_1, player_2>;
     struct simple
     {
         player<player_1> player_1{point::Love};
@@ -52,7 +53,7 @@ struct game
     };
     struct forty
     {
-        variant<player_1, player_2> leading_player;
+        player_1_or_player_2 leading_player;
         point points_other_players;
     };
     struct deuce
@@ -60,11 +61,11 @@ struct game
     };
     struct advantage
     {
-        variant<player_1, player_2> leading;
+        player_1_or_player_2 leading;
     };
     struct winner
     {
-        variant<player_1, player_2> the_one_and_only;
+        player_1_or_player_2 the_one_and_only;
     };
     using state_type = variant<simple, forty, deuce, advantage, winner>;
     state_type state;
