@@ -35,29 +35,8 @@ point operator++(point p)
     return p;
 }
 
-struct player
-{
-    string name;
-    point points;
-};
-
-bool operator==(const player& p1, const player& p2)
-{
-    return (p1.name == p2.name);
-}
-
-bool operator!=(const player& p1, const player& p2)
-{
-    return !(p1.name == p2.name);
-}
-
-player inc_score_of(const player& p)
-{
-    return player{p.name, ++p.points};
-}
-
 template<class player_type>
-struct typed_player
+struct player
 {
     point points;
 };
@@ -68,14 +47,12 @@ struct game
     struct player_2 {};
     struct simple
     {
-        player player_1;
-        player player_2;
-        typed_player<game::player_1> points_player_1{point::Love};
-        typed_player<game::player_2> points_player_2{point::Love};
+        player<player_1> player_1{point::Love};
+        player<player_2> player_2{point::Love};
     };
     struct forty
     {
-        variant<game::player_1, game::player_2> leading_player;
+        variant<player_1, player_2> leading_player;
         point points_other_players;
     };
     struct deuce
@@ -100,22 +77,22 @@ using score_action = variant<player_1_scored, player_2_scored>;
 
 bool scorer_gets_forty_points(const game::simple& g, player_1_scored)
 {
-    return g.points_player_1.points == point::Thirty;
+    return g.player_1.points == point::Thirty;
 }
 
 bool scorer_gets_forty_points(const game::simple& g, player_2_scored)
 {
-    return g.points_player_2.points == point::Thirty;
+    return g.player_2.points == point::Thirty;
 }
 
 game::forty create_forty_game(const game::simple& g, player_1_scored)
 {
-    return {game::player_1{}, g.points_player_2.points};
+    return {game::player_1{}, g.player_2.points};
 }
 
 game::forty create_forty_game(const game::simple& g, player_2_scored)
 {
-    return {game::player_2{}, g.points_player_1.points};
+    return {game::player_2{}, g.player_1.points};
 }
 
 game::winner create_winner_game(const game::forty& g, player_1_scored)
@@ -177,21 +154,14 @@ bool is_deuce(const game::forty& g, player_2_scored)
     return std::get_if<game::player_1>(&g.leading_player);
 }
 
-optional<player> has_winner(const game::simple& g)
-{
-    if(g.player_1.points == point::Forty) return g.player_1;
-    if(g.player_2.points == point::Forty) return g.player_2;
-    else return nullopt;
-}
-
 game::simple inc_score_of(const game::simple& g, player_1_scored)
 {
-    return {inc_score_of(g.player_1), g.player_2, {++g.points_player_1.points}, g.points_player_2};
+    return {{++g.player_1.points}, g.player_2};
 }
 
 game::simple inc_score_of(const game::simple& g, player_2_scored)
 {
-    return {g.player_1, inc_score_of(g.player_2), g.points_player_1, {++g.points_player_2.points}};
+    return {g.player_1, {++g.player_2.points}};
 }
 
 template<class scoring_player>
@@ -249,12 +219,6 @@ ostream& operator<<(ostream& str, const point& p)
     return str;
 }
 
-ostream& operator<<(ostream& str, const player& p)
-{
-    str << p.name << ": " << p.points;
-    return str;
-}
-
 using map_player_type_to_name =
     fusion::map<
         fusion::pair<game::player_1, std::string>,
@@ -277,10 +241,10 @@ struct player_type_to_string
 ostream& operator<<(ostream& str, const game::simple& g)
 {
     str << player_type_to_string{}(game::player_1{}) << ": "
-        << g.points_player_1.points << ' '
+        << g.player_1.points << ' '
         << "vs. "
         << player_type_to_string{}(game::player_2{}) << ": "
-        << g.points_player_2.points << '\n';
+        << g.player_2.points << '\n';
     return str;
 }
 
@@ -338,9 +302,7 @@ const auto player_2_name{"bert"s};
 
 TEST_CASE("simple game")
 {
-    const player player_1{player_1_name, point::Love};
-    const player player_2{player_2_name, point::Love};
-    game g{game::simple{player_1, player_2}};
+    game g{game::simple{}};
 
     auto a = draw(g);
     REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 0\n"s);
@@ -391,9 +353,7 @@ TEST_CASE("simple game")
 
 TEST_CASE("deuce/advantage/win game")
 {
-    const player player_1{player_1_name, point::Love};
-    const player player_2{player_2_name, point::Love};
-    game g{game::simple{player_1, player_2}};
+    game g{game::simple{}};
 
     for(int i{}; i < 3; ++i)
     {
