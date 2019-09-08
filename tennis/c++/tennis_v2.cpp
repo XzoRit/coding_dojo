@@ -1,4 +1,8 @@
 #include <doctest.h>
+
+#include <boost/fusion/container/map.hpp>
+#include <boost/fusion/include/at_key.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -12,6 +16,8 @@ namespace v2
 {
 using namespace std;
 using namespace std::string_literals;
+
+namespace fusion = boost::fusion;
 
 enum class point
 {
@@ -73,7 +79,7 @@ struct game
     };
     struct winner
     {
-        string won_by;
+        variant<player_1, player_2> the_one_and_only;
     };
     using state_type = variant<simple, forty, deuce, advantage, winner>;
     state_type state;
@@ -106,12 +112,12 @@ game::forty create_forty_game(const game::simple& g, player_2_scored)
 
 game::winner create_winner_game(const game::forty& g, player_1_scored)
 {
-    return {g.player_1.name};
+    return {game::player_1{}};
 }
 
 game::winner create_winner_game(const game::forty& g, player_2_scored)
 {
-    return {g.player_2.name};
+    return {game::player_2{}};
 }
 
 game::advantage create_advantage_game(const game::deuce& g, player_1_scored)
@@ -132,7 +138,7 @@ struct create_deuce_or_winner_game<player_1_scored>
 {
     game::state_type operator()(const game::player_1& p)
     {
-        return game::winner{"player_1"};
+        return game::winner{game::player_1{}};
     }
     game::state_type operator()(const game::player_2&)
     {
@@ -149,7 +155,7 @@ struct create_deuce_or_winner_game<player_2_scored>
     }
     game::state_type operator()(const game::player_2& p)
     {
-        return game::winner{"player_2"};
+        return game::winner{game::player_2{}};
     }
 };
 
@@ -209,9 +215,9 @@ struct update_game_state
     {
         return game{visit(create_deuce_or_winner_game<scoring_player>{}, g.leading)};
     }
-    game operator()(const game::winner&) const
+    game operator()(const game::winner& g) const
     {
-        return game{};
+        return game{g};
     }
 };
 
@@ -245,6 +251,25 @@ ostream& operator<<(ostream& str, const player& p)
     return str;
 }
 
+using map_player_type_to_name =
+    fusion::map<
+        fusion::pair<game::player_1, std::string>,
+        fusion::pair<game::player_2, std::string>
+    >;
+map_player_type_to_name player_type_to_name{
+    fusion::make_pair<game::player_1>("oscar"),
+    fusion::make_pair<game::player_2>("bert")
+};
+
+struct player_type_to_string
+{
+    template<class player_type>
+    string operator()(const player_type&)
+    {
+        return fusion::at_key<player_type>(player_type_to_name);
+    }
+};
+
 ostream& operator<<(ostream& str, const game::simple& g)
 {
     str << g.player_1 << " vs. " << g.player_2;
@@ -265,33 +290,21 @@ ostream& operator<<(ostream& str, game::deuce)
     return str;
 }
 
-struct player_to_string
-{
-    string operator()(const game::player_1&)
-        {
-            return "player_1"s;
-        }
-    string operator()(const game::player_2&)
-        {
-            return "player_2"s;
-        }
-};
-
 ostream& operator<<(ostream& str, const game::advantage& g)
 {
-    str << "advantage " << visit(player_to_string{}, g.leading) << "\n";
+    str << "advantage " << visit(player_type_to_string{}, g.leading) << "\n";
     return str;
 }
 
 ostream& operator<<(ostream& str, const game::winner& g)
 {
-    str << g.won_by << ": won\n";
+    str << visit(player_type_to_string{}, g.the_one_and_only) << ": won\n";
     return str;
 }
 
 ostream& operator<<(ostream& str, const game& g)
 {
-    visit([&](const auto & a) mutable { str << a; }, g.state);
+    visit([&str](const auto & a) mutable { str << a; }, g.state);
     return str;
 }
 
@@ -302,63 +315,66 @@ string draw(const game& g)
     return str.str();
 }
 
+const auto player_1_name{"oscar"s};
+const auto player_2_name{"bert"s};
+
 TEST_CASE("simple game")
 {
-    const player player_1{"player_1", point::Love};
-    const player player_2{"player_2", point::Love};
+    const player player_1{player_1_name, point::Love};
+    const player player_2{player_2_name, point::Love};
     game g{game::simple{player_1, player_2}};
 
     auto a = draw(g);
-    REQUIRE(a == "player_1: 0 vs. player_2: 0\n"s);
+    REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 0\n"s);
 
     SUBCASE("player_1 scores once")
     {
         g = update(g, player_1_scored{});
         a = draw(g);
-        REQUIRE(a == "player_1: 15 vs. player_2: 0\n"s);
+        REQUIRE(a == player_1_name + ": 15 vs. " + player_2_name + ": 0\n"s);
 
         INFO("scores twice");
         g = update(g, player_1_scored{});
         a = draw(g);
-        REQUIRE(a == "player_1: 30 vs. player_2: 0\n"s);
+        REQUIRE(a == player_1_name + ": 30 vs. " + player_2_name + ": 0\n"s);
 
         INFO("scores thrice");
         g = update(g, player_1_scored{});
         a = draw(g);
-        REQUIRE(a == "player_1: 40 vs. player_2: 0\n"s);
+        REQUIRE(a == player_1_name + ": 40 vs. " + player_2_name + ": 0\n"s);
 
         INFO("player_1 won");
         g = update(g, player_1_scored{});
         a = draw(g);
-        REQUIRE(a == "player_1: won\n"s);
+        REQUIRE(a == player_1_name + ": won\n"s);
     }
     SUBCASE("player_2 scores once")
     {
         g = update(g, player_2_scored{});
         a = draw(g);
-        REQUIRE(a == "player_1: 0 vs. player_2: 15\n"s);
+        REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 15\n"s);
 
         INFO("scores twice");
         g = update(g, player_2_scored{});
         a = draw(g);
-        REQUIRE(a == "player_1: 0 vs. player_2: 30\n"s);
+        REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 30\n"s);
 
         INFO("scores thrice");
         g = update(g, player_2_scored{});
         a = draw(g);
-        REQUIRE(a == "player_1: 0 vs. player_2: 40\n"s);
+        REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 40\n"s);
 
         INFO("player_2 won");
         g = update(g, player_2_scored{});
         a = draw(g);
-        REQUIRE(a == "player_2: won\n"s);
+        REQUIRE(a == "" + player_2_name + ": won\n"s);
     }
 }
 
 TEST_CASE("deuce/advantage/win game")
 {
-    const player player_1{"player_1", point::Love};
-    const player player_2{"player_2", point::Love};
+    const player player_1{player_1_name, point::Love};
+    const player player_2{player_2_name, point::Love};
     game g{game::simple{player_1, player_2}};
 
     for(int i{}; i < 3; ++i)
@@ -371,10 +387,10 @@ TEST_CASE("deuce/advantage/win game")
     auto a = draw(g);
     REQUIRE(a == "deuce\n"s);
 
-    INFO("advantage player_1");
+    INFO("advantage " + player_1_name);
     g = update(g, player_1_scored{});
     a = draw(g);
-    REQUIRE(a == "advantage player_1\n"s);
+    REQUIRE(a == "advantage " + player_1_name + "\n"s);
 
     INFO("deuce");
     g = update(g, player_2_scored{});
@@ -383,28 +399,28 @@ TEST_CASE("deuce/advantage/win game")
 
     SUBCASE("player_1 will win")
     {
-        INFO("advantage player_1");
+        INFO("advantage " + player_1_name + "");
         g = update(g, player_1_scored{});
         a = draw(g);
-        REQUIRE(a == "advantage player_1\n"s);
+        REQUIRE(a == "advantage " + player_1_name + "\n"s);
 
-        INFO("winner player_1");
+        INFO("winner " + player_1_name);
         g = update(g, player_1_scored{});
         a = draw(g);
-        REQUIRE(a == "player_1: won\n"s);
+        REQUIRE(a == player_1_name + ": won\n"s);
     }
 
     SUBCASE("player_2 will win")
     {
-        INFO("advantage player_2");
+        INFO("advantage " + player_2_name + "");
         g = update(g, player_2_scored{});
         a = draw(g);
-        REQUIRE(a == "advantage player_2\n"s);
+        REQUIRE(a == "advantage " + player_2_name + "\n"s);
 
-        INFO("winner player_2");
+        INFO("winner " + player_2_name);
         g = update(g, player_2_scored{});
         a = draw(g);
-        REQUIRE(a == "player_2: won\n"s);
+        REQUIRE(a == "" + player_2_name + ": won\n"s);
     }
 }
 }
