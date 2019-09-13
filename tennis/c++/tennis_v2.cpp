@@ -1,23 +1,15 @@
 #include <doctest.h>
 
-#include <boost/fusion/container/map.hpp>
-#include <boost/fusion/include/at_key.hpp>
-
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <variant>
 #include <optional>
 
-namespace
-{
-}
 namespace v2
 {
 using namespace std;
 using namespace std::string_literals;
-
-namespace fusion = boost::fusion;
 
 enum class point
 {
@@ -26,7 +18,6 @@ enum class point
     Thirty,
     Forty
 };
-
 point operator++(point p)
 {
     if(p == point::Love) return point::Fifteen;
@@ -220,140 +211,130 @@ ostream& operator<<(ostream& str, const point& p)
     return str;
 }
 
-using map_player_type_to_name =
-    fusion::map<
-        fusion::pair<game::player_1, std::string>,
-        fusion::pair<game::player_2, std::string>
-    >;
-map_player_type_to_name player_type_to_name{
-    fusion::make_pair<game::player_1>("oscar"),
-    fusion::make_pair<game::player_2>("bert")
+struct view
+{
+    string player_1{};
+    string player_2{};
+
+    struct player_to_string
+    {
+        view* the_view;
+        string operator()(const game::player_1&)
+        {
+            return the_view->player_1;
+        }
+        string operator()(const game::player_2&)
+        {
+            return the_view->player_2;
+        }
+    };
+    ostream& draw(ostream& str, const game::simple& g)
+    {
+        str << player_1 << ": "
+            << g.player_1.points << ' '
+            << "vs. "
+            << player_2 << ": "
+            << g.player_2.points << '\n';
+        return str;
+    }
+    ostream& draw(ostream& str, const game::forty& g)
+    {
+        if(std::get_if<game::player_1>(&g.leading_player))
+        {
+            str << visit(player_to_string{this}, g.leading_player) << ": " << point::Forty << ' '
+                << "vs. "
+                << player_2 << ": " << g.points_other_players;
+        }
+        else
+        {
+            str << player_1 << ": " << g.points_other_players << ' '
+                << "vs. "
+                << visit(player_to_string{this}, g.leading_player) << ": " << point::Forty;
+        }
+        str << '\n';
+        return str;
+    }
+    ostream& draw(ostream& str, game::deuce)
+    {
+        str << "deuce\n";
+        return str;
+    }
+    ostream& draw(ostream& str, const game::advantage& g)
+    {
+        str << "advantage " << visit(player_to_string{this}, g.leading) << "\n";
+        return str;
+    }
+    ostream& draw(ostream& str, const game::winner& g)
+    {
+        str << visit(player_to_string{this}, g.the_one_and_only) << ": won\n";
+        return str;
+    }
+    string draw(const game& g)
+    {
+      stringstream str;
+      visit([this, &str](const auto & a) mutable { draw(str, a); }, g.state);
+      return str.str();
+    }
 };
 
-struct player_type_to_string
-{
-    template<class player_type>
-    string operator()(const player_type&)
-    {
-        return fusion::at_key<player_type>(player_type_to_name);
-    }
-};
-
-ostream& operator<<(ostream& str, const game::simple& g)
-{
-    str << player_type_to_string{}(game::player_1{}) << ": "
-        << g.player_1.points << ' '
-        << "vs. "
-        << player_type_to_string{}(game::player_2{}) << ": "
-        << g.player_2.points << '\n';
-    return str;
-}
-
-ostream& operator<<(ostream& str, const game::forty& g)
-{
-    if(std::get_if<game::player_1>(&g.leading_player))
-    {
-        str << visit(player_type_to_string{}, g.leading_player) << ": " << point::Forty << ' '
-            << "vs. "
-            << player_type_to_string{}(game::player_2{}) << ": " << g.points_other_players;
-    }
-    else
-    {
-        str << player_type_to_string{}(game::player_1{}) << ": " << g.points_other_players << ' '
-            << "vs. "
-            << visit(player_type_to_string{}, g.leading_player) << ": " << point::Forty;
-    }
-    str << '\n';
-    return str;
-}
-
-ostream& operator<<(ostream& str, game::deuce)
-{
-    str << "deuce\n";
-    return str;
-}
-
-ostream& operator<<(ostream& str, const game::advantage& g)
-{
-    str << "advantage " << visit(player_type_to_string{}, g.leading) << "\n";
-    return str;
-}
-
-ostream& operator<<(ostream& str, const game::winner& g)
-{
-    str << visit(player_type_to_string{}, g.the_one_and_only) << ": won\n";
-    return str;
-}
-
-ostream& operator<<(ostream& str, const game& g)
-{
-    visit([&str](const auto & a) mutable { str << a; }, g.state);
-    return str;
-}
-
-string draw(const game& g)
-{
-    stringstream str;
-    str << g;
-    return str.str();
-}
-
-const auto player_1_name{"oscar"s};
-const auto player_2_name{"bert"s};
+const auto player_1_name{"john"s};
+const auto player_2_name{"jane"s};
 
 TEST_CASE("simple game")
 {
+    view v{player_1_name, player_2_name};
     game g{game::simple{}};
 
-    auto a = draw(g);
+    auto a = v.draw(g);
     REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 0\n"s);
 
     SUBCASE("player_1 scores once")
     {
         g = update(g, player_1_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == player_1_name + ": 15 vs. " + player_2_name + ": 0\n"s);
 
         INFO("scores twice");
         g = update(g, player_1_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == player_1_name + ": 30 vs. " + player_2_name + ": 0\n"s);
 
         INFO("scores thrice");
         g = update(g, player_1_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == player_1_name + ": 40 vs. " + player_2_name + ": 0\n"s);
 
         INFO("player_1 won");
         g = update(g, player_1_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == player_1_name + ": won\n"s);
     }
     SUBCASE("player_2 scores once")
     {
         g = update(g, player_2_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 15\n"s);
 
         INFO("scores twice");
         g = update(g, player_2_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 30\n"s);
 
         INFO("scores thrice");
         g = update(g, player_2_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 40\n"s);
 
         INFO("player_2 won");
         g = update(g, player_2_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == "" + player_2_name + ": won\n"s);
     }
 }
 
 TEST_CASE("deuce/advantage/win game")
 {
+    view v{player_1_name, player_2_name};
     game g{game::simple{}};
 
     for(int i{}; i < 3; ++i)
@@ -363,29 +344,29 @@ TEST_CASE("deuce/advantage/win game")
     }
 
     INFO("deuce");
-    auto a = draw(g);
+    auto a = v.draw(g);
     REQUIRE(a == "deuce\n"s);
 
     INFO("advantage " + player_1_name);
     g = update(g, player_1_scored{});
-    a = draw(g);
+    a = v.draw(g);
     REQUIRE(a == "advantage " + player_1_name + "\n"s);
 
     INFO("deuce");
     g = update(g, player_2_scored{});
-    a = draw(g);
+    a = v.draw(g);
     REQUIRE(a == "deuce\n"s);
 
     SUBCASE("player_1 will win")
     {
         INFO("advantage " + player_1_name + "");
         g = update(g, player_1_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == "advantage " + player_1_name + "\n"s);
 
         INFO("winner " + player_1_name);
         g = update(g, player_1_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == player_1_name + ": won\n"s);
     }
 
@@ -393,12 +374,12 @@ TEST_CASE("deuce/advantage/win game")
     {
         INFO("advantage " + player_2_name + "");
         g = update(g, player_2_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == "advantage " + player_2_name + "\n"s);
 
         INFO("winner " + player_2_name);
         g = update(g, player_2_scored{});
-        a = draw(g);
+        a = v.draw(g);
         REQUIRE(a == "" + player_2_name + ": won\n"s);
     }
 }
