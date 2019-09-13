@@ -11,6 +11,14 @@ namespace v2
 using namespace std;
 using namespace std::string_literals;
 
+inline namespace action
+{
+struct player_1_scored {};
+struct player_2_scored {};
+using score_action = variant<player_1_scored, player_2_scored>;
+}
+inline namespace model
+{
 enum class point
 {
     Love,
@@ -25,13 +33,11 @@ point operator++(point p)
     if(p == point::Thirty) return point::Forty;
     return p;
 }
-
 template<class player_type>
 struct player
 {
     point points{point::Love};
 };
-
 struct game
 {
     struct player_1 {};
@@ -61,55 +67,40 @@ struct game
     using state_type = variant<simple, forty, deuce, advantage, winner>;
     state_type state{simple{}};
 };
-
-struct player_1_scored {};
-struct player_2_scored {};
-
-using score_action = variant<player_1_scored, player_2_scored>;
-
 bool scorer_gets_forty_points(const game::simple& g, player_1_scored)
 {
     return g.player_1.points == point::Thirty;
 }
-
 bool scorer_gets_forty_points(const game::simple& g, player_2_scored)
 {
     return g.player_2.points == point::Thirty;
 }
-
 game::forty create_forty_game(const game::simple& g, player_1_scored)
 {
     return {game::player_1{}, g.player_2.points};
 }
-
 game::forty create_forty_game(const game::simple& g, player_2_scored)
 {
     return {game::player_2{}, g.player_1.points};
 }
-
 game::winner create_winner_game(const game::forty& g, player_1_scored)
 {
     return {game::player_1{}};
 }
-
 game::winner create_winner_game(const game::forty& g, player_2_scored)
 {
     return {game::player_2{}};
 }
-
 game::advantage create_advantage_game(const game::deuce& g, player_1_scored)
 {
     return game::advantage{game::player_1{}};
 }
-
 game::advantage create_advantage_game(const game::deuce& g, player_2_scored)
 {
     return game::advantage{game::player_2{}};
 }
-
 template<class player_scored>
 struct create_deuce_or_winner_game;
-
 template<>
 struct create_deuce_or_winner_game<player_1_scored>
 {
@@ -122,7 +113,6 @@ struct create_deuce_or_winner_game<player_1_scored>
         return game::deuce{};
     }
 };
-
 template<>
 struct create_deuce_or_winner_game<player_2_scored>
 {
@@ -135,7 +125,6 @@ struct create_deuce_or_winner_game<player_2_scored>
         return game::winner{game::player_2{}};
     }
 };
-
 bool is_deuce(const game::forty& g, player_1_scored)
 {
     return std::get_if<game::player_2>(&g.leading_player);
@@ -145,17 +134,14 @@ bool is_deuce(const game::forty& g, player_2_scored)
 {
     return std::get_if<game::player_1>(&g.leading_player);
 }
-
 game::simple inc_score_of(const game::simple& g, player_1_scored)
 {
     return {{++g.player_1.points}, g.player_2};
 }
-
 game::simple inc_score_of(const game::simple& g, player_2_scored)
 {
     return {g.player_1, {++g.player_2.points}};
 }
-
 template<class scoring_player>
 struct update_game_state
 {
@@ -186,7 +172,6 @@ struct update_game_state
         return game{g};
     }
 };
-
 struct apply_score_action
 {
     template<class scoring_player>
@@ -196,12 +181,13 @@ struct apply_score_action
     }
     const game& current;
 };
-
 game update(const game& g, const score_action& player_scored)
 {
     return visit(apply_score_action{g}, player_scored);
 }
-
+}
+inline namespace view
+{
 ostream& operator<<(ostream& str, const point& p)
 {
     if(p == point::Love) str << "0";
@@ -210,22 +196,20 @@ ostream& operator<<(ostream& str, const point& p)
     else if(p == point::Forty) str << "40";
     return str;
 }
-
-struct view
+struct render
 {
     string player_1{};
     string player_2{};
-
     struct player_to_string
     {
-        const view* the_view;
+        const render* the_render;
         string operator()(const game::player_1&) const
         {
-            return the_view->player_1;
+            return the_render->player_1;
         }
         string operator()(const game::player_2&) const
         {
-            return the_view->player_2;
+            return the_render->player_2;
         }
     };
     ostream& draw(ostream& str, const game::simple& g) const
@@ -276,58 +260,59 @@ struct view
       return str.str();
     }
 };
+}
 
 const auto player_1_name{"john"s};
 const auto player_2_name{"jane"s};
-const view v{player_1_name, player_2_name};
+const render r{player_1_name, player_2_name};
 
 TEST_CASE("simple game")
 {
     game g{};
 
-    auto a = v.draw(g);
+    auto a = r.draw(g);
     REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 0\n"s);
 
     SUBCASE("player_1 scores once")
     {
         g = update(g, player_1_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == player_1_name + ": 15 vs. " + player_2_name + ": 0\n"s);
 
         INFO("scores twice");
         g = update(g, player_1_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == player_1_name + ": 30 vs. " + player_2_name + ": 0\n"s);
 
         INFO("scores thrice");
         g = update(g, player_1_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == player_1_name + ": 40 vs. " + player_2_name + ": 0\n"s);
 
         INFO("player_1 won");
         g = update(g, player_1_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == player_1_name + ": won\n"s);
     }
     SUBCASE("player_2 scores once")
     {
         g = update(g, player_2_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 15\n"s);
 
         INFO("scores twice");
         g = update(g, player_2_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 30\n"s);
 
         INFO("scores thrice");
         g = update(g, player_2_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 40\n"s);
 
         INFO("player_2 won");
         g = update(g, player_2_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == "" + player_2_name + ": won\n"s);
     }
 }
@@ -344,29 +329,29 @@ TEST_CASE("deuce/advantage/win game")
     g = update(g, player_2_scored{});
 
     INFO("deuce");
-    auto a = v.draw(g);
+    auto a = r.draw(g);
     REQUIRE(a == "deuce\n"s);
 
     INFO("advantage " + player_1_name);
     g = update(g, player_1_scored{});
-    a = v.draw(g);
+    a = r.draw(g);
     REQUIRE(a == "advantage " + player_1_name + "\n"s);
 
     INFO("deuce");
     g = update(g, player_2_scored{});
-    a = v.draw(g);
+    a = r.draw(g);
     REQUIRE(a == "deuce\n"s);
 
     SUBCASE("player_1 will win")
     {
         INFO("advantage " + player_1_name + "");
         g = update(g, player_1_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == "advantage " + player_1_name + "\n"s);
 
         INFO("winner " + player_1_name);
         g = update(g, player_1_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == player_1_name + ": won\n"s);
     }
 
@@ -374,12 +359,12 @@ TEST_CASE("deuce/advantage/win game")
     {
         INFO("advantage " + player_2_name + "");
         g = update(g, player_2_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == "advantage " + player_2_name + "\n"s);
 
         INFO("winner " + player_2_name);
         g = update(g, player_2_scored{});
-        a = v.draw(g);
+        a = r.draw(g);
         REQUIRE(a == "" + player_2_name + ": won\n"s);
     }
 }
