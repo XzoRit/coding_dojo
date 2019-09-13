@@ -29,7 +29,7 @@ point operator++(point p)
 template<class player_type>
 struct player
 {
-    point points;
+    point points{point::Love};
 };
 
 struct game
@@ -44,22 +44,22 @@ struct game
     };
     struct forty
     {
-        player_1_or_player_2 leading_player;
-        point points_other_players;
+        player_1_or_player_2 leading_player{};
+        point points_other_players{point::Love};
     };
     struct deuce
     {
     };
     struct advantage
     {
-        player_1_or_player_2 leading;
+        player_1_or_player_2 leading{};
     };
     struct winner
     {
-        player_1_or_player_2 the_one_and_only;
+        player_1_or_player_2 the_one_and_only{};
     };
     using state_type = variant<simple, forty, deuce, advantage, winner>;
-    state_type state;
+    state_type state{simple{}};
 };
 
 struct player_1_scored {};
@@ -113,11 +113,11 @@ struct create_deuce_or_winner_game;
 template<>
 struct create_deuce_or_winner_game<player_1_scored>
 {
-    game::state_type operator()(const game::player_1& p)
+    game::state_type operator()(const game::player_1& p) const
     {
         return game::winner{game::player_1{}};
     }
-    game::state_type operator()(const game::player_2&)
+    game::state_type operator()(const game::player_2&) const
     {
         return game::deuce{};
     }
@@ -126,11 +126,11 @@ struct create_deuce_or_winner_game<player_1_scored>
 template<>
 struct create_deuce_or_winner_game<player_2_scored>
 {
-    game::state_type operator()(const game::player_1&)
+    game::state_type operator()(const game::player_1&) const
     {
         return game::deuce{};
     }
-    game::state_type operator()(const game::player_2& p)
+    game::state_type operator()(const game::player_2& p) const
     {
         return game::winner{game::player_2{}};
     }
@@ -218,17 +218,17 @@ struct view
 
     struct player_to_string
     {
-        view* the_view;
-        string operator()(const game::player_1&)
+        const view* the_view;
+        string operator()(const game::player_1&) const
         {
             return the_view->player_1;
         }
-        string operator()(const game::player_2&)
+        string operator()(const game::player_2&) const
         {
             return the_view->player_2;
         }
     };
-    ostream& draw(ostream& str, const game::simple& g)
+    ostream& draw(ostream& str, const game::simple& g) const
     {
         str << player_1 << ": "
             << g.player_1.points << ' '
@@ -237,7 +237,7 @@ struct view
             << g.player_2.points << '\n';
         return str;
     }
-    ostream& draw(ostream& str, const game::forty& g)
+    ostream& draw(ostream& str, const game::forty& g) const
     {
         if(std::get_if<game::player_1>(&g.leading_player))
         {
@@ -254,36 +254,36 @@ struct view
         str << '\n';
         return str;
     }
-    ostream& draw(ostream& str, game::deuce)
+    ostream& draw(ostream& str, game::deuce) const
     {
         str << "deuce\n";
         return str;
     }
-    ostream& draw(ostream& str, const game::advantage& g)
+    ostream& draw(ostream& str, const game::advantage& g) const
     {
         str << "advantage " << visit(player_to_string{this}, g.leading) << "\n";
         return str;
     }
-    ostream& draw(ostream& str, const game::winner& g)
+    ostream& draw(ostream& str, const game::winner& g) const
     {
         str << visit(player_to_string{this}, g.the_one_and_only) << ": won\n";
         return str;
     }
-    string draw(const game& g)
+    string draw(const game& g) const
     {
       stringstream str;
-      visit([this, &str](const auto & a) mutable { draw(str, a); }, g.state);
+      visit([this, &str](const auto & a) { draw(str, a); }, g.state);
       return str.str();
     }
 };
 
 const auto player_1_name{"john"s};
 const auto player_2_name{"jane"s};
+const view v{player_1_name, player_2_name};
 
 TEST_CASE("simple game")
 {
-    view v{player_1_name, player_2_name};
-    game g{game::simple{}};
+    game g{};
 
     auto a = v.draw(g);
     REQUIRE(a == player_1_name + ": 0 vs. " + player_2_name + ": 0\n"s);
@@ -334,14 +334,14 @@ TEST_CASE("simple game")
 
 TEST_CASE("deuce/advantage/win game")
 {
-    view v{player_1_name, player_2_name};
-    game g{game::simple{}};
+    game g{game::simple
+        {
+            {point::Thirty},
+            {point::Thirty}
+        }};
 
-    for(int i{}; i < 3; ++i)
-    {
-        g = update(g, player_1_scored{});
-        g = update(g, player_2_scored{});
-    }
+    g = update(g, player_1_scored{});
+    g = update(g, player_2_scored{});
 
     INFO("deuce");
     auto a = v.draw(g);
