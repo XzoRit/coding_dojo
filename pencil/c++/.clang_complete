@@ -1,0 +1,4 @@
+-std=c++17
+-I../../doctest/doctest
+-I../../range-v3/include
+-I../../../boost
