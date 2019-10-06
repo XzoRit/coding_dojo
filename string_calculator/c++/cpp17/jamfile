@@ -1,0 +1,12 @@
+project cpp17
+    : usage-requirements <include>.
+    ;
+
+constant sources
+    : [ glob *.cpp ]
+    ;
+
+lib cpp17
+    : $(sources)
+    : <include>.
+    ;

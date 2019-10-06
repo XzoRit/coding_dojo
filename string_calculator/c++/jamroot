@@ -1,0 +1,13 @@
+project string_calculator_project
+    : build-dir build_boost
+    ;
+
+build-project cpp17
+    ;
+
+use-project /cpp17
+    : cpp17
+    ;
+
+build-project test
+    ;

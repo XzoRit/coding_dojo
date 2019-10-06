@@ -1,0 +1,17 @@
+import testing
+    ;
+
+alias doctest
+    :
+    :
+    :
+    : <include>../../../doctest/doctest
+    ;
+
+run main.cpp
+    :
+    :
+    : <library>/cpp17//cpp17
+      <library>doctest
+    : string_calculator_test
+    ;
