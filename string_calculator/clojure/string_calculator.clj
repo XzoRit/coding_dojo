@@ -1,4 +1,4 @@
-;; run script with clj <script-name>
+;; run script with clojure <script-name>
 
 (ns xzr
   (:use clojure.test))

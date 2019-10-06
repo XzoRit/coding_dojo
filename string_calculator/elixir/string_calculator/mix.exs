@@ -5,7 +5,7 @@ defmodule StringCalculator.Mixfile do
     [app: :string_calculator,
      version: "0.0.1",
      elixir: "~> 1.0",
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application

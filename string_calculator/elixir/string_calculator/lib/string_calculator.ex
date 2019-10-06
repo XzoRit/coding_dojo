@@ -8,7 +8,7 @@ defmodule StringCalculator do
 		|> extractSepAndNums
 		|> splitNumsBySep
 		|> Enum.map(&(String.to_integer/1))
-		|> Enum.partition(&(&1 < 0))
+		|> Enum.split_with(&(&1 < 0))
 		|> sumPositives
 	end
 

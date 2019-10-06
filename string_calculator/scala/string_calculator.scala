@@ -1,5 +1,5 @@
-/* compile with scalac-2.11 -cp <jar-files> <script-name> */
-/* run test with scala-2.11 -cp <jar-files> org.scalatest.run <test-class-name> */
+/* sbt */
+/* sbt test */
 import org.scalatest._
 
 class StringCalculator {
