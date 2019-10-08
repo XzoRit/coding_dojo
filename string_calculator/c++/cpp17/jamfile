@@ -6,7 +6,22 @@ constant sources
     : [ glob *.cpp ]
     ;
 
+alias range
+    :
+    :
+    :
+    : <include>../../../range-v3/include
+    ;
+
+import boost
+    ;
+
+boost.use-project
+    ;
+
 lib cpp17
     : $(sources)
     : <include>.
+      <library>range
+      <use>/boost//headers
     ;

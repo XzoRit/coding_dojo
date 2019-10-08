@@ -1,17 +1,29 @@
-#ifndef STRING_CALCULATOR_H
-#define STRING_CALCULATOR_H
+#pragma once
 
-#include <string>
-#include <vector>
+#include <range/v3/all.hpp>
+
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+
+#include <algorithm>
+#include <functional>
 #include <iostream>
-#include <stdexcept>
-#include <sstream>
 #include <iterator>
+#include <numeric>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 namespace StringCalculator
 {
+using namespace std::string_literals;
+
 // template<typename IterOut>
-// auto make_ints_from_str(std::string const& numsAsString, std::string const& sep,
+// auto make_ints_from_str(std::string const& numsAsString, std::string const&
+// sep,
 //                         IterOut out) -> void
 // {
 //     using boost::algorithm::split;
@@ -53,28 +65,37 @@ namespace StringCalculator
 //     }
 // }
 
-// auto extractSep(std::string const& parse) -> std::pair<std::string, std::string>
-// {
-//     static auto const SizeOfSepSection = std::string::size_type{4};
+using boost::algorithm::is_any_of;
+using boost::algorithm::split;
 
-//     if(parse.size() >= SizeOfSepSection && parse[0] == '/')
-//         return std::make_pair(std::string(parse.begin() + SizeOfSepSection, parse.end()), std::string(1, parse[2]));
-//     else
-//         return std::make_pair(parse, ",\n");
-// }
+inline const auto sumNonNegatives = [](const auto& ints) {
+    auto negs = ranges::filter_view(ints, [](auto i){ return i < 0; });
+    if (negs.empty()) return ranges::accumulate(ints, 0);
+    auto s = ranges::accumulate(negs, ""s, [](auto s, auto i){ return s + " " + std::to_string(i); });
+    throw std::invalid_argument{"negatives not allowed"s + s};
+};
 
-auto add(std::string const& nums) -> int
-{
-    // sum_non_negatives(to_ints(split_by(extract_separator, nums)))
+inline const auto extractNumsAndSep = [](const auto& parse) -> std::pair<std::string, std::string> {
+  constexpr auto SizeOfSepSection{ 4 };
 
-    // auto const numsAndSep = extractSep(nums);
+  if (parse.size() >= SizeOfSepSection && parse[0] == '/')
+    return { { begin(parse) + SizeOfSepSection, end(parse) }, { 1, parse[2] } };
+  else
+    return { parse, ",\n"s };
+};
 
-    // std::vector<int> ints{};
-    // make_ints_from_str(numsAndSep.first, numsAndSep.second, std::back_inserter(ints));
-
-    // return boost::accumulate(ints, 0);
+inline const auto add = [](const auto& addStr) {
+  if (addStr.empty())
     return 0;
-}
-}
 
-#endif
+  auto [nums, sep] = extractNumsAndSep(addStr);
+
+  std::vector<std::string> separatedNums{};
+  split(separatedNums, nums, is_any_of(sep));
+
+  auto ints = ranges::views::transform(
+    separatedNums, [](const auto& a) { return std::stoi(a); });
+
+  return sumNonNegatives(ints);
+};
+}
