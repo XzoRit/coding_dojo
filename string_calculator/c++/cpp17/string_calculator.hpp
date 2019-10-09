@@ -21,81 +21,45 @@ namespace StringCalculator
 {
 using namespace std::string_literals;
 
-// template<typename IterOut>
-// auto make_ints_from_str(std::string const& numsAsString, std::string const&
-// sep,
-//                         IterOut out) -> void
-// {
-//     using boost::algorithm::split;
-//     using boost::algorithm::is_any_of;
-
-//     using boost::range::transform;
-//     using boost::range::copy;
-//     using boost::range::find_if;
-//     using boost::adaptors::filtered;
-
-//     if(numsAsString.empty()) return;
-
-//     std::vector<std::string> sepNumsAsString{};
-//     split(sepNumsAsString, numsAsString, is_any_of(sep));
-
-//     std::vector<int> ints(sepNumsAsString.size(), 0);
-//     transform(sepNumsAsString, std::begin(ints), [](std::string const & str)
-//     {
-//         return std::stoi(str);
-//     });
-
-//     auto checkForNegNums = [](int i)
-//     {
-//         return i < 0;
-//     };
-//     if(find_if(ints, checkForNegNums) == std::end(ints))
-//     {
-//         copy(ints, out);
-//     }
-//     else
-//     {
-//         std::vector<int> negNums{};
-//         copy(ints | filtered(checkForNegNums), std::back_inserter(negNums));
-
-//         std::ostringstream exceptTxt{};
-//         exceptTxt << "Negative numbers not allowed: ";
-//         copy(negNums, std::ostream_iterator<int>(exceptTxt, " "));
-//         throw std::invalid_argument{exceptTxt.str()};
-//     }
-// }
-
 using boost::algorithm::is_any_of;
 using boost::algorithm::split;
 
-inline const auto sumNonNegatives = [](const auto& ints) {
-    auto negs = ranges::filter_view(ints, [](auto i){ return i < 0; });
-    if (negs.empty()) return ranges::accumulate(ints, 0);
-    auto s = ranges::accumulate(negs, ""s, [](auto s, auto i){ return s + " " + std::to_string(i); });
-    throw std::invalid_argument{"negatives not allowed"s + s};
+inline const auto sum_positives = [](const auto& ints) {
+  auto negs = ranges::filter_view(ints, [](auto i) { return i < 0; });
+  if (negs.empty())
+    return ranges::accumulate(ints, 0);
+  auto negs_str = ranges::accumulate(
+    negs, ""s, [](auto s, auto i) { return s + " " + std::to_string(i); });
+  throw std::invalid_argument{ "negatives not allowed"s + negs_str };
 };
 
-inline const auto extractNumsAndSep = [](const auto& parse) -> std::pair<std::string, std::string> {
-  constexpr auto SizeOfSepSection{ 4 };
+inline const auto str_to_int = [](const auto& str) {
+  if (str.empty())
+    return 0;
+  return std::stoi(str);
+};
 
-  if (parse.size() >= SizeOfSepSection && parse[0] == '/')
-    return { { begin(parse) + SizeOfSepSection, end(parse) }, { 1, parse[2] } };
+inline const auto to_ints = [](const auto& nums) {
+  return ranges::views::transform(nums, str_to_int);
+};
+
+inline const auto split_nums_by_seps = [](const auto& nums_and_seps) {
+  const auto& [nums, seps] = nums_and_seps;
+  std::vector<std::string> separated_nums{};
+  split(separated_nums, nums, is_any_of(seps));
+  return separated_nums;
+};
+
+inline const auto split_into_nums_and_seps = [](const auto& parse) -> std::pair<std::string, std::string> {
+  constexpr auto size_of_seps_section{ 4 };
+
+  if (parse.size() >= size_of_seps_section && parse[0] == '/')
+    return { { begin(parse) + size_of_seps_section, end(parse) }, { 1, parse[2] } };
   else
     return { parse, ",\n"s };
 };
 
-inline const auto add = [](const auto& addStr) {
-  if (addStr.empty())
-    return 0;
-
-  auto [nums, sep] = extractNumsAndSep(addStr);
-
-  std::vector<std::string> separatedNums{};
-  split(separatedNums, nums, is_any_of(sep));
-
-  auto ints = ranges::views::transform(
-    separatedNums, [](const auto& a) { return std::stoi(a); });
-
-  return sumNonNegatives(ints);
+inline const auto add = [](const auto& add_str) {
+  return sum_positives(to_ints(split_nums_by_seps(split_into_nums_and_seps(add_str))));
 };
 }
