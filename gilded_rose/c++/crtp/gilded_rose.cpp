@@ -21,7 +21,6 @@ class Item
 {
   public:
     void update();
-    void stream(std::ostream& o);
 };
 
 template <class It>
@@ -32,23 +31,9 @@ void Item<It>::update()
 }
 
 template <class It>
-void Item<It>::stream(std::ostream& o)
-{
-    It& self = *static_cast<It*>(this);
-    o << self;
-}
-
-template <class It>
 void updateItem(Item<It>& item)
 {
     item.update();
-}
-
-template <class It>
-std::ostream& streamItem(std::ostream& o, Item<It>& item)
-{
-    item.stream(o);
-    return o;
 }
 
 class Article : public Item<Article>
@@ -290,6 +275,54 @@ bool Conjured::operator!=(Conjured const& other) const
 std::ostream& operator<<(std::ostream& o, Conjured const& a)
 {
     o << "Conjured " << a.name << ", " << a.sellIn << ", " << a.quality;
+    return o;
+}
+
+class GildedRose
+{
+  public:
+    void update();
+
+  private:
+    Article a{"+5 Dexterity Vest", 10, 20};
+    AgedBrie b{0};
+    Article c{"Elixir of the Mongoose", 5, 7};
+    Sulfuras d{};
+    Sulfuras e{};
+    BackstagePass f{"TAFKAL80ETC concert", 15, 20};
+    BackstagePass g{"TAFKAL80ETC concert", 10, 49};
+    BackstagePass h{"TAFKAL80ETC concert", 5, 49};
+    Conjured i{"Sword of Gold", 5, 21};
+
+    friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
+};
+
+void GildedRose::update()
+{
+    updateItem(a);
+    updateItem(b);
+    updateItem(c);
+    updateItem(d);
+    updateItem(e);
+    updateItem(f);
+    updateItem(g);
+    updateItem(h);
+    updateItem(i);
+}
+
+std::ostream& operator<<(std::ostream& o, GildedRose const& g)
+{
+    o << "name, sellIn, quality\n";
+    o << g.a << '\n';
+    o << g.b << '\n';
+    o << g.c << '\n';
+    o << g.d << '\n';
+    o << g.e << '\n';
+    o << g.f << '\n';
+    o << g.g << '\n';
+    o << g.h << '\n';
+    o << g.i << '\n';
+
     return o;
 }
 
@@ -600,6 +633,8 @@ int main(int argc, const char** argv)
     auto h = BackstagePass("TAFKAL80ETC concert", 5, 49);
     auto i = Conjured("Sword of Gold", 5, 21);
 
+    GildedRose store;
+
     std::cout << "GildedRose\n";
 
     for (int day = 0; day <= 30; day++)
@@ -607,27 +642,9 @@ int main(int argc, const char** argv)
         std::cout << "-------- day " << day << " --------\n";
         std::cout << "name, sellIn, quality\n";
 
-        updateItem(a);
-        updateItem(b);
-        updateItem(c);
-        updateItem(d);
-        updateItem(e);
-        updateItem(f);
-        updateItem(g);
-        updateItem(h);
-        updateItem(i);
+        store.update();
 
-        streamItem(std::cout, a) << '\n';
-        streamItem(std::cout, b) << '\n';
-        streamItem(std::cout, c) << '\n';
-        streamItem(std::cout, d) << '\n';
-        streamItem(std::cout, e) << '\n';
-        streamItem(std::cout, f) << '\n';
-        streamItem(std::cout, g) << '\n';
-        streamItem(std::cout, h) << '\n';
-        streamItem(std::cout, i) << '\n';
-
-        std::cout << "\n\n";
+        std::cout << store << "\n\n";
     }
 
     doctest::Context context;
