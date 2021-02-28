@@ -1,7 +1,9 @@
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <ostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 class Quality
@@ -25,11 +27,11 @@ class Item
     virtual void stream(std::ostream& o) = 0;
 };
 
-std::ostream& operator<<(std::ostream& o, Item* it);
+std::ostream& operator<<(std::ostream& o, Item& it);
 
-std::ostream& operator<<(std::ostream& o, Item* it)
+std::ostream& operator<<(std::ostream& o, Item& it)
 {
-    it->stream(o);
+    it.stream(o);
     return o;
 }
 
@@ -267,30 +269,31 @@ bool Conjured::operator!=(Conjured const& other) const
 class GildedRose
 {
   public:
-    void add(Item*);
+    using ItemRef = std::unique_ptr<Item>;
+    void add(ItemRef);
     void update();
 
   private:
-    using Articles = std::vector<Item*>;
+    using Articles = std::vector<ItemRef>;
     Articles articles;
 
     friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
 };
 
-void GildedRose::add(Item* it)
+void GildedRose::add(ItemRef it)
 {
-    articles.push_back(it);
+    articles.push_back(std::move(it));
 }
 
 void GildedRose::update()
 {
-    std::for_each(articles.begin(), articles.end(), [](auto it) { it->update(); });
+    std::for_each(articles.begin(), articles.end(), [](auto& it) { it->update(); });
 }
 
 std::ostream& operator<<(std::ostream& o, GildedRose const& g)
 {
     o << "name, sellIn, quality\n";
-    std::for_each(g.articles.begin(), g.articles.end(), [&o](auto it) { o << it << '\n'; });
+    std::for_each(g.articles.begin(), g.articles.end(), [&o](auto& it) { o << *it << '\n'; });
     return o;
 }
 
@@ -591,15 +594,15 @@ SCENARIO("conjured article with min quality is updated")
 int main(int argc, const char** argv)
 {
     GildedRose store;
-    store.add(new Article("+5 Dexterity Vest", 10, 20));
-    store.add(new AgedBrie(0));
-    store.add(new Article("Elixir of the Mongoose", 5, 7));
-    store.add(new Sulfuras());
-    store.add(new Sulfuras());
-    store.add(new BackstagePass("TAFKAL80ETC concert", 15, 20));
-    store.add(new BackstagePass("TAFKAL80ETC concert", 10, 49));
-    store.add(new BackstagePass("TAFKAL80ETC concert", 5, 49));
-    store.add(new Conjured("Sword of Gold", 5, 21));
+    store.add(std::make_unique<Article>("+5 Dexterity Vest", 10, 20));
+    store.add(std::make_unique<AgedBrie>(0));
+    store.add(std::make_unique<Article>("Elixir of the Mongoose", 5, 7));
+    store.add(std::make_unique<Sulfuras>());
+    store.add(std::make_unique<Sulfuras>());
+    store.add(std::make_unique<BackstagePass>("TAFKAL80ETC concert", 15, 20));
+    store.add(std::make_unique<BackstagePass>("TAFKAL80ETC concert", 10, 49));
+    store.add(std::make_unique<BackstagePass>("TAFKAL80ETC concert", 5, 49));
+    store.add(std::make_unique<Conjured>("Sword of Gold", 5, 21));
 
     std::cout << "GildedRose\n";
 
