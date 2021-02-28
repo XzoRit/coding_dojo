@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(gilded_rose_std_variant)
+project(gilded_rose_virtual)
 
 include_directories("
 ${CMAKE_CURRENT_SOURCE_DIR}/../../../doctest/doctest")

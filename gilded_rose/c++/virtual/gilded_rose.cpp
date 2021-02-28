@@ -1,7 +1,8 @@
+#include <algorithm>
 #include <iostream>
-
-#ifndef _QUALITY_HPP_
-#define _QUALITY_HPP_
+#include <ostream>
+#include <string>
+#include <vector>
 
 class Quality
 {
@@ -15,63 +16,44 @@ class Quality
     {
         return 0;
     }
-
-    static int sulfuras()
-    {
-        return 80;
-    }
 };
 
-#endif
-
-class Article
+class Item
 {
+  public:
+    virtual void update() = 0;
+    virtual void stream(std::ostream& o) = 0;
 };
 
-#ifndef _ARTICLE_HPP_
-#define _ARTICLE_HPP_
+std::ostream& operator<<(std::ostream& o, Item* it);
 
-#include <ostream>
-#include <string>
+std::ostream& operator<<(std::ostream& o, Item* it)
+{
+    it->stream(o);
+    return o;
+}
 
-class Article
+class Article : public Item
 {
   public:
     Article(std::string name, int sellIn, int quality);
-    void update();
+    void update() override;
+    void stream(std::ostream& o) override;
+
     bool operator==(Article const&) const;
     bool operator!=(Article const&) const;
 
   private:
-    friend std::ostream& operator<<(std::ostream& o, Article const& a);
     std::string const name;
     int sellIn;
     int quality;
 };
-
-#endif
-
-std::ostream& operator<<(std::ostream& o, Article const& a)
-{
-    o << a.name << ", " << a.sellIn << ", " << a.quality;
-    return o;
-}
 
 Article::Article(std::string name, int sellIn, int quality)
     : name(name)
     , sellIn(sellIn)
     , quality(quality)
 {
-}
-
-bool Article::operator==(Article const& other) const
-{
-    return (sellIn == other.sellIn) && (quality == other.quality) && (name == other.name);
-}
-
-bool Article::operator!=(Article const& other) const
-{
-    return !(*this == other);
 }
 
 void Article::update()
@@ -91,35 +73,51 @@ void Article::update()
     --sellIn;
 }
 
-#ifndef _AGED_BRIE_HPP_
-#define _AGED_BRIE_HPP_
+void Article::stream(std::ostream& o)
+{
+    o << name << ", " << sellIn << ", " << quality;
+}
 
-#include <ostream>
+bool Article::operator==(Article const& other) const
+{
+    return (sellIn == other.sellIn) && (quality == other.quality) && (name == other.name);
+}
 
-class AgedBrie
+bool Article::operator!=(Article const& other) const
+{
+    return !(*this == other);
+}
+
+class AgedBrie : public Item
 {
   public:
     AgedBrie(int quality);
+    void update() override;
+    void stream(std::ostream& o) override;
+
     bool operator==(AgedBrie const& other) const;
     bool operator!=(AgedBrie const& other) const;
-    void update();
 
   private:
-    friend std::ostream& operator<<(std::ostream& o, AgedBrie const& a);
     int quality;
 };
-
-#endif
-
-std::ostream& operator<<(std::ostream& o, AgedBrie const& a)
-{
-    o << "Aged Brie, " << a.quality;
-    return o;
-}
 
 AgedBrie::AgedBrie(int quality)
     : quality(quality)
 {
+}
+
+void AgedBrie::update()
+{
+    if (quality < Quality::max())
+    {
+        ++quality;
+    }
+}
+
+void AgedBrie::stream(std::ostream& o)
+{
+    o << "Aged Brie, " << quality;
 }
 
 bool AgedBrie::operator==(AgedBrie const& other) const
@@ -132,58 +130,27 @@ bool AgedBrie::operator!=(AgedBrie const& other) const
     return !(*this == other);
 }
 
-void AgedBrie::update()
-{
-    if (quality < Quality::max())
-    {
-        ++quality;
-    }
-}
-
-#ifndef _BACKSTAGE_PASS_HPP_
-#define _BACKSTAGE_PASS_HPP_
-
-#include <ostream>
-#include <string>
-
-class BackstagePass
+class BackstagePass : public Item
 {
   public:
     BackstagePass(std::string concert, int sellIn, int quality);
+    void update() override;
+    void stream(std::ostream& o) override;
+
     bool operator==(BackstagePass const& other) const;
     bool operator!=(BackstagePass const& other) const;
-    void update();
 
   private:
-    friend std::ostream& operator<<(std::ostream& o, BackstagePass const& b);
     std::string concert;
     int sellIn;
     int quality;
 };
-
-#endif
-
-std::ostream& operator<<(std::ostream& o, BackstagePass const& b)
-{
-    o << "Backstage pass for " << b.concert << ", " << b.sellIn << ", " << b.quality;
-    return o;
-}
 
 BackstagePass::BackstagePass(std::string concert, int sellIn, int quality)
     : concert(concert)
     , sellIn(sellIn)
     , quality(quality)
 {
-}
-
-bool BackstagePass::operator==(BackstagePass const& other) const
-{
-    return (quality == other.quality) && (sellIn == other.sellIn) && (concert == other.concert);
-}
-
-bool BackstagePass::operator!=(BackstagePass const& other) const
-{
-    return !(*this == other);
 }
 
 void BackstagePass::update()
@@ -211,76 +178,58 @@ void BackstagePass::update()
     --sellIn;
 }
 
-#ifndef _SULFURAS_HPP_
-#define _SULFURAS_HPP_
+void BackstagePass::stream(std::ostream& o)
+{
+    o << "Backstage pass for " << concert << ", " << sellIn << ", " << quality;
+}
 
-#include <ostream>
+bool BackstagePass::operator==(BackstagePass const& other) const
+{
+    return (quality == other.quality) && (sellIn == other.sellIn) && (concert == other.concert);
+}
 
-class Sulfuras
+bool BackstagePass::operator!=(BackstagePass const& other) const
+{
+    return !(*this == other);
+}
+
+class Sulfuras : public Item
 {
   public:
-    void update();
-
-  private:
-    friend std::ostream& operator<<(std::ostream& o, Sulfuras const& s);
+    void update() override;
+    void stream(std::ostream& o) override;
 };
-
-#endif
-
-std::ostream& operator<<(std::ostream& o, Sulfuras const& s)
-{
-    o << "Sulfuras";
-    return o;
-}
 
 void Sulfuras::update()
 {
 }
 
-#ifndef _CONJURED_HPP_
-#define _CONJURED_HPP_
+void Sulfuras::stream(std::ostream& o)
+{
+    o << "Sulfuras";
+}
 
-#include <ostream>
-#include <string>
-
-class Conjured
+class Conjured : public Item
 {
   public:
     Conjured(std::string name, int sellIn, int quality);
-    void update();
+    void update() override;
+    void stream(std::ostream& o) override;
+
     bool operator==(Conjured const&) const;
     bool operator!=(Conjured const&) const;
 
   private:
-    friend std::ostream& operator<<(std::ostream& o, Conjured const& a);
-    std::string const name;
+    std::string name;
     int sellIn;
     int quality;
 };
-
-#endif
-
-std::ostream& operator<<(std::ostream& o, Conjured const& a)
-{
-    o << "Conjured " << a.name << ", " << a.sellIn << ", " << a.quality;
-    return o;
-}
 
 Conjured::Conjured(std::string name, int sellIn, int quality)
     : name(name)
     , sellIn(sellIn)
     , quality(quality)
 {
-}
-
-bool Conjured::operator==(Conjured const& other) const
-{
-    return (sellIn == other.sellIn) && (quality == other.quality) && (name == other.name);
-}
-
-bool Conjured::operator!=(Conjured const& other) const
-{
-    return !(*this == other);
 }
 
 void Conjured::update()
@@ -300,87 +249,53 @@ void Conjured::update()
     --sellIn;
 }
 
-#ifndef _ARTICLES_HPP_
-#define _ARTICLES_HPP_
+void Conjured::stream(std::ostream& o)
+{
+    o << "Conjured " << name << ", " << sellIn << ", " << quality;
+}
 
-#include <variant>
-#include <vector>
+bool Conjured::operator==(Conjured const& other) const
+{
+    return (sellIn == other.sellIn) && (quality == other.quality) && (name == other.name);
+}
 
-typedef std::vector<std::variant<Article, AgedBrie, BackstagePass, Sulfuras, Conjured>> Articles;
+bool Conjured::operator!=(Conjured const& other) const
+{
+    return !(*this == other);
+}
 
-#endif
-
-#ifndef _GILDED_ROSE_HPP_
-#define _GILDED_ROSE_HPP_
-
-#include <algorithm>
-
-template <class ArticlesType>
 class GildedRose
 {
   public:
-    explicit GildedRose(ArticlesType articles);
-    void updateQuality();
+    void add(Item*);
+    void update();
 
   private:
-    template <class Articles>
-    friend std::ostream& operator<<(std::ostream& o, GildedRose<Articles> const& g);
-    ArticlesType articles;
+    using Articles = std::vector<Item*>;
+    Articles articles;
+
+    friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
 };
 
-class OStreamer
+void GildedRose::add(Item* it)
 {
-  public:
-    explicit OStreamer(std::ostream& o)
-        : o(o)
-    {
-    }
+    articles.push_back(it);
+}
 
-    template <class T>
-    void operator()(const T& t) const
-    {
-        o << t << '\n';
-    }
+void GildedRose::update()
+{
+    std::for_each(articles.begin(), articles.end(), [](auto it) { it->update(); });
+}
 
-  private:
-    std::ostream& o;
-};
-
-template <class Articles>
-std::ostream& operator<<(std::ostream& o, GildedRose<Articles> const& g)
+std::ostream& operator<<(std::ostream& o, GildedRose const& g)
 {
     o << "name, sellIn, quality\n";
-    std::for_each(g.articles.begin(), g.articles.end(), [&o](const auto& as) { std::visit(OStreamer{o}, as); });
+    std::for_each(g.articles.begin(), g.articles.end(), [&o](auto it) { o << it << '\n'; });
     return o;
 }
 
-class Updater
-{
-  public:
-    template <class T>
-    void operator()(T& t)
-    {
-        t.update();
-    }
-};
-
-template <class ArticlesType>
-GildedRose<ArticlesType>::GildedRose(ArticlesType articles)
-    : articles(articles)
-{
-}
-
-template <class ArticlesType>
-void GildedRose<ArticlesType>::updateQuality()
-{
-    std::for_each(articles.begin(), articles.end(), [](auto& as) { std::visit(Updater{}, as); });
-}
-
-#endif
-
-#include <vector>
-
 #define DOCTEST_CONFIG_IMPLEMENT
+#define DOCTEST_CONFIG_COLORS_NONE
 #include <doctest.h>
 
 SCENARIO("article with positive sellin is updated")
@@ -610,7 +525,6 @@ SCENARIO("sulfuras is updated")
         Sulfuras s;
         WHEN("it is updated")
         {
-            s.update();
             THEN("neither quality nor sellin change")
             {
             }
@@ -674,10 +588,28 @@ SCENARIO("conjured article with min quality is updated")
     }
 }
 
-using namespace std;
-
 int main(int argc, const char** argv)
 {
+    GildedRose store;
+    store.add(new Article("+5 Dexterity Vest", 10, 20));
+    store.add(new AgedBrie(0));
+    store.add(new Article("Elixir of the Mongoose", 5, 7));
+    store.add(new Sulfuras());
+    store.add(new Sulfuras());
+    store.add(new BackstagePass("TAFKAL80ETC concert", 15, 20));
+    store.add(new BackstagePass("TAFKAL80ETC concert", 10, 49));
+    store.add(new BackstagePass("TAFKAL80ETC concert", 5, 49));
+    store.add(new Conjured("Sword of Gold", 5, 21));
+
+    std::cout << "GildedRose\n";
+
+    for (int day = 0; day <= 30; day++)
+    {
+        std::cout << "-------- day " << day << " --------\n";
+        std::cout << store << "\n\n";
+        store.update();
+    }
+
     doctest::Context context;
 
     context.applyCommandLine(argc, argv);
@@ -686,27 +618,6 @@ int main(int argc, const char** argv)
 
     if (context.shouldExit())
         return res;
-
-    Articles articles;
-    articles.push_back(Article("+5 Dexterity Vest", 10, 20));
-    articles.push_back(AgedBrie(0));
-    articles.push_back(Article("Elixir of the Mongoose", 5, 7));
-    articles.push_back(Sulfuras());
-    articles.push_back(Sulfuras());
-    articles.push_back(BackstagePass("TAFKAL80ETC concert", 15, 20));
-    articles.push_back(BackstagePass("TAFKAL80ETC concert", 10, 49));
-    articles.push_back(BackstagePass("TAFKAL80ETC concert", 5, 49));
-    articles.push_back(Conjured("Sword of Gold", 5, 21));
-    GildedRose<Articles> app(articles);
-
-    cout << "OMGHAI!" << endl;
-
-    for (int day = 0; day <= 30; day++)
-    {
-        cout << "-------- day " << day << " --------\n";
-        cout << app << "\n\n";
-        app.updateQuality();
-    }
 
     return res;
 }

@@ -96,6 +96,14 @@ AgedBrie::AgedBrie(int quality)
 {
 }
 
+void AgedBrie::update()
+{
+    if (quality < Quality::max())
+    {
+        ++quality;
+    }
+}
+
 bool AgedBrie::operator==(AgedBrie const& other) const
 {
     return quality == other.quality;
@@ -104,14 +112,6 @@ bool AgedBrie::operator==(AgedBrie const& other) const
 bool AgedBrie::operator!=(AgedBrie const& other) const
 {
     return !(*this == other);
-}
-
-void AgedBrie::update()
-{
-    if (quality < Quality::max())
-    {
-        ++quality;
-    }
 }
 
 std::ostream& operator<<(std::ostream& o, AgedBrie const& a)
