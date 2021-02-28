@@ -254,19 +254,6 @@ std::ostream& operator<<(std::ostream& o, Conjured const& a)
     return o;
 }
 
-using Articles = std::vector<std::variant<Article, AgedBrie, BackstagePass, Sulfuras, Conjured>>;
-
-class GildedRose
-{
-  public:
-    explicit GildedRose(Articles articles);
-    void update();
-
-  private:
-    friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
-    Articles articles;
-};
-
 class OStreamer
 {
   public:
@@ -285,13 +272,6 @@ class OStreamer
     std::ostream& o;
 };
 
-std::ostream& operator<<(std::ostream& o, GildedRose const& g)
-{
-    o << "name, sellIn, quality\n";
-    std::for_each(g.articles.begin(), g.articles.end(), [&o](const auto& as) { std::visit(OStreamer{o}, as); });
-    return o;
-}
-
 class Updater
 {
   public:
@@ -306,14 +286,36 @@ class Updater
     }
 };
 
-GildedRose::GildedRose(Articles articles)
-    : articles(articles)
+class GildedRose
 {
+  public:
+    using Item = std::variant<Article, AgedBrie, BackstagePass, Sulfuras, Conjured>;
+
+    void add(Item);
+    void update();
+
+  private:
+    using Articles = std::vector<Item>;
+    Articles articles;
+
+    friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
+};
+
+void GildedRose::add(Item it)
+{
+    articles.push_back(it);
 }
 
 void GildedRose::update()
 {
     std::for_each(articles.begin(), articles.end(), [](auto& as) { std::visit(Updater{}, as); });
+}
+
+std::ostream& operator<<(std::ostream& o, GildedRose const& g)
+{
+    o << "name, sellIn, quality\n";
+    std::for_each(g.articles.begin(), g.articles.end(), [&o](const auto& as) { std::visit(OStreamer{o}, as); });
+    return o;
 }
 
 #define DOCTEST_CONFIG_IMPLEMENT
@@ -612,17 +614,16 @@ SCENARIO("conjured article with min quality is updated")
 
 int main(int argc, const char** argv)
 {
-    Articles articles;
-    articles.push_back(Article("+5 Dexterity Vest", 10, 20));
-    articles.push_back(AgedBrie(0));
-    articles.push_back(Article("Elixir of the Mongoose", 5, 7));
-    articles.push_back(Sulfuras());
-    articles.push_back(Sulfuras());
-    articles.push_back(BackstagePass("TAFKAL80ETC concert", 15, 20));
-    articles.push_back(BackstagePass("TAFKAL80ETC concert", 10, 49));
-    articles.push_back(BackstagePass("TAFKAL80ETC concert", 5, 49));
-    articles.push_back(Conjured("Sword of Gold", 5, 21));
-    GildedRose store(articles);
+    GildedRose store;
+    store.add(Article("+5 Dexterity Vest", 10, 20));
+    store.add(AgedBrie(0));
+    store.add(Article("Elixir of the Mongoose", 5, 7));
+    store.add(Sulfuras());
+    store.add(Sulfuras());
+    store.add(BackstagePass("TAFKAL80ETC concert", 15, 20));
+    store.add(BackstagePass("TAFKAL80ETC concert", 10, 49));
+    store.add(BackstagePass("TAFKAL80ETC concert", 5, 49));
+    store.add(Conjured("Sword of Gold", 5, 21));
 
     std::cout << "GildedRose\n";
 
