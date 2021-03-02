@@ -2,8 +2,13 @@ cmake_minimum_required(VERSION 3.2)
 
 project(gilded_rose_crtp)
 
-include_directories("
-${CMAKE_CURRENT_SOURCE_DIR}/../../../doctest/doctest")
+set(
+  BOOST_ROOT
+  $ENV{BOOST_ROOT}
+)
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../../doctest/doctest")
+include_directories("${BOOST_ROOT}")
 
 set (${PROJECT_NAME}_headers "")
 set (${PROJECT_NAME}_sources "")

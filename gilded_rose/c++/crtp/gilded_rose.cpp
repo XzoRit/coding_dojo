@@ -1,6 +1,11 @@
+#include <boost/hana.hpp>
+
 #include <iostream>
 #include <ostream>
 #include <string>
+
+using ::boost::hana::for_each;
+using ::boost::hana::members;
 
 class Quality
 {
@@ -278,12 +283,8 @@ std::ostream& operator<<(std::ostream& o, Conjured const& a)
     return o;
 }
 
-class GildedRose
+struct Articles
 {
-  public:
-    void update();
-
-  private:
     Article a{"+5 Dexterity Vest", 10, 20};
     AgedBrie b{0};
     Article c{"Elixir of the Mongoose", 5, 7};
@@ -293,35 +294,30 @@ class GildedRose
     BackstagePass g{"TAFKAL80ETC concert", 10, 49};
     BackstagePass h{"TAFKAL80ETC concert", 5, 49};
     Conjured i{"Sword of Gold", 5, 21};
+};
+
+BOOST_HANA_ADAPT_STRUCT(Articles, a, b, c, d, e, f, g, h, i);
+
+class GildedRose
+{
+  public:
+    void update();
+
+  private:
+    Articles articles;
 
     friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
 };
 
 void GildedRose::update()
 {
-    updateItem(a);
-    updateItem(b);
-    updateItem(c);
-    updateItem(d);
-    updateItem(e);
-    updateItem(f);
-    updateItem(g);
-    updateItem(h);
-    updateItem(i);
+    for_each(members(articles), [](auto&& item) { updateItem(item); });
 }
 
 std::ostream& operator<<(std::ostream& o, GildedRose const& g)
 {
     o << "name, sellIn, quality\n";
-    o << g.a << '\n';
-    o << g.b << '\n';
-    o << g.c << '\n';
-    o << g.d << '\n';
-    o << g.e << '\n';
-    o << g.f << '\n';
-    o << g.g << '\n';
-    o << g.h << '\n';
-    o << g.i << '\n';
+    for_each(members(g.articles), [&](auto&& item) { o << item << '\n'; });
 
     return o;
 }
@@ -623,16 +619,6 @@ SCENARIO("conjured article with min quality is updated")
 int main(int argc, const char** argv)
 {
 
-    auto a = Article("+5 Dexterity Vest", 10, 20);
-    auto b = AgedBrie(0);
-    auto c = Article("Elixir of the Mongoose", 5, 7);
-    auto d = Sulfuras();
-    auto e = Sulfuras();
-    auto f = BackstagePass("TAFKAL80ETC concert", 15, 20);
-    auto g = BackstagePass("TAFKAL80ETC concert", 10, 49);
-    auto h = BackstagePass("TAFKAL80ETC concert", 5, 49);
-    auto i = Conjured("Sword of Gold", 5, 21);
-
     GildedRose store;
 
     std::cout << "GildedRose\n";
@@ -640,7 +626,6 @@ int main(int argc, const char** argv)
     for (int day = 0; day <= 30; day++)
     {
         std::cout << "-------- day " << day << " --------\n";
-        std::cout << "name, sellIn, quality\n";
 
         store.update();
 
