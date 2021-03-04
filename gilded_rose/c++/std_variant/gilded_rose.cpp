@@ -3,7 +3,6 @@
 #include <ostream>
 #include <string>
 #include <variant>
-#include <vector>
 
 class Quality
 {
@@ -25,21 +24,20 @@ class Article
     Article(std::string name, int sellIn, int quality);
     void update();
 
-    bool operator==(Article const&) const;
-    bool operator!=(Article const&) const;
-
   private:
-    std::string const name;
+    std::string name;
     int sellIn;
     int quality;
 
-    friend std::ostream& operator<<(std::ostream& o, Article const& a);
+    friend bool operator==(const Article& a, const Article& b);
+    friend bool operator!=(const Article& a, const Article& b);
+    friend std::ostream& operator<<(std::ostream& o, const Article& a);
 };
 
 Article::Article(std::string name, int sellIn, int quality)
-    : name(name)
-    , sellIn(sellIn)
-    , quality(quality)
+    : name{name}
+    , sellIn{sellIn}
+    , quality{quality}
 {
 }
 
@@ -60,17 +58,17 @@ void Article::update()
     --sellIn;
 }
 
-bool Article::operator==(Article const& other) const
+bool operator==(const Article& a, const Article& b)
 {
-    return (sellIn == other.sellIn) && (quality == other.quality) && (name == other.name);
+    return (a.sellIn == b.sellIn) && (a.quality == b.quality) && (a.name == b.name);
 }
 
-bool Article::operator!=(Article const& other) const
+bool operator!=(const Article& a, const Article& b)
 {
-    return !(*this == other);
+    return !(a == b);
 }
 
-std::ostream& operator<<(std::ostream& o, Article const& a)
+std::ostream& operator<<(std::ostream& o, const Article& a)
 {
     o << a.name << ", " << a.sellIn << ", " << a.quality;
     return o;
@@ -82,17 +80,16 @@ class AgedBrie
     AgedBrie(int quality);
     void update();
 
-    bool operator==(AgedBrie const& other) const;
-    bool operator!=(AgedBrie const& other) const;
-
   private:
     int quality;
 
-    friend std::ostream& operator<<(std::ostream& o, AgedBrie const& a);
+    friend bool operator==(const AgedBrie& a, const AgedBrie& b);
+    friend bool operator!=(const AgedBrie& a, const AgedBrie& b);
+    friend std::ostream& operator<<(std::ostream& o, const AgedBrie& a);
 };
 
 AgedBrie::AgedBrie(int quality)
-    : quality(quality)
+    : quality{quality}
 {
 }
 
@@ -104,17 +101,17 @@ void AgedBrie::update()
     }
 }
 
-bool AgedBrie::operator==(AgedBrie const& other) const
+bool operator==(const AgedBrie& a, const AgedBrie& b)
 {
-    return quality == other.quality;
+    return a.quality == b.quality;
 }
 
-bool AgedBrie::operator!=(AgedBrie const& other) const
+bool operator!=(const AgedBrie& a, const AgedBrie& b)
 {
-    return !(*this == other);
+    return !(a == b);
 }
 
-std::ostream& operator<<(std::ostream& o, AgedBrie const& a)
+std::ostream& operator<<(std::ostream& o, const AgedBrie& a)
 {
     o << "Aged Brie, " << a.quality;
     return o;
@@ -126,21 +123,20 @@ class BackstagePass
     BackstagePass(std::string concert, int sellIn, int quality);
     void update();
 
-    bool operator==(BackstagePass const& other) const;
-    bool operator!=(BackstagePass const& other) const;
-
   private:
     std::string concert;
     int sellIn;
     int quality;
 
-    friend std::ostream& operator<<(std::ostream& o, BackstagePass const& b);
+    friend bool operator==(const BackstagePass& a, const BackstagePass& b);
+    friend bool operator!=(const BackstagePass& a, const BackstagePass& b);
+    friend std::ostream& operator<<(std::ostream& o, const BackstagePass& b);
 };
 
 BackstagePass::BackstagePass(std::string concert, int sellIn, int quality)
-    : concert(concert)
-    , sellIn(sellIn)
-    , quality(quality)
+    : concert{concert}
+    , sellIn{sellIn}
+    , quality{quality}
 {
 }
 
@@ -169,17 +165,17 @@ void BackstagePass::update()
     --sellIn;
 }
 
-bool BackstagePass::operator==(BackstagePass const& other) const
+bool operator==(const BackstagePass& a, const BackstagePass& b)
 {
-    return (quality == other.quality) && (sellIn == other.sellIn) && (concert == other.concert);
+    return (a.quality == b.quality) && (a.sellIn == b.sellIn) && (a.concert == b.concert);
 }
 
-bool BackstagePass::operator!=(BackstagePass const& other) const
+bool operator!=(const BackstagePass& a, const BackstagePass& b)
 {
-    return !(*this == other);
+    return !(a == b);
 }
 
-std::ostream& operator<<(std::ostream& o, BackstagePass const& b)
+std::ostream& operator<<(std::ostream& o, const BackstagePass& b)
 {
     o << "Backstage pass for " << b.concert << ", " << b.sellIn << ", " << b.quality;
     return o;
@@ -188,10 +184,10 @@ std::ostream& operator<<(std::ostream& o, BackstagePass const& b)
 class Sulfuras
 {
   private:
-    friend std::ostream& operator<<(std::ostream& o, Sulfuras const& s);
+    friend std::ostream& operator<<(std::ostream& o, const Sulfuras& s);
 };
 
-std::ostream& operator<<(std::ostream& o, Sulfuras const& s)
+std::ostream& operator<<(std::ostream& o, const Sulfuras& s)
 {
     o << "Sulfuras";
     return o;
@@ -203,21 +199,20 @@ class Conjured
     Conjured(std::string name, int sellIn, int quality);
     void update();
 
-    bool operator==(Conjured const&) const;
-    bool operator!=(Conjured const&) const;
-
   private:
     std::string name;
     int sellIn;
     int quality;
 
-    friend std::ostream& operator<<(std::ostream& o, Conjured const& a);
+    friend bool operator==(const Conjured& a, const Conjured& b);
+    friend bool operator!=(const Conjured& a, const Conjured& b);
+    friend std::ostream& operator<<(std::ostream& o, const Conjured& a);
 };
 
 Conjured::Conjured(std::string name, int sellIn, int quality)
-    : name(name)
-    , sellIn(sellIn)
-    , quality(quality)
+    : name{name}
+    , sellIn{sellIn}
+    , quality{quality}
 {
 }
 
@@ -238,17 +233,17 @@ void Conjured::update()
     --sellIn;
 }
 
-bool Conjured::operator==(Conjured const& other) const
+bool operator==(const Conjured& a, const Conjured& b)
 {
-    return (sellIn == other.sellIn) && (quality == other.quality) && (name == other.name);
+    return (a.sellIn == b.sellIn) && (a.quality == b.quality) && (a.name == b.name);
 }
 
-bool Conjured::operator!=(Conjured const& other) const
+bool operator!=(const Conjured& a, const Conjured& b)
 {
-    return !(*this == other);
+    return !(a == b);
 }
 
-std::ostream& operator<<(std::ostream& o, Conjured const& a)
+std::ostream& operator<<(std::ostream& o, const Conjured& a)
 {
     o << "Conjured " << a.name << ", " << a.sellIn << ", " << a.quality;
     return o;
@@ -326,16 +321,16 @@ SCENARIO("article with positive sellin is updated")
 {
     GIVEN("an article with positive sellin")
     {
-        int const quality = 7;
-        int const sellIn = 16;
-        std::string const name = "article";
-        Article a(name, sellIn, quality);
+        const int quality{7};
+        const int sellIn{16};
+        const std::string name{"article"};
+        Article a{name, sellIn, quality};
         WHEN("it is updated")
         {
             a.update();
             THEN("quality and sellin are decremented by 1")
             {
-                CHECK(a == Article(name, sellIn - 1, quality - 1));
+                CHECK(a == Article{name, sellIn - 1, quality - 1});
             }
         }
     }
@@ -345,16 +340,16 @@ SCENARIO("article with sellin of 0 is updated")
 {
     GIVEN("an aritcle with a sellin value of 0")
     {
-        int const quality = 7;
-        int const sellIn = 0;
-        std::string const name = "article";
-        Article a(name, sellIn, quality);
+        const int quality{7};
+        const int sellIn{0};
+        const std::string name{"article"};
+        Article a{name, sellIn, quality};
         WHEN("it is updated")
         {
             a.update();
             THEN("quality is decremented by 2 and sellin is decremented by 1")
             {
-                CHECK(a == Article(name, sellIn - 1, quality - 2));
+                CHECK(a == Article{name, sellIn - 1, quality - 2});
             }
         }
     }
@@ -364,15 +359,15 @@ SCENARIO("article with min quality is updated")
 {
     GIVEN("an article with min quality")
     {
-        int const sellIn = 0;
-        std::string const name = "article";
-        Article a(name, sellIn, Quality::min());
+        const int sellIn{0};
+        const std::string name{"article"};
+        Article a{name, sellIn, Quality::min()};
         WHEN("it is updated")
         {
             a.update();
             THEN("quality does not change and sellin is decremented by 1")
             {
-                CHECK(a == Article(name, sellIn - 1, Quality::min()));
+                CHECK(a == Article{name, sellIn - 1, Quality::min()});
             }
         }
     }
@@ -382,14 +377,14 @@ SCENARIO("aged brie is updated")
 {
     GIVEN("an aged brie")
     {
-        int const quality = 28;
-        AgedBrie a(quality);
+        const int quality{28};
+        AgedBrie a{quality};
         WHEN("it is updated")
         {
             a.update();
             THEN("quality increases by 1")
             {
-                CHECK(a == AgedBrie(quality + 1));
+                CHECK(a == AgedBrie{quality + 1});
             }
         }
     }
@@ -399,13 +394,13 @@ SCENARIO("aged brie with max quality is updated")
 {
     GIVEN("an aged brie with max quality")
     {
-        AgedBrie a(Quality::max());
+        AgedBrie a{Quality::max()};
         WHEN("it is updated")
         {
             a.update();
             THEN("quality does not change")
             {
-                CHECK(a == AgedBrie(Quality::max()));
+                CHECK(a == AgedBrie{Quality::max()});
             }
         }
     }
@@ -415,16 +410,16 @@ SCENARIO("backstage pass with sellin over 10 is updated")
 {
     GIVEN("a backstage pass with sellin over 10")
     {
-        int const quality = 41;
-        int const sellIn = 11;
-        std::string const concert = "x.y.u.";
-        BackstagePass b(concert, sellIn, quality);
+        const int quality{41};
+        const int sellIn{11};
+        const std::string concert{"x.y.u."};
+        BackstagePass b{concert, sellIn, quality};
         WHEN("it is updated")
         {
             b.update();
             THEN("quality increases by 1 and sellin decreases by 1")
             {
-                CHECK(b == BackstagePass(concert, sellIn - 1, quality + 1));
+                CHECK(b == BackstagePass{concert, sellIn - 1, quality + 1});
             }
         }
     }
@@ -434,15 +429,15 @@ SCENARIO("backstage pass with sellin over 10 and max quality is updated")
 {
     GIVEN("a backstage pass with sellin over 10 and max quality")
     {
-        int const sellIn = 11;
-        std::string const concert = "x.y.u.";
-        BackstagePass b(concert, sellIn, Quality::max());
+        const int sellIn{11};
+        const std::string concert{"x.y.u."};
+        BackstagePass b{concert, sellIn, Quality::max()};
         WHEN("it is updated")
         {
             b.update();
             THEN("quality increases does not change and sellin decreases by 1")
             {
-                CHECK(b == BackstagePass(concert, sellIn - 1, Quality::max()));
+                CHECK(b == BackstagePass{concert, sellIn - 1, Quality::max()});
             }
         }
     }
@@ -452,16 +447,16 @@ SCENARIO("backstage pass with sellin of 10 is updated")
 {
     GIVEN("a backstage with sellin of 10")
     {
-        int const quality = 41;
-        int const sellIn = 10;
-        std::string const concert = "x.y.u.";
-        BackstagePass b(concert, sellIn, quality);
+        const int quality{41};
+        const int sellIn{10};
+        const std::string concert{"x.y.u."};
+        BackstagePass b{concert, sellIn, quality};
         WHEN("it is updated")
         {
             b.update();
             THEN("quality increaes by 2 and sellin decreases by 1")
             {
-                CHECK(b == BackstagePass(concert, sellIn - 1, quality + 2));
+                CHECK(b == BackstagePass{concert, sellIn - 1, quality + 2});
             }
         }
     }
@@ -471,16 +466,16 @@ SCENARIO("backstage pass with sellin of 10 and quality 1 under max is updated")
 {
     GIVEN("a backstage pass with sellin of 10 and quality 1 under max")
     {
-        int const quality = Quality::max() - 1;
-        int const sellIn = 10;
-        std::string const concert = "x.y.u.";
-        BackstagePass b(concert, sellIn, quality);
+        const int quality{Quality::max() - 1};
+        const int sellIn{10};
+        const std::string concert{"x.y.u."};
+        BackstagePass b{concert, sellIn, quality};
         WHEN("it is updated")
         {
             b.update();
             THEN("quality is set to max and selllin decreases by 1")
             {
-                CHECK(b == BackstagePass(concert, sellIn - 1, Quality::max()));
+                CHECK(b == BackstagePass{concert, sellIn - 1, Quality::max()});
             }
         }
     }
@@ -489,16 +484,16 @@ SCENARIO("backstage pass with sellin of 5 is updated")
 {
     GIVEN("a backstage with sellin of 5")
     {
-        int const quality = 41;
-        int const sellIn = 5;
-        std::string const concert = "x.y.u.";
-        BackstagePass b(concert, sellIn, quality);
+        const int quality{41};
+        const int sellIn{5};
+        const std::string concert{"x.y.u."};
+        BackstagePass b{concert, sellIn, quality};
         WHEN("it is updated")
         {
             b.update();
             THEN("quality increaes by 3 and sellin decreases by 1")
             {
-                CHECK(b == BackstagePass(concert, sellIn - 1, quality + 3));
+                CHECK(b == BackstagePass{concert, sellIn - 1, quality + 3});
             }
         }
     }
@@ -508,16 +503,16 @@ SCENARIO("backstage pass with sellin of 5 and quality 1 under max is updated")
 {
     GIVEN("a backstage pass with sellin of 5 and quality 1 under max")
     {
-        int const quality = Quality::max() - 1;
-        int const sellIn = 5;
-        std::string const concert = "x.y.u.";
+        const int quality{Quality::max() - 1};
+        const int sellIn{5};
+        const std::string concert{"x.y.u."};
         BackstagePass b(concert, sellIn, quality);
         WHEN("it is updated")
         {
             b.update();
             THEN("quality is set to max and selllin decreases by 1")
             {
-                CHECK(b == BackstagePass(concert, sellIn - 1, Quality::max()));
+                CHECK(b == BackstagePass{concert, sellIn - 1, Quality::max()});
             }
         }
     }
@@ -527,16 +522,16 @@ SCENARIO("backstage pass for a passed concert is updated")
 {
     GIVEN("a backstage pass with sellin of 0")
     {
-        int const quality = 41;
-        int const sellIn = 0;
-        std::string const concert = "x.y.u.";
+        const int quality{41};
+        const int sellIn{0};
+        const std::string concert{"x.y.u."};
         BackstagePass b(concert, sellIn, quality);
         WHEN("it is updated")
         {
             b.update();
             THEN("quality value is is set to min and sellin is decreased by 1")
             {
-                CHECK(b == BackstagePass(concert, sellIn - 1, Quality::min()));
+                CHECK(b == BackstagePass{concert, sellIn - 1, Quality::min()});
             }
         }
     }
@@ -560,16 +555,16 @@ SCENARIO("conjured article with positive sellin is updated")
 {
     GIVEN("a conjured article with positive sellin")
     {
-        int const quality = 7;
-        int const sellIn = 16;
-        std::string const name = "conjured article";
+        const int quality{7};
+        const int sellIn{16};
+        const std::string name{"conjured article"};
         Conjured c(name, sellIn, quality);
         WHEN("it is updated")
         {
             c.update();
             THEN("quality is decremented by 2 and sellin is decremented by 1")
             {
-                CHECK(c == Conjured(name, sellIn - 1, quality - 2));
+                CHECK(c == Conjured{name, sellIn - 1, quality - 2});
             }
         }
     }
@@ -579,16 +574,16 @@ SCENARIO("conjured article with sellin of 0 is updated")
 {
     GIVEN("a conjured aritcle with a sellin value of 0")
     {
-        int const quality = 7;
-        int const sellIn = 0;
-        std::string const name = "conjured article";
+        const int quality{7};
+        const int sellIn{0};
+        const std::string name{"conjured article"};
         Conjured c(name, sellIn, quality);
         WHEN("it is updated")
         {
             c.update();
             THEN("quality is decremented by 4 and sellin is decremented by 1")
             {
-                CHECK(c == Conjured(name, sellIn - 1, quality - 4));
+                CHECK(c == Conjured{name, sellIn - 1, quality - 4});
             }
         }
     }
@@ -598,15 +593,15 @@ SCENARIO("conjured article with min quality is updated")
 {
     GIVEN("a conjured article with min quality")
     {
-        int const sellIn = 0;
-        std::string const name = "conjured article";
+        const int sellIn{0};
+        const std::string name{"conjured article"};
         Conjured c(name, sellIn, Quality::min());
         WHEN("it is updated")
         {
             c.update();
             THEN("quality does not change and sellin is decremented by 1")
             {
-                CHECK(c == Conjured(name, sellIn - 1, Quality::min()));
+                CHECK(c == Conjured{name, sellIn - 1, Quality::min()});
             }
         }
     }
@@ -614,7 +609,13 @@ SCENARIO("conjured article with min quality is updated")
 
 int main(int argc, const char** argv)
 {
-    GildedRose store;
+    doctest::Context context{};
+    context.applyCommandLine(argc, argv);
+    const int res{context.run()};
+    if (context.shouldExit() || res != 0)
+        return res;
+
+    GildedRose store{};
     store.add(Article("+5 Dexterity Vest", 10, 20));
     store.add(AgedBrie(0));
     store.add(Article("Elixir of the Mongoose", 5, 7));
@@ -626,22 +627,12 @@ int main(int argc, const char** argv)
     store.add(Conjured("Sword of Gold", 5, 21));
 
     std::cout << "GildedRose\n";
-
-    for (int day = 0; day <= 30; day++)
+    for (int day{0}; day <= 30; ++day)
     {
         std::cout << "-------- day " << day << " --------\n";
-        std::cout << store << "\n\n";
         store.update();
+        std::cout << store << "\n\n";
     }
 
-    doctest::Context context;
-
-    context.applyCommandLine(argc, argv);
-
-    int res = context.run();
-
-    if (context.shouldExit())
-        return res;
-
-    return res;
+    return 0;
 }
