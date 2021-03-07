@@ -24,12 +24,13 @@ class Item
 {
   public:
     virtual void update() = 0;
-    virtual void stream(std::ostream& o) = 0;
+    virtual void stream(std::ostream& o) const = 0;
+    virtual ~Item() = default;
 };
 
-std::ostream& operator<<(std::ostream& o, Item& it);
+std::ostream& operator<<(std::ostream& o, const Item& it);
 
-std::ostream& operator<<(std::ostream& o, Item& it)
+std::ostream& operator<<(std::ostream& o, const Item& it)
 {
     it.stream(o);
     return o;
@@ -40,21 +41,21 @@ class Article : public Item
   public:
     Article(std::string name, int sellIn, int quality);
     void update() override;
-    void stream(std::ostream& o) override;
-
-    bool operator==(Article const&) const;
-    bool operator!=(Article const&) const;
+    void stream(std::ostream& o) const override;
 
   private:
-    std::string const name;
+    std::string name;
     int sellIn;
     int quality;
+
+    friend bool operator==(const Article& a, const Article& b);
+    friend bool operator!=(const Article& a, const Article& b);
 };
 
 Article::Article(std::string name, int sellIn, int quality)
-    : name(name)
-    , sellIn(sellIn)
-    , quality(quality)
+    : name{name}
+    , sellIn{sellIn}
+    , quality{quality}
 {
 }
 
@@ -75,19 +76,19 @@ void Article::update()
     --sellIn;
 }
 
-void Article::stream(std::ostream& o)
+void Article::stream(std::ostream& o) const
 {
     o << name << ", " << sellIn << ", " << quality;
 }
 
-bool Article::operator==(Article const& other) const
+bool operator==(const Article& a, const Article& b)
 {
-    return (sellIn == other.sellIn) && (quality == other.quality) && (name == other.name);
+    return (a.sellIn == b.sellIn) && (a.quality == b.quality) && (a.name == b.name);
 }
 
-bool Article::operator!=(Article const& other) const
+bool operator!=(const Article& a, const Article& b)
 {
-    return !(*this == other);
+    return !(a == b);
 }
 
 class AgedBrie : public Item
@@ -95,17 +96,17 @@ class AgedBrie : public Item
   public:
     AgedBrie(int quality);
     void update() override;
-    void stream(std::ostream& o) override;
-
-    bool operator==(AgedBrie const& other) const;
-    bool operator!=(AgedBrie const& other) const;
+    void stream(std::ostream& o) const override;
 
   private:
     int quality;
+
+    friend bool operator==(const AgedBrie& a, const AgedBrie& b);
+    friend bool operator!=(const AgedBrie& a, const AgedBrie& b);
 };
 
 AgedBrie::AgedBrie(int quality)
-    : quality(quality)
+    : quality{quality}
 {
 }
 
@@ -117,19 +118,19 @@ void AgedBrie::update()
     }
 }
 
-void AgedBrie::stream(std::ostream& o)
+void AgedBrie::stream(std::ostream& o) const
 {
     o << "Aged Brie, " << quality;
 }
 
-bool AgedBrie::operator==(AgedBrie const& other) const
+bool operator==(const AgedBrie& a, const AgedBrie& b)
 {
-    return quality == other.quality;
+    return a.quality == b.quality;
 }
 
-bool AgedBrie::operator!=(AgedBrie const& other) const
+bool operator!=(const AgedBrie& a, const AgedBrie& b)
 {
-    return !(*this == other);
+    return !(a == b);
 }
 
 class BackstagePass : public Item
@@ -137,21 +138,21 @@ class BackstagePass : public Item
   public:
     BackstagePass(std::string concert, int sellIn, int quality);
     void update() override;
-    void stream(std::ostream& o) override;
-
-    bool operator==(BackstagePass const& other) const;
-    bool operator!=(BackstagePass const& other) const;
+    void stream(std::ostream& o) const override;
 
   private:
     std::string concert;
     int sellIn;
     int quality;
+
+    friend bool operator==(const BackstagePass& a, const BackstagePass& b);
+    friend bool operator!=(const BackstagePass& a, const BackstagePass& b);
 };
 
 BackstagePass::BackstagePass(std::string concert, int sellIn, int quality)
-    : concert(concert)
-    , sellIn(sellIn)
-    , quality(quality)
+    : concert{concert}
+    , sellIn{sellIn}
+    , quality{quality}
 {
 }
 
@@ -180,33 +181,33 @@ void BackstagePass::update()
     --sellIn;
 }
 
-void BackstagePass::stream(std::ostream& o)
+void BackstagePass::stream(std::ostream& o) const
 {
     o << "Backstage pass for " << concert << ", " << sellIn << ", " << quality;
 }
 
-bool BackstagePass::operator==(BackstagePass const& other) const
+bool operator==(const BackstagePass& a, const BackstagePass& b)
 {
-    return (quality == other.quality) && (sellIn == other.sellIn) && (concert == other.concert);
+    return (a.quality == b.quality) && (a.sellIn == b.sellIn) && (a.concert == b.concert);
 }
 
-bool BackstagePass::operator!=(BackstagePass const& other) const
+bool operator!=(const BackstagePass& a, const BackstagePass& b)
 {
-    return !(*this == other);
+    return !(a == b);
 }
 
 class Sulfuras : public Item
 {
   public:
     void update() override;
-    void stream(std::ostream& o) override;
+    void stream(std::ostream& o) const override;
 };
 
 void Sulfuras::update()
 {
 }
 
-void Sulfuras::stream(std::ostream& o)
+void Sulfuras::stream(std::ostream& o) const
 {
     o << "Sulfuras";
 }
@@ -216,21 +217,21 @@ class Conjured : public Item
   public:
     Conjured(std::string name, int sellIn, int quality);
     void update() override;
-    void stream(std::ostream& o) override;
-
-    bool operator==(Conjured const&) const;
-    bool operator!=(Conjured const&) const;
+    void stream(std::ostream& o) const override;
 
   private:
     std::string name;
     int sellIn;
     int quality;
+
+    friend bool operator==(const Conjured& a, const Conjured& b);
+    friend bool operator!=(const Conjured& a, const Conjured& b);
 };
 
 Conjured::Conjured(std::string name, int sellIn, int quality)
-    : name(name)
-    , sellIn(sellIn)
-    , quality(quality)
+    : name{name}
+    , sellIn{sellIn}
+    , quality{quality}
 {
 }
 
@@ -251,49 +252,50 @@ void Conjured::update()
     --sellIn;
 }
 
-void Conjured::stream(std::ostream& o)
+void Conjured::stream(std::ostream& o) const
 {
     o << "Conjured " << name << ", " << sellIn << ", " << quality;
 }
 
-bool Conjured::operator==(Conjured const& other) const
+bool operator==(const Conjured& a, const Conjured& b)
 {
-    return (sellIn == other.sellIn) && (quality == other.quality) && (name == other.name);
+    return (a.sellIn == b.sellIn) && (a.quality == b.quality) && (a.name == b.name);
 }
 
-bool Conjured::operator!=(Conjured const& other) const
+bool operator!=(const Conjured& a, const Conjured& b)
 {
-    return !(*this == other);
+    return !(a == b);
 }
 
 class GildedRose
 {
   public:
     using ItemRef = std::unique_ptr<Item>;
-    void add(ItemRef);
+    void add(ItemRef item);
     void update();
 
   private:
     using Articles = std::vector<ItemRef>;
     Articles articles;
 
-    friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
+    friend std::ostream& operator<<(std::ostream& o, const GildedRose& g);
 };
 
-void GildedRose::add(ItemRef it)
+void GildedRose::add(ItemRef item)
 {
-    articles.push_back(std::move(it));
+    articles.push_back(std::move(item));
 }
 
 void GildedRose::update()
 {
-    std::for_each(articles.begin(), articles.end(), [](auto& it) { it->update(); });
+    std::for_each(begin(articles), end(articles), [](const auto& item) { item->update(); });
 }
 
-std::ostream& operator<<(std::ostream& o, GildedRose const& g)
+std::ostream& operator<<(std::ostream& o, const GildedRose& g)
 {
     o << "name, sellIn, quality\n";
-    std::for_each(g.articles.begin(), g.articles.end(), [&o](auto& it) { o << *it << '\n'; });
+    std::for_each(begin(g.articles), end(g.articles), [&o](const auto& item) { o << *item << '\n'; });
+
     return o;
 }
 
@@ -593,7 +595,13 @@ SCENARIO("conjured article with min quality is updated")
 
 int main(int argc, const char** argv)
 {
-    GildedRose store;
+    doctest::Context context{};
+    context.applyCommandLine(argc, argv);
+    const int res{context.run()};
+    if (context.shouldExit() || res != 0)
+        return res;
+
+    GildedRose store{};
     store.add(std::make_unique<Article>("+5 Dexterity Vest", 10, 20));
     store.add(std::make_unique<AgedBrie>(0));
     store.add(std::make_unique<Article>("Elixir of the Mongoose", 5, 7));
@@ -605,22 +613,12 @@ int main(int argc, const char** argv)
     store.add(std::make_unique<Conjured>("Sword of Gold", 5, 21));
 
     std::cout << "GildedRose\n";
-
-    for (int day = 0; day <= 30; day++)
+    for (int day{0}; day <= 30; ++day)
     {
         std::cout << "-------- day " << day << " --------\n";
-        std::cout << store << "\n\n";
         store.update();
+        std::cout << store << "\n\n";
     }
 
-    doctest::Context context;
-
-    context.applyCommandLine(argc, argv);
-
-    int res = context.run();
-
-    if (context.shouldExit())
-        return res;
-
-    return res;
+    return 0;
 }
