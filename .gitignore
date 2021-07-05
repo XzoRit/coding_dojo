@@ -45,3 +45,4 @@ leap_year/c++/build
 /gilded_rose/c++/crtp/build/
 /gilded_rose/c++/type_erasure/build/
 /gilded_rose/c++/base/build/
+/gilded_rose/c++/value_with_any_interface/build/
