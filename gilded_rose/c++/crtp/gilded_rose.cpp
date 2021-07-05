@@ -1,11 +1,6 @@
-#include <boost/hana.hpp>
-
 #include <iostream>
 #include <ostream>
 #include <string>
-
-using ::boost::hana::for_each;
-using ::boost::hana::members;
 
 class Quality
 {
@@ -21,27 +16,7 @@ class Quality
     }
 };
 
-template <class It>
-class Item
-{
-  public:
-    void update();
-};
-
-template <class It>
-void Item<It>::update()
-{
-    It& self = *static_cast<It*>(this);
-    self.update();
-}
-
-template <class It>
-void updateItem(Item<It>& item)
-{
-    item.update();
-}
-
-class Article : public Item<Article>
+class Article
 {
   public:
     Article(std::string name, int sellIn, int quality);
@@ -97,7 +72,7 @@ std::ostream& operator<<(std::ostream& o, const Article& a)
     return o;
 }
 
-class AgedBrie : public Item<AgedBrie>
+class AgedBrie
 {
   public:
     AgedBrie(int quality);
@@ -140,7 +115,7 @@ std::ostream& operator<<(std::ostream& o, const AgedBrie& a)
     return o;
 }
 
-class BackstagePass : public Item<BackstagePass>
+class BackstagePass
 {
   public:
     BackstagePass(std::string concert, int sellIn, int quality);
@@ -204,18 +179,11 @@ std::ostream& operator<<(std::ostream& o, const BackstagePass& b)
     return o;
 }
 
-class Sulfuras : public Item<Sulfuras>
+class Sulfuras
 {
-  public:
-    void update();
-
   private:
     friend std::ostream& operator<<(std::ostream& o, const Sulfuras& s);
 };
-
-void Sulfuras::update()
-{
-}
 
 std::ostream& operator<<(std::ostream& o, const Sulfuras& s)
 {
@@ -223,7 +191,7 @@ std::ostream& operator<<(std::ostream& o, const Sulfuras& s)
     return o;
 }
 
-class Conjured : public Item<Conjured>
+class Conjured
 {
   public:
     Conjured(std::string name, int sellIn, int quality);
@@ -279,8 +247,47 @@ std::ostream& operator<<(std::ostream& o, const Conjured& a)
     return o;
 }
 
-struct Articles
+class GildedRose
 {
+  public:
+    void update();
+    // TODO: void add(???);
+
+  private:
+    // TODO: Articles articles;
+
+    friend std::ostream& operator<<(std::ostream& o, const GildedRose& g);
+};
+
+void GildedRose::update()
+{
+    // TODO: update all articles
+}
+/* TODO
+void GildedRose::add(???)
+{
+}
+*/
+std::ostream& operator<<(std::ostream& o, const GildedRose& g)
+{
+    o << "name, sellIn, quality\n";
+    // TODO: put all articles into stream
+
+    return o;
+}
+
+#define DOCTEST_CONFIG_IMPLEMENT
+#define DOCTEST_CONFIG_COLORS_NONE
+#include <doctest.h>
+
+int main(int argc, const char** argv)
+{
+    doctest::Context context{};
+    context.applyCommandLine(argc, argv);
+    const int res{context.run()};
+    if (context.shouldExit() || res != 0)
+        return res;
+
     Article a{"+5 Dexterity Vest", 10, 20};
     AgedBrie b{0};
     Article c{"Elixir of the Mongoose", 5, 7};
@@ -290,37 +297,20 @@ struct Articles
     BackstagePass g{"TAFKAL80ETC concert", 10, 49};
     BackstagePass h{"TAFKAL80ETC concert", 5, 49};
     Conjured i{"Sword of Gold", 5, 21};
-};
 
-BOOST_HANA_ADAPT_STRUCT(Articles, a, b, c, d, e, f, g, h, i);
+    GildedRose store{};
+    // TODO: add items to store here
+    // store.add(???);
+    std::cout << "GildedRose\n";
+    for (int day{0}; day <= 30; ++day)
+    {
+        std::cout << "-------- day " << day << " --------\n";
+        store.update();
+        std::cout << store << "\n\n";
+    }
 
-class GildedRose
-{
-  public:
-    void update();
-
-  private:
-    Articles articles;
-
-    friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
-};
-
-void GildedRose::update()
-{
-    for_each(members(articles), [](auto&& item) { updateItem(item); });
+    return 0;
 }
-
-std::ostream& operator<<(std::ostream& o, GildedRose const& g)
-{
-    o << "name, sellIn, quality\n";
-    for_each(members(g.articles), [&](auto&& item) { o << item << '\n'; });
-
-    return o;
-}
-
-#define DOCTEST_CONFIG_IMPLEMENT
-#define DOCTEST_CONFIG_COLORS_NONE
-#include <doctest.h>
 
 SCENARIO("article with positive sellin is updated")
 {
@@ -610,24 +600,4 @@ SCENARIO("conjured article with min quality is updated")
             }
         }
     }
-}
-
-int main(int argc, const char** argv)
-{
-    doctest::Context context{};
-    context.applyCommandLine(argc, argv);
-    const int res{context.run()};
-    if (context.shouldExit() || res != 0)
-        return res;
-
-    GildedRose store{};
-    std::cout << "GildedRose\n";
-    for (int day{0}; day <= 30; ++day)
-    {
-        std::cout << "-------- day " << day << " --------\n";
-        store.update();
-        std::cout << store << "\n\n";
-    }
-
-    return 0;
 }

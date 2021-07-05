@@ -3,6 +3,10 @@
 #include <ostream>
 #include <string>
 #include <variant>
+#include <vector>
+
+using std::variant;
+using std::visit;
 
 class Quality
 {
@@ -249,42 +253,10 @@ std::ostream& operator<<(std::ostream& o, const Conjured& a)
     return o;
 }
 
-class OStreamer
-{
-  public:
-    explicit OStreamer(std::ostream& o)
-        : o(o)
-    {
-    }
-
-    template <class T>
-    void operator()(const T& t) const
-    {
-        o << t << '\n';
-    }
-
-  private:
-    std::ostream& o;
-};
-
-class Updater
-{
-  public:
-    template <class T>
-    void operator()(T& t) const
-    {
-        t.update();
-    }
-
-    void operator()(Sulfuras) const
-    {
-    }
-};
-
 class GildedRose
 {
   public:
-    using Item = std::variant<Article, AgedBrie, BackstagePass, Sulfuras, Conjured>;
+    using Item = variant<Article, AgedBrie, BackstagePass, Sulfuras, Conjured>;
 
     void add(Item);
     void update();
@@ -294,6 +266,35 @@ class GildedRose
     Articles articles;
 
     friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
+
+    struct Update
+    {
+        template <class T>
+        void operator()(T& t) const
+        {
+            t.update();
+        }
+
+        void operator()(Sulfuras) const
+        {
+        }
+    };
+
+    struct OStream
+    {
+        explicit OStream(std::ostream* o)
+            : o{o}
+        {
+        }
+
+        template <class T>
+        void operator()(const T& t) const
+        {
+            (*o) << t << '\n';
+        }
+
+        std::ostream* o;
+    };
 };
 
 void GildedRose::add(Item it)
@@ -303,19 +304,55 @@ void GildedRose::add(Item it)
 
 void GildedRose::update()
 {
-    std::for_each(articles.begin(), articles.end(), [](auto& as) { std::visit(Updater{}, as); });
+    Update update{};
+    for (auto& item : articles)
+        visit(update, item);
 }
 
 std::ostream& operator<<(std::ostream& o, GildedRose const& g)
 {
+    GildedRose::OStream stream{&o};
     o << "name, sellIn, quality\n";
-    std::for_each(g.articles.begin(), g.articles.end(), [&o](const auto& as) { std::visit(OStreamer{o}, as); });
+    for (const auto& item : g.articles)
+        visit(stream, item);
+
     return o;
 }
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #define DOCTEST_CONFIG_COLORS_NONE
+// #define DOCTEST_CONFIG_DISABLE
 #include <doctest.h>
+
+int main(int argc, const char** argv)
+{
+    doctest::Context context{};
+    context.applyCommandLine(argc, argv);
+    const int res{context.run()};
+    if (context.shouldExit() || res != 0)
+        return res;
+
+    GildedRose store{};
+    store.add(Article("+5 Dexterity Vest", 10, 20));
+    store.add(AgedBrie(0));
+    store.add(Article("Elixir of the Mongoose", 5, 7));
+    store.add(Sulfuras());
+    store.add(Sulfuras());
+    store.add(BackstagePass("TAFKAL80ETC concert", 15, 20));
+    store.add(BackstagePass("TAFKAL80ETC concert", 10, 49));
+    store.add(BackstagePass("TAFKAL80ETC concert", 5, 49));
+    store.add(Conjured("Sword of Gold", 5, 21));
+
+    std::cout << "GildedRose\n";
+    for (int day{0}; day <= 30; ++day)
+    {
+        std::cout << "-------- day " << day << " --------\n";
+        store.update();
+        std::cout << store << "\n\n";
+    }
+
+    return 0;
+}
 
 SCENARIO("article with positive sellin is updated")
 {
@@ -605,34 +642,4 @@ SCENARIO("conjured article with min quality is updated")
             }
         }
     }
-}
-
-int main(int argc, const char** argv)
-{
-    doctest::Context context{};
-    context.applyCommandLine(argc, argv);
-    const int res{context.run()};
-    if (context.shouldExit() || res != 0)
-        return res;
-
-    GildedRose store{};
-    store.add(Article("+5 Dexterity Vest", 10, 20));
-    store.add(AgedBrie(0));
-    store.add(Article("Elixir of the Mongoose", 5, 7));
-    store.add(Sulfuras());
-    store.add(Sulfuras());
-    store.add(BackstagePass("TAFKAL80ETC concert", 15, 20));
-    store.add(BackstagePass("TAFKAL80ETC concert", 10, 49));
-    store.add(BackstagePass("TAFKAL80ETC concert", 5, 49));
-    store.add(Conjured("Sword of Gold", 5, 21));
-
-    std::cout << "GildedRose\n";
-    for (int day{0}; day <= 30; ++day)
-    {
-        std::cout << "-------- day " << day << " --------\n";
-        store.update();
-        std::cout << store << "\n\n";
-    }
-
-    return 0;
 }

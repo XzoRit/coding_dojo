@@ -1,10 +1,47 @@
 #include <algorithm>
+#include <any>
 #include <iostream>
 #include <memory>
 #include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
+
+template <class Interface>
+class Implementation
+{
+  public:
+    template <class ConcreteType>
+    Implementation(ConcreteType obj)
+        : storage{std::move(obj)}
+        , getter{[](std::any& storage) -> Interface& { return std::any_cast<ConcreteType&>(storage); }}
+    {
+    }
+
+    Interface* operator->()
+    {
+        return &getter(storage);
+    }
+
+    Interface& operator*()
+    {
+        return getter(storage);
+    }
+
+    const Interface* operator->() const
+    {
+        return const_cast<Implementation<Interface>*>(this)->operator->();
+    }
+
+    const Interface& operator*() const
+    {
+        return const_cast<Implementation<Interface>*>(this)->operator*();
+    }
+
+  private:
+    std::any storage;
+    Interface& (*getter)(std::any&);
+};
 
 class Quality
 {
@@ -24,7 +61,6 @@ class Item
 {
   public:
     virtual void update() = 0;
-    virtual std::unique_ptr<Item> clone() = 0;
     virtual bool equals(const Item& i) const = 0;
     virtual void stream(std::ostream& o) const = 0;
     virtual ~Item() = default;
@@ -55,7 +91,6 @@ class Article : public Item
   public:
     Article(std::string name, int sellIn, int quality);
     void update() override;
-    std::unique_ptr<Item> clone() override;
     bool equals(const Item& i) const override;
     void stream(std::ostream& o) const override;
 
@@ -89,11 +124,6 @@ void Article::update()
     --sellIn;
 }
 
-std::unique_ptr<Item> Article::clone()
-{
-    return std::make_unique<Article>(name, sellIn, quality);
-}
-
 bool Article::equals(const Item& i) const
 {
     if (const Article* other = dynamic_cast<const Article*>(&i))
@@ -113,7 +143,6 @@ class AgedBrie : public Item
   public:
     AgedBrie(int quality);
     void update() override;
-    std::unique_ptr<Item> clone() override;
     bool equals(const Item& i) const override;
     void stream(std::ostream& o) const override;
 
@@ -132,11 +161,6 @@ void AgedBrie::update()
     {
         ++quality;
     }
-}
-
-std::unique_ptr<Item> AgedBrie::clone()
-{
-    return std::make_unique<AgedBrie>(quality);
 }
 
 bool AgedBrie::equals(const Item& i) const
@@ -158,7 +182,6 @@ class BackstagePass : public Item
   public:
     BackstagePass(std::string concert, int sellIn, int quality);
     void update() override;
-    std::unique_ptr<Item> clone() override;
     bool equals(const Item& i) const override;
     void stream(std::ostream& o) const override;
 
@@ -200,11 +223,6 @@ void BackstagePass::update()
     --sellIn;
 }
 
-std::unique_ptr<Item> BackstagePass::clone()
-{
-    return std::make_unique<BackstagePass>(concert, sellIn, quality);
-}
-
 bool BackstagePass::equals(const Item& i) const
 {
     if (const BackstagePass* other = dynamic_cast<const BackstagePass*>(&i))
@@ -223,18 +241,12 @@ class Sulfuras : public Item
 {
   public:
     void update() override;
-    std::unique_ptr<Item> clone() override;
     bool equals(const Item& i) const override;
     void stream(std::ostream& o) const override;
 };
 
 void Sulfuras::update()
 {
-}
-
-std::unique_ptr<Item> Sulfuras::clone()
-{
-    return std::make_unique<Sulfuras>();
 }
 
 bool Sulfuras::equals(const Item& i) const
@@ -252,7 +264,6 @@ class Conjured : public Item
   public:
     Conjured(std::string name, int sellIn, int quality);
     void update() override;
-    std::unique_ptr<Item> clone() override;
     bool equals(const Item& i) const override;
     void stream(std::ostream& o) const override;
 
@@ -286,11 +297,6 @@ void Conjured::update()
     --sellIn;
 }
 
-std::unique_ptr<Item> Conjured::clone()
-{
-    return std::make_unique<Conjured>(name, sellIn, quality);
-}
-
 bool Conjured::equals(const Item& i) const
 {
     if (const Conjured* other = dynamic_cast<const Conjured*>(&i))
@@ -305,28 +311,29 @@ void Conjured::stream(std::ostream& o) const
     o << "Conjured " << name << ", " << sellIn << ", " << quality;
 }
 
+using ItemValue = Implementation<Item>;
+
 class GildedRose
 {
   public:
-    using ItemRef = std::unique_ptr<Item>;
-    void add(ItemRef item);
+    void add(ItemValue item);
     void update();
 
   private:
-    using Articles = std::vector<ItemRef>;
+    using Articles = std::vector<ItemValue>;
     Articles articles;
 
     friend std::ostream& operator<<(std::ostream& o, const GildedRose& g);
 };
 
-void GildedRose::add(ItemRef item)
+void GildedRose::add(ItemValue item)
 {
     articles.push_back(std::move(item));
 }
 
 void GildedRose::update()
 {
-    for (auto&& item : articles)
+    for (auto& item : articles)
     {
         item->update();
     }
@@ -335,9 +342,9 @@ void GildedRose::update()
 std::ostream& operator<<(std::ostream& o, const GildedRose& g)
 {
     o << "name, sellIn, quality\n";
-    for (auto&& item : g.articles)
+    for (const auto& item : g.articles)
     {
-        o << *item << '\n';
+        o << (*item) << '\n';
     }
 
     return o;
@@ -345,6 +352,7 @@ std::ostream& operator<<(std::ostream& o, const GildedRose& g)
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #define DOCTEST_CONFIG_COLORS_NONE
+//#define DOCTEST_CONFIG_DISABLE
 #include <doctest.h>
 
 int main(int argc, const char** argv)
@@ -356,15 +364,15 @@ int main(int argc, const char** argv)
         return res;
 
     GildedRose store{};
-    store.add(std::make_unique<Article>("+5 Dexterity Vest", 10, 20));
-    store.add(std::make_unique<AgedBrie>(0));
-    store.add(std::make_unique<Article>("Elixir of the Mongoose", 5, 7));
-    store.add(std::make_unique<Sulfuras>());
-    store.add(std::make_unique<Sulfuras>());
-    store.add(std::make_unique<BackstagePass>("TAFKAL80ETC concert", 15, 20));
-    store.add(std::make_unique<BackstagePass>("TAFKAL80ETC concert", 10, 49));
-    store.add(std::make_unique<BackstagePass>("TAFKAL80ETC concert", 5, 49));
-    store.add(std::make_unique<Conjured>("Sword of Gold", 5, 21));
+    store.add(Article("+5 Dexterity Vest", 10, 20));
+    store.add(AgedBrie(0));
+    store.add(Article("Elixir of the Mongoose", 5, 7));
+    store.add(Sulfuras());
+    store.add(Sulfuras());
+    store.add(BackstagePass("TAFKAL80ETC concert", 15, 20));
+    store.add(BackstagePass("TAFKAL80ETC concert", 10, 49));
+    store.add(BackstagePass("TAFKAL80ETC concert", 5, 49));
+    store.add(Conjured("Sword of Gold", 5, 21));
 
     std::cout << "GildedRose\n";
     for (int day{0}; day <= 30; ++day)
@@ -377,10 +385,10 @@ int main(int argc, const char** argv)
     return 0;
 }
 
-void testItem(Item* i)
+void testItem(ItemValue i)
 {
     {
-        const auto old{i->clone()};
+        const ItemValue old{i};
         i->update();
         CHECK(*old != *i);
     }
@@ -393,8 +401,8 @@ void testItem(Item* i)
 
 TEST_CASE("article behaves like an item")
 {
-    std::unique_ptr<Item> a = std::make_unique<Article>("article", 16, 7);
-    testItem(a.get());
+    ItemValue a = Article("article", 16, 7);
+    testItem(a);
 }
 
 SCENARIO("article with positive sellin is updated")
@@ -404,7 +412,7 @@ SCENARIO("article with positive sellin is updated")
         int const quality = 7;
         int const sellIn = 16;
         std::string const name = "article";
-        std::unique_ptr<Item> a = std::make_unique<Article>(name, sellIn, quality);
+        ItemValue a = Article(name, sellIn, quality);
         WHEN("it is updated")
         {
             a->update();
@@ -423,7 +431,7 @@ SCENARIO("article with sellin of 0 is updated")
         int const quality = 7;
         int const sellIn = 0;
         std::string const name = "article";
-        std::unique_ptr<Item> a = std::make_unique<Article>(name, sellIn, quality);
+        ItemValue a = Article(name, sellIn, quality);
         WHEN("it is updated")
         {
             a->update();
@@ -441,7 +449,7 @@ SCENARIO("article with min quality is updated")
     {
         int const sellIn = 0;
         std::string const name = "article";
-        std::unique_ptr<Item> a = std::make_unique<Article>(name, sellIn, Quality::min());
+        ItemValue a = Article(name, sellIn, Quality::min());
         WHEN("it is updated")
         {
             a->update();
@@ -455,8 +463,8 @@ SCENARIO("article with min quality is updated")
 
 TEST_CASE("aged brie behaves like an item")
 {
-    std::unique_ptr<Item> a = std::make_unique<AgedBrie>(28);
-    testItem(a.get());
+    ItemValue a = AgedBrie(28);
+    testItem(a);
 }
 
 SCENARIO("aged brie is updated")
@@ -464,7 +472,7 @@ SCENARIO("aged brie is updated")
     GIVEN("an aged brie")
     {
         int const quality = 28;
-        std::unique_ptr<Item> a = std::make_unique<AgedBrie>(quality);
+        ItemValue a = AgedBrie(quality);
         WHEN("it is updated")
         {
             a->update();
@@ -480,7 +488,7 @@ SCENARIO("aged brie with max quality is updated")
 {
     GIVEN("an aged brie with max quality")
     {
-        std::unique_ptr<Item> a = std::make_unique<AgedBrie>(Quality::max());
+        ItemValue a = AgedBrie(Quality::max());
         WHEN("it is updated")
         {
             a->update();
@@ -494,8 +502,8 @@ SCENARIO("aged brie with max quality is updated")
 
 TEST_CASE("backstage pass behaves like an item")
 {
-    const auto b{std::make_unique<BackstagePass>("abc", 11, 41)};
-    testItem(b.get());
+    const auto b{BackstagePass("abc", 11, 41)};
+    testItem(b);
 }
 
 SCENARIO("backstage pass with sellin over 10 is updated")
@@ -505,7 +513,7 @@ SCENARIO("backstage pass with sellin over 10 is updated")
         int const quality = 41;
         int const sellIn = 11;
         std::string const concert = "x.y.u.";
-        std::unique_ptr<Item> b = std::make_unique<BackstagePass>(concert, sellIn, quality);
+        ItemValue b = BackstagePass(concert, sellIn, quality);
         WHEN("it is updated")
         {
             b->update();
@@ -523,7 +531,7 @@ SCENARIO("backstage pass with sellin over 10 and max quality is updated")
     {
         int const sellIn = 11;
         std::string const concert = "x.y.u.";
-        std::unique_ptr<Item> b = std::make_unique<BackstagePass>(concert, sellIn, Quality::max());
+        ItemValue b = BackstagePass(concert, sellIn, Quality::max());
         WHEN("it is updated")
         {
             b->update();
@@ -542,7 +550,7 @@ SCENARIO("backstage pass with sellin of 10 is updated")
         int const quality = 41;
         int const sellIn = 10;
         std::string const concert = "x.y.u.";
-        std::unique_ptr<Item> b = std::make_unique<BackstagePass>(concert, sellIn, quality);
+        ItemValue b = BackstagePass(concert, sellIn, quality);
         WHEN("it is updated")
         {
             b->update();
@@ -561,7 +569,7 @@ SCENARIO("backstage pass with sellin of 10 and quality 1 under max is updated")
         int const quality = Quality::max() - 1;
         int const sellIn = 10;
         std::string const concert = "x.y.u.";
-        std::unique_ptr<Item> b = std::make_unique<BackstagePass>(concert, sellIn, quality);
+        ItemValue b = BackstagePass(concert, sellIn, quality);
         WHEN("it is updated")
         {
             b->update();
@@ -579,7 +587,7 @@ SCENARIO("backstage pass with sellin of 5 is updated")
         int const quality = 41;
         int const sellIn = 5;
         std::string const concert = "x.y.u.";
-        std::unique_ptr<Item> b = std::make_unique<BackstagePass>(concert, sellIn, quality);
+        ItemValue b = BackstagePass(concert, sellIn, quality);
         WHEN("it is updated")
         {
             b->update();
@@ -598,7 +606,7 @@ SCENARIO("backstage pass with sellin of 5 and quality 1 under max is updated")
         int const quality = Quality::max() - 1;
         int const sellIn = 5;
         std::string const concert = "x.y.u.";
-        std::unique_ptr<Item> b = std::make_unique<BackstagePass>(concert, sellIn, quality);
+        ItemValue b = BackstagePass(concert, sellIn, quality);
         WHEN("it is updated")
         {
             b->update();
@@ -617,7 +625,7 @@ SCENARIO("backstage pass for a passed concert is updated")
         int const quality = 41;
         int const sellIn = 0;
         std::string const concert = "x.y.u.";
-        std::unique_ptr<Item> b = std::make_unique<BackstagePass>(concert, sellIn, quality);
+        ItemValue b = BackstagePass(concert, sellIn, quality);
         WHEN("it is updated")
         {
             b->update();
@@ -631,15 +639,15 @@ SCENARIO("backstage pass for a passed concert is updated")
 
 TEST_CASE("sulfuras behaves like an item")
 {
-    const auto s{std::make_unique<Sulfuras>()};
-    testItem(s.get());
+    const auto s{Sulfuras()};
+    testItem(s);
 }
 
 SCENARIO("sulfuras is updated")
 {
     GIVEN("sulfuras")
     {
-        std::unique_ptr<Item> s = std::make_unique<Sulfuras>();
+        ItemValue s = Sulfuras();
         WHEN("it is updated")
         {
             THEN("neither quality nor sellin change")
@@ -651,8 +659,8 @@ SCENARIO("sulfuras is updated")
 
 TEST_CASE("conjured behaves like an item")
 {
-    const auto c{std::make_unique<Conjured>("conjured", 16, 7)};
-    testItem(c.get());
+    const auto c{Conjured("conjured", 16, 7)};
+    testItem(c);
 }
 
 SCENARIO("conjured article with positive sellin is updated")
@@ -662,7 +670,7 @@ SCENARIO("conjured article with positive sellin is updated")
         int const quality = 7;
         int const sellIn = 16;
         std::string const name = "conjured article";
-        std::unique_ptr<Item> c = std::make_unique<Conjured>(name, sellIn, quality);
+        ItemValue c = Conjured(name, sellIn, quality);
         WHEN("it is updated")
         {
             c->update();
@@ -681,7 +689,7 @@ SCENARIO("conjured article with sellin of 0 is updated")
         int const quality = 7;
         int const sellIn = 0;
         std::string const name = "conjured article";
-        std::unique_ptr<Item> c = std::make_unique<Conjured>(name, sellIn, quality);
+        ItemValue c = Conjured(name, sellIn, quality);
         WHEN("it is updated")
         {
             c->update();
@@ -699,7 +707,7 @@ SCENARIO("conjured article with min quality is updated")
     {
         int const sellIn = 0;
         std::string const name = "conjured article";
-        std::unique_ptr<Item> c = std::make_unique<Conjured>(name, sellIn, Quality::min());
+        ItemValue c = Conjured(name, sellIn, Quality::min());
         WHEN("it is updated")
         {
             c->update();

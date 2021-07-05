@@ -9,13 +9,11 @@ class Quality
     {
         return 50;
     }
-
     static int min()
     {
         return 0;
     }
 };
-
 class Article
 {
   public:
@@ -26,19 +24,16 @@ class Article
     std::string name;
     int sellIn;
     int quality;
-
     friend bool operator==(const Article& a, const Article& b);
     friend bool operator!=(const Article& a, const Article& b);
     friend std::ostream& operator<<(std::ostream& o, const Article& a);
 };
-
 Article::Article(std::string name, int sellIn, int quality)
     : name{name}
     , sellIn{sellIn}
     , quality{quality}
 {
 }
-
 void Article::update()
 {
     if (sellIn > 0)
@@ -55,23 +50,19 @@ void Article::update()
     }
     --sellIn;
 }
-
 bool operator==(const Article& a, const Article& b)
 {
     return (a.sellIn == b.sellIn) && (a.quality == b.quality) && (a.name == b.name);
 }
-
 bool operator!=(const Article& a, const Article& b)
 {
     return !(a == b);
 }
-
 std::ostream& operator<<(std::ostream& o, const Article& a)
 {
     o << a.name << ", " << a.sellIn << ", " << a.quality;
     return o;
 }
-
 class AgedBrie
 {
   public:
@@ -80,17 +71,14 @@ class AgedBrie
 
   private:
     int quality;
-
     friend bool operator==(const AgedBrie& a, const AgedBrie& b);
     friend bool operator!=(const AgedBrie& a, const AgedBrie& b);
     friend std::ostream& operator<<(std::ostream& o, const AgedBrie& a);
 };
-
 AgedBrie::AgedBrie(int quality)
     : quality{quality}
 {
 }
-
 void AgedBrie::update()
 {
     if (quality < Quality::max())
@@ -98,23 +86,19 @@ void AgedBrie::update()
         ++quality;
     }
 }
-
 bool operator==(const AgedBrie& a, const AgedBrie& b)
 {
     return a.quality == b.quality;
 }
-
 bool operator!=(const AgedBrie& a, const AgedBrie& b)
 {
     return !(a == b);
 }
-
 std::ostream& operator<<(std::ostream& o, const AgedBrie& a)
 {
     o << "Aged Brie, " << a.quality;
     return o;
 }
-
 class BackstagePass
 {
   public:
@@ -125,19 +109,16 @@ class BackstagePass
     std::string concert;
     int sellIn;
     int quality;
-
     friend bool operator==(const BackstagePass& a, const BackstagePass& b);
     friend bool operator!=(const BackstagePass& a, const BackstagePass& b);
     friend std::ostream& operator<<(std::ostream& o, const BackstagePass& b);
 };
-
 BackstagePass::BackstagePass(std::string concert, int sellIn, int quality)
     : concert{concert}
     , sellIn{sellIn}
     , quality{quality}
 {
 }
-
 void BackstagePass::update()
 {
     if (sellIn <= 0)
@@ -162,35 +143,29 @@ void BackstagePass::update()
     }
     --sellIn;
 }
-
 bool operator==(const BackstagePass& a, const BackstagePass& b)
 {
     return (a.quality == b.quality) && (a.sellIn == b.sellIn) && (a.concert == b.concert);
 }
-
 bool operator!=(const BackstagePass& a, const BackstagePass& b)
 {
     return !(a == b);
 }
-
 std::ostream& operator<<(std::ostream& o, const BackstagePass& b)
 {
     o << "Backstage pass for " << b.concert << ", " << b.sellIn << ", " << b.quality;
     return o;
 }
-
 class Sulfuras
 {
   private:
     friend std::ostream& operator<<(std::ostream& o, const Sulfuras& s);
 };
-
 std::ostream& operator<<(std::ostream& o, const Sulfuras& s)
 {
     o << "Sulfuras";
     return o;
 }
-
 class Conjured
 {
   public:
@@ -201,19 +176,16 @@ class Conjured
     std::string name;
     int sellIn;
     int quality;
-
     friend bool operator==(const Conjured& a, const Conjured& b);
     friend bool operator!=(const Conjured& a, const Conjured& b);
     friend std::ostream& operator<<(std::ostream& o, const Conjured& a);
 };
-
 Conjured::Conjured(std::string name, int sellIn, int quality)
     : name{name}
     , sellIn{sellIn}
     , quality{quality}
 {
 }
-
 void Conjured::update()
 {
     if (sellIn > 0)
@@ -230,51 +202,74 @@ void Conjured::update()
     }
     --sellIn;
 }
-
 bool operator==(const Conjured& a, const Conjured& b)
 {
     return (a.sellIn == b.sellIn) && (a.quality == b.quality) && (a.name == b.name);
 }
-
 bool operator!=(const Conjured& a, const Conjured& b)
 {
     return !(a == b);
 }
-
 std::ostream& operator<<(std::ostream& o, const Conjured& a)
 {
     o << "Conjured " << a.name << ", " << a.sellIn << ", " << a.quality;
     return o;
 }
-
 class GildedRose
 {
   public:
     void update();
-
+    // TODO: void add(???);
   private:
-    // Articles articles;
-
+    // TODO: Articles articles;
     friend std::ostream& operator<<(std::ostream& o, const GildedRose& g);
 };
-
 void GildedRose::update()
 {
-    // update all articles
+    // TODO: update all articles
 }
-
+/* TODO
+void GildedRose::add(???)
+{
+}
+*/
 std::ostream& operator<<(std::ostream& o, const GildedRose& g)
 {
     o << "name, sellIn, quality\n";
-    // stream all articles
-
+    // TODO: put all articles into stream
     return o;
 }
-
 #define DOCTEST_CONFIG_IMPLEMENT
 #define DOCTEST_CONFIG_COLORS_NONE
 #include <doctest.h>
-
+int main(int argc, const char** argv)
+{
+    doctest::Context context{};
+    context.applyCommandLine(argc, argv);
+    const int res{context.run()};
+    if (context.shouldExit() || res != 0)
+        return res;
+    Article a{"+5 Dexterity Vest", 10, 20};
+    AgedBrie b{0};
+    Article c{"Elixir of the Mongoose", 5, 7};
+    Sulfuras d{};
+    Sulfuras e{};
+    BackstagePass f{"TAFKAL80ETC concert", 15, 20};
+    BackstagePass g{"TAFKAL80ETC concert", 10, 49};
+    BackstagePass h{"TAFKAL80ETC concert", 5, 49};
+    Conjured i{"Sword of Gold", 5, 21};
+    GildedRose store{};
+    // TODO: add items to store here
+    // store.add(???);
+    std::cout << "GildedRose\n";
+    for (int day{0}; day <= 30; ++day)
+    {
+        std::cout << "-------- day " << day << " --------\n";
+        store.update();
+        std::cout << store << "\n\n";
+    }
+    return 0;
+}
 SCENARIO("article with positive sellin is updated")
 {
     GIVEN("an article with positive sellin")
@@ -293,7 +288,6 @@ SCENARIO("article with positive sellin is updated")
         }
     }
 }
-
 SCENARIO("article with sellin of 0 is updated")
 {
     GIVEN("an aritcle with a sellin value of 0")
@@ -312,7 +306,6 @@ SCENARIO("article with sellin of 0 is updated")
         }
     }
 }
-
 SCENARIO("article with min quality is updated")
 {
     GIVEN("an article with min quality")
@@ -330,7 +323,6 @@ SCENARIO("article with min quality is updated")
         }
     }
 }
-
 SCENARIO("aged brie is updated")
 {
     GIVEN("an aged brie")
@@ -347,7 +339,6 @@ SCENARIO("aged brie is updated")
         }
     }
 }
-
 SCENARIO("aged brie with max quality is updated")
 {
     GIVEN("an aged brie with max quality")
@@ -363,7 +354,6 @@ SCENARIO("aged brie with max quality is updated")
         }
     }
 }
-
 SCENARIO("backstage pass with sellin over 10 is updated")
 {
     GIVEN("a backstage pass with sellin over 10")
@@ -382,7 +372,6 @@ SCENARIO("backstage pass with sellin over 10 is updated")
         }
     }
 }
-
 SCENARIO("backstage pass with sellin over 10 and max quality is updated")
 {
     GIVEN("a backstage pass with sellin over 10 and max quality")
@@ -400,7 +389,6 @@ SCENARIO("backstage pass with sellin over 10 and max quality is updated")
         }
     }
 }
-
 SCENARIO("backstage pass with sellin of 10 is updated")
 {
     GIVEN("a backstage with sellin of 10")
@@ -419,7 +407,6 @@ SCENARIO("backstage pass with sellin of 10 is updated")
         }
     }
 }
-
 SCENARIO("backstage pass with sellin of 10 and quality 1 under max is updated")
 {
     GIVEN("a backstage pass with sellin of 10 and quality 1 under max")
@@ -456,7 +443,6 @@ SCENARIO("backstage pass with sellin of 5 is updated")
         }
     }
 }
-
 SCENARIO("backstage pass with sellin of 5 and quality 1 under max is updated")
 {
     GIVEN("a backstage pass with sellin of 5 and quality 1 under max")
@@ -475,7 +461,6 @@ SCENARIO("backstage pass with sellin of 5 and quality 1 under max is updated")
         }
     }
 }
-
 SCENARIO("backstage pass for a passed concert is updated")
 {
     GIVEN("a backstage pass with sellin of 0")
@@ -494,7 +479,6 @@ SCENARIO("backstage pass for a passed concert is updated")
         }
     }
 }
-
 SCENARIO("sulfuras is updated")
 {
     GIVEN("sulfuras")
@@ -508,7 +492,6 @@ SCENARIO("sulfuras is updated")
         }
     }
 }
-
 SCENARIO("conjured article with positive sellin is updated")
 {
     GIVEN("a conjured article with positive sellin")
@@ -527,7 +510,6 @@ SCENARIO("conjured article with positive sellin is updated")
         }
     }
 }
-
 SCENARIO("conjured article with sellin of 0 is updated")
 {
     GIVEN("a conjured aritcle with a sellin value of 0")
@@ -546,7 +528,6 @@ SCENARIO("conjured article with sellin of 0 is updated")
         }
     }
 }
-
 SCENARIO("conjured article with min quality is updated")
 {
     GIVEN("a conjured article with min quality")
@@ -563,34 +544,4 @@ SCENARIO("conjured article with min quality is updated")
             }
         }
     }
-}
-
-int main(int argc, const char** argv)
-{
-    doctest::Context context{};
-    context.applyCommandLine(argc, argv);
-    const int res{context.run()};
-    if (context.shouldExit() || res != 0)
-        return res;
-
-    Article a{"+5 Dexterity Vest", 10, 20};
-    AgedBrie b{0};
-    Article c{"Elixir of the Mongoose", 5, 7};
-    Sulfuras d{};
-    Sulfuras e{};
-    BackstagePass f{"TAFKAL80ETC concert", 15, 20};
-    BackstagePass g{"TAFKAL80ETC concert", 10, 49};
-    BackstagePass h{"TAFKAL80ETC concert", 5, 49};
-    Conjured i{"Sword of Gold", 5, 21};
-
-    GildedRose store{};
-    std::cout << "GildedRose\n";
-    for (int day{0}; day <= 30; ++day)
-    {
-        std::cout << "-------- day " << day << " --------\n";
-        store.update();
-        std::cout << store << "\n\n";
-    }
-
-    return 0;
 }
