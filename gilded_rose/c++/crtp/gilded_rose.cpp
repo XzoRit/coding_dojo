@@ -1,6 +1,11 @@
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/for_each.hpp>
+#include <boost/hana.hpp>
+#include <boost/mp11/tuple.hpp>
 #include <iostream>
 #include <ostream>
 #include <string>
+#include <tuple>
 
 class Quality
 {
@@ -9,14 +14,29 @@ class Quality
     {
         return 50;
     }
-
     static int min()
     {
         return 0;
     }
 };
-
-class Article
+template <class It>
+class Item
+{
+  public:
+    void update();
+};
+template <class It>
+void Item<It>::update()
+{
+    It& self = *static_cast<It*>(this);
+    self.update();
+}
+template <class It>
+void updateItem(Item<It>& item)
+{
+    item.update();
+}
+class Article : public Item<Article>
 {
   public:
     Article(std::string name, int sellIn, int quality);
@@ -26,19 +46,16 @@ class Article
     std::string name;
     int sellIn;
     int quality;
-
     friend bool operator==(const Article& a, const Article& b);
     friend bool operator!=(const Article& a, const Article& b);
     friend std::ostream& operator<<(std::ostream& o, const Article& a);
 };
-
 Article::Article(std::string name, int sellIn, int quality)
     : name{name}
     , sellIn{sellIn}
     , quality{quality}
 {
 }
-
 void Article::update()
 {
     if (sellIn > 0)
@@ -55,24 +72,20 @@ void Article::update()
     }
     --sellIn;
 }
-
 bool operator==(const Article& a, const Article& b)
 {
     return (a.sellIn == b.sellIn) && (a.quality == b.quality) && (a.name == b.name);
 }
-
 bool operator!=(const Article& a, const Article& b)
 {
     return !(a == b);
 }
-
 std::ostream& operator<<(std::ostream& o, const Article& a)
 {
     o << a.name << ", " << a.sellIn << ", " << a.quality;
     return o;
 }
-
-class AgedBrie
+class AgedBrie : public Item<AgedBrie>
 {
   public:
     AgedBrie(int quality);
@@ -80,17 +93,14 @@ class AgedBrie
 
   private:
     int quality;
-
     friend bool operator==(const AgedBrie& a, const AgedBrie& b);
     friend bool operator!=(const AgedBrie& a, const AgedBrie& b);
     friend std::ostream& operator<<(std::ostream& o, const AgedBrie& a);
 };
-
 AgedBrie::AgedBrie(int quality)
     : quality{quality}
 {
 }
-
 void AgedBrie::update()
 {
     if (quality < Quality::max())
@@ -98,24 +108,20 @@ void AgedBrie::update()
         ++quality;
     }
 }
-
 bool operator==(const AgedBrie& a, const AgedBrie& b)
 {
     return a.quality == b.quality;
 }
-
 bool operator!=(const AgedBrie& a, const AgedBrie& b)
 {
     return !(a == b);
 }
-
 std::ostream& operator<<(std::ostream& o, const AgedBrie& a)
 {
     o << "Aged Brie, " << a.quality;
     return o;
 }
-
-class BackstagePass
+class BackstagePass : public Item<BackstagePass>
 {
   public:
     BackstagePass(std::string concert, int sellIn, int quality);
@@ -125,19 +131,16 @@ class BackstagePass
     std::string concert;
     int sellIn;
     int quality;
-
     friend bool operator==(const BackstagePass& a, const BackstagePass& b);
     friend bool operator!=(const BackstagePass& a, const BackstagePass& b);
     friend std::ostream& operator<<(std::ostream& o, const BackstagePass& b);
 };
-
 BackstagePass::BackstagePass(std::string concert, int sellIn, int quality)
     : concert{concert}
     , sellIn{sellIn}
     , quality{quality}
 {
 }
-
 void BackstagePass::update()
 {
     if (sellIn <= 0)
@@ -162,36 +165,36 @@ void BackstagePass::update()
     }
     --sellIn;
 }
-
 bool operator==(const BackstagePass& a, const BackstagePass& b)
 {
     return (a.quality == b.quality) && (a.sellIn == b.sellIn) && (a.concert == b.concert);
 }
-
 bool operator!=(const BackstagePass& a, const BackstagePass& b)
 {
     return !(a == b);
 }
-
 std::ostream& operator<<(std::ostream& o, const BackstagePass& b)
 {
     o << "Backstage pass for " << b.concert << ", " << b.sellIn << ", " << b.quality;
     return o;
 }
-
-class Sulfuras
+class Sulfuras : public Item<Sulfuras>
 {
+  public:
+    void update();
+
   private:
     friend std::ostream& operator<<(std::ostream& o, const Sulfuras& s);
 };
-
+void Sulfuras::update()
+{
+}
 std::ostream& operator<<(std::ostream& o, const Sulfuras& s)
 {
     o << "Sulfuras";
     return o;
 }
-
-class Conjured
+class Conjured : public Item<Conjured>
 {
   public:
     Conjured(std::string name, int sellIn, int quality);
@@ -201,19 +204,16 @@ class Conjured
     std::string name;
     int sellIn;
     int quality;
-
     friend bool operator==(const Conjured& a, const Conjured& b);
     friend bool operator!=(const Conjured& a, const Conjured& b);
     friend std::ostream& operator<<(std::ostream& o, const Conjured& a);
 };
-
 Conjured::Conjured(std::string name, int sellIn, int quality)
     : name{name}
     , sellIn{sellIn}
     , quality{quality}
 {
 }
-
 void Conjured::update()
 {
     if (sellIn > 0)
@@ -230,54 +230,111 @@ void Conjured::update()
     }
     --sellIn;
 }
-
 bool operator==(const Conjured& a, const Conjured& b)
 {
     return (a.sellIn == b.sellIn) && (a.quality == b.quality) && (a.name == b.name);
 }
-
 bool operator!=(const Conjured& a, const Conjured& b)
 {
     return !(a == b);
 }
-
 std::ostream& operator<<(std::ostream& o, const Conjured& a)
 {
     o << "Conjured " << a.name << ", " << a.sellIn << ", " << a.quality;
     return o;
 }
-
-class GildedRose
+#define V2
+#if defined(V1)
+#define NS_V1 inline namespace v1
+#else
+#define NS_V1 namespace v1
+#endif
+#if defined(V2)
+#define NS_V2 inline namespace v2
+#else
+#define NS_V2 namespace v2
+#endif
+NS_V1
 {
-  public:
-    void update();
-    // TODO: void add(???);
+    using Articles = std::
+        tuple<Article, AgedBrie, Article, Sulfuras, Sulfuras, BackstagePass, BackstagePass, BackstagePass, Conjured>;
+    class GildedRose
+    {
+      public:
+        void update();
 
-  private:
-    // TODO: Articles articles;
-
-    friend std::ostream& operator<<(std::ostream& o, const GildedRose& g);
-};
-
-void GildedRose::update()
-{
-    // TODO: update all articles
+      private:
+        Articles articles = std::make_tuple(Article{"+5 Dexterity Vest", 10, 20},
+                                            AgedBrie{0},
+                                            Article{"Elixir of the Mongoose", 5, 7},
+                                            Sulfuras{},
+                                            Sulfuras{},
+                                            BackstagePass{"TAFKAL80ETC concert", 15, 20},
+                                            BackstagePass{"TAFKAL80ETC concert", 10, 49},
+                                            BackstagePass{"TAFKAL80ETC concert", 5, 49},
+                                            Conjured{"Sword of Gold", 5, 21});
+        friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
+    };
+    void GildedRose::update()
+    {
+        ::boost::mp11::tuple_for_each(articles, [](auto& item) { updateItem(item); });
+    }
+    std::ostream& operator<<(std::ostream& o, GildedRose const& g)
+    {
+        o << "name, sellIn, quality\n";
+        ::boost::mp11::tuple_for_each(g.articles, [&](const auto& item) { o << item << '\n'; });
+        return o;
+    }
 }
-/* TODO
-void GildedRose::add(???)
+NS_V2
 {
+    struct Articles
+    {
+        Article a{"+5 Dexterity Vest", 10, 20};
+        AgedBrie b{0};
+        Article c{"Elixir of the Mongoose", 5, 7};
+        Sulfuras d{};
+        Sulfuras e{};
+        BackstagePass f{"TAFKAL80ETC concert", 15, 20};
+        BackstagePass g{"TAFKAL80ETC concert", 10, 49};
+        BackstagePass h{"TAFKAL80ETC concert", 5, 49};
+        Conjured i{"Sword of Gold", 5, 21};
+    };
 }
-*/
-std::ostream& operator<<(std::ostream& o, const GildedRose& g)
+BOOST_HANA_ADAPT_STRUCT(v2::Articles, a, b, c, d, e, f, g, h, i);
+BOOST_FUSION_ADAPT_STRUCT(v2::Articles, a, b, c, d, e, f, g, h, i);
+NS_V2
 {
-    o << "name, sellIn, quality\n";
-    // TODO: put all articles into stream
+    class GildedRose
+    {
+      public:
+        void update();
 
-    return o;
+      private:
+        Articles articles;
+        friend std::ostream& operator<<(std::ostream& o, GildedRose const& g);
+    };
+    void GildedRose::update()
+    {
+        ::boost::hana::for_each(::boost::hana::members(articles), [](auto&& item) { updateItem(item); });
+        // ::boost::fusion::for_each(articles,
+        //                           [](auto&& item) { updateItem(item); });
+    }
+    std::ostream& operator<<(std::ostream& o, GildedRose const& g)
+    {
+        o << "name, sellIn, quality\n";
+        ::boost::hana::for_each(::boost::hana::members(g.articles), [&](const auto& item) { o << item << '\n'; });
+        // ::boost::fusion::for_each(g.articles,
+        //                           [&](const auto& item) { o << item <<
+        '\n';
+        //                           });
+        return o;
+    }
 }
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #define DOCTEST_CONFIG_COLORS_NONE
+// #define DOCTEST_CONFIG_DISABLE
 #include <doctest.h>
 
 int main(int argc, const char** argv)
@@ -287,20 +344,7 @@ int main(int argc, const char** argv)
     const int res{context.run()};
     if (context.shouldExit() || res != 0)
         return res;
-
-    Article a{"+5 Dexterity Vest", 10, 20};
-    AgedBrie b{0};
-    Article c{"Elixir of the Mongoose", 5, 7};
-    Sulfuras d{};
-    Sulfuras e{};
-    BackstagePass f{"TAFKAL80ETC concert", 15, 20};
-    BackstagePass g{"TAFKAL80ETC concert", 10, 49};
-    BackstagePass h{"TAFKAL80ETC concert", 5, 49};
-    Conjured i{"Sword of Gold", 5, 21};
-
     GildedRose store{};
-    // TODO: add items to store here
-    // store.add(???);
     std::cout << "GildedRose\n";
     for (int day{0}; day <= 30; ++day)
     {
@@ -308,7 +352,6 @@ int main(int argc, const char** argv)
         store.update();
         std::cout << store << "\n\n";
     }
-
     return 0;
 }
 
@@ -438,7 +481,7 @@ SCENARIO("backstage pass with sellin over 10 and max quality is updated")
     }
 }
 
-SCENARIO("backstage pass with sellin of 10 is updated")
+ SCENARIO("backstage pass with sellin of 10 is updated")
 {
     GIVEN("a backstage with sellin of 10")
     {
@@ -475,6 +518,7 @@ SCENARIO("backstage pass with sellin of 10 and quality 1 under max is updated")
         }
     }
 }
+
 SCENARIO("backstage pass with sellin of 5 is updated")
 {
     GIVEN("a backstage with sellin of 5")
