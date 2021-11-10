@@ -1,3 +1,5 @@
+// https://godbolt.org/z/zdTzK91Pr
+
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/hana.hpp>
@@ -325,8 +327,7 @@ NS_V2
         o << "name, sellIn, quality\n";
         ::boost::hana::for_each(::boost::hana::members(g.articles), [&](const auto& item) { o << item << '\n'; });
         // ::boost::fusion::for_each(g.articles,
-        //                           [&](const auto& item) { o << item <<
-        '\n';
+        //                           [&](const auto& item) { o << item << '\n';
         //                           });
         return o;
     }
@@ -334,16 +335,11 @@ NS_V2
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #define DOCTEST_CONFIG_COLORS_NONE
-// #define DOCTEST_CONFIG_DISABLE
+#define DOCTEST_CONFIG_DISABLE
 #include <doctest.h>
 
 int main(int argc, const char** argv)
 {
-    doctest::Context context{};
-    context.applyCommandLine(argc, argv);
-    const int res{context.run()};
-    if (context.shouldExit() || res != 0)
-        return res;
     GildedRose store{};
     std::cout << "GildedRose\n";
     for (int day{0}; day <= 30; ++day)
@@ -352,6 +348,13 @@ int main(int argc, const char** argv)
         store.update();
         std::cout << store << "\n\n";
     }
+
+    doctest::Context context{};
+    context.applyCommandLine(argc, argv);
+    const int res{context.run()};
+    if (context.shouldExit() || res != 0)
+        return res;
+
     return 0;
 }
 
@@ -481,7 +484,7 @@ SCENARIO("backstage pass with sellin over 10 and max quality is updated")
     }
 }
 
- SCENARIO("backstage pass with sellin of 10 is updated")
+SCENARIO("backstage pass with sellin of 10 is updated")
 {
     GIVEN("a backstage with sellin of 10")
     {

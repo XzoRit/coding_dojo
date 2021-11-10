@@ -1,3 +1,5 @@
+// https://godbolt.org/z/vhjPP7G74
+
 #include <algorithm>
 #include <any>
 #include <iostream>
@@ -352,17 +354,11 @@ std::ostream& operator<<(std::ostream& o, const GildedRose& g)
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #define DOCTEST_CONFIG_COLORS_NONE
-//#define DOCTEST_CONFIG_DISABLE
+#define DOCTEST_CONFIG_DISABLE
 #include <doctest.h>
 
 int main(int argc, const char** argv)
 {
-    doctest::Context context{};
-    context.applyCommandLine(argc, argv);
-    const int res{context.run()};
-    if (context.shouldExit() || res != 0)
-        return res;
-
     GildedRose store{};
     store.add(Article("+5 Dexterity Vest", 10, 20));
     store.add(AgedBrie(0));
@@ -381,6 +377,12 @@ int main(int argc, const char** argv)
         store.update();
         std::cout << store << "\n\n";
     }
+
+    doctest::Context context{};
+    context.applyCommandLine(argc, argv);
+    const int res{context.run()};
+    if (context.shouldExit() || res != 0)
+        return res;
 
     return 0;
 }

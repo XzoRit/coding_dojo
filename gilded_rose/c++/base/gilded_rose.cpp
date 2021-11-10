@@ -1,3 +1,5 @@
+// https://godbolt.org/z/YxThGEs67
+
 #include <iostream>
 #include <ostream>
 #include <string>

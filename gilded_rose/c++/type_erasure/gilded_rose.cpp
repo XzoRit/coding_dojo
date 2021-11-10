@@ -1,3 +1,5 @@
+// https://godbolt.org/z/aqz3Tvs4e
+
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -6,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#define V2
+#define V1
 
 #if defined(V1)
 #define NS_V1 inline namespace v1
@@ -169,19 +171,23 @@ NS_V2
         }
 
         Item(Item&& rhs) noexcept
+            : Item{}
         {
             this->swap(rhs);
         }
 
         ~Item()
         {
-            delete_(repr_);
-            repr_ = nullptr;
-            delete_ = nullptr;
-            clone_ = nullptr;
-            update_ = nullptr;
-            stream_ = nullptr;
-            equals_ = nullptr;
+            if (repr_)
+            {
+                delete_(repr_);
+                repr_ = nullptr;
+                delete_ = nullptr;
+                clone_ = nullptr;
+                update_ = nullptr;
+                stream_ = nullptr;
+                equals_ = nullptr;
+            }
         }
 
         Item& operator=(Item rhs) noexcept
@@ -211,6 +217,7 @@ NS_V2
         friend std::ostream& operator<<(std::ostream& o, const Item& it);
 
       private:
+        Item() = default;
         void* repr_{nullptr};
         void (*delete_)(void*){nullptr};
         void* (*clone_)(void*){nullptr};
@@ -525,17 +532,11 @@ std::ostream& operator<<(std::ostream& o, const GildedRose& g)
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #define DOCTEST_CONFIG_COLORS_NONE
-//#define DOCTEST_CONFIG_DISABLE
+// #define DOCTEST_CONFIG_DISABLE
 #include <doctest.h>
 
 int main(int argc, const char** argv)
 {
-    doctest::Context context{};
-    context.applyCommandLine(argc, argv);
-    const int res{context.run()};
-    if (context.shouldExit() || res != 0)
-        return res;
-
     GildedRose store{};
     store.add(Article{"+5 Dexterity Vest", 10, 20});
     store.add(AgedBrie{0});
@@ -554,6 +555,13 @@ int main(int argc, const char** argv)
         store.update();
         std::cout << store << "\n\n";
     }
+
+    doctest::Context context{};
+    context.applyCommandLine(argc, argv);
+    const int res{context.run()};
+
+    if (context.shouldExit() || res != 0)
+        return res;
 
     return 0;
 }

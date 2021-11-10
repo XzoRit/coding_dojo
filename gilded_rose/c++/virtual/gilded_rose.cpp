@@ -1,3 +1,5 @@
+// https://godbolt.org/z/1K5MrnTY5
+
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -23,11 +25,13 @@ class Quality
 class Item
 {
   public:
+    virtual ~Item() = default;
+
     virtual void update() = 0;
+    virtual void stream(std::ostream& o) const = 0;
+
     virtual std::unique_ptr<Item> clone() = 0;
     virtual bool equals(const Item& i) const = 0;
-    virtual void stream(std::ostream& o) const = 0;
-    virtual ~Item() = default;
 };
 
 bool operator==(const Item& a, const Item& b);
@@ -345,16 +349,11 @@ std::ostream& operator<<(std::ostream& o, const GildedRose& g)
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #define DOCTEST_CONFIG_COLORS_NONE
+// #define DOCTEST_CONFIG_DISABLE
 #include <doctest.h>
 
 int main(int argc, const char** argv)
 {
-    doctest::Context context{};
-    context.applyCommandLine(argc, argv);
-    const int res{context.run()};
-    if (context.shouldExit() || res != 0)
-        return res;
-
     GildedRose store{};
     store.add(std::make_unique<Article>("+5 Dexterity Vest", 10, 20));
     store.add(std::make_unique<AgedBrie>(0));
@@ -373,6 +372,13 @@ int main(int argc, const char** argv)
         store.update();
         std::cout << store << "\n\n";
     }
+
+    doctest::Context context{};
+    context.applyCommandLine(argc, argv);
+    const int res{context.run()};
+
+    if (context.shouldExit() || res != 0)
+        return res;
 
     return 0;
 }
